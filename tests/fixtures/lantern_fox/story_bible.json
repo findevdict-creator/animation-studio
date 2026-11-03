@@ -1,0 +1,73 @@
+{
+  "schema_version": "2.0",
+  "title": "The Lantern Fox",
+  "logline": "A girl follows a glowing fox into the woods.",
+  "synopsis": "Mia sees a glowing fox at dusk and follows it to a clearing.",
+  "genre": [],
+  "tone": [],
+  "themes": [],
+  "setting": {
+    "era": "",
+    "world": ""
+  },
+  "cast_index": [
+    {
+      "id": "char_mia",
+      "name": "Mia",
+      "aliases": [],
+      "role": "protagonist"
+    },
+    {
+      "id": "char_fox",
+      "name": "The fox",
+      "aliases": [
+        "the glow"
+      ],
+      "role": "supporting"
+    }
+  ],
+  "location_index": [
+    {
+      "id": "loc_forest_clearing",
+      "name": "Forest clearing"
+    }
+  ],
+  "beats": [
+    {
+      "id": "beat_001",
+      "order": 1,
+      "summary": "Mia sees the fox.",
+      "source_text": "",
+      "story_function": "setup",
+      "location_id": "loc_forest_clearing",
+      "time_of_day": "dusk",
+      "character_ids": [
+        "char_mia",
+        "char_fox"
+      ],
+      "emotional_tone": "",
+      "dialogue": [
+        {
+          "speaker_id": "char_mia",
+          "text": "Who's there?",
+          "source": "verbatim"
+        }
+      ]
+    },
+    {
+      "id": "beat_002",
+      "order": 2,
+      "summary": "The fox sits and waits.",
+      "source_text": "",
+      "story_function": "inciting_incident",
+      "location_id": "loc_forest_clearing",
+      "time_of_day": "dusk",
+      "character_ids": [
+        "char_mia",
+        "char_fox"
+      ],
+      "emotional_tone": "",
+      "dialogue": []
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "target_duration_sec": 30,
+  "library_manifest_path": "tests/fixtures/lantern_fox/manifest.json",
+  "human_approval": {
+    "mode": "none"
+  }
+}

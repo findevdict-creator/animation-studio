@@ -1,0 +1,382 @@
+{
+  "schema_version": "2.0",
+  "fps": 24,
+  "shots": [
+    {
+      "shot_id": "sh_01_01",
+      "scene_id": "sc_01",
+      "frame_start": 1,
+      "frame_end": 240,
+      "environment": {
+        "library_id": "lib_env_forest_a",
+        "time_variant": "dusk"
+      },
+      "camera": {
+        "rig": "static",
+        "sensor_mm": 36.0,
+        "keyframes": [
+          {
+            "frame": 1,
+            "position_m": [
+              -4.0,
+              -30.0,
+              6.0
+            ],
+            "look_at_m": [
+              0.0,
+              0.0,
+              0.8
+            ],
+            "focal_mm": 35.0,
+            "roll_deg": 0.0
+          }
+        ],
+        "interpolation": "ease_in_out",
+        "depth_of_field": null
+      },
+      "characters": [
+        {
+          "character_id": "char_mia",
+          "library_id": "lib_char_girl_a",
+          "outfit_id": "out_mia_default",
+          "path": [
+            {
+              "frame": 1,
+              "position_m": [
+                -8.0,
+                -12.0,
+                0.0
+              ],
+              "facing_deg": 35.0
+            },
+            {
+              "frame": 200,
+              "position_m": [
+                -0.6,
+                -0.8,
+                0.0
+              ],
+              "facing_deg": 10.0
+            }
+          ],
+          "clips": [
+            {
+              "clip_id": "clip_walk_cautious",
+              "frame_start": 1,
+              "frame_end": 200,
+              "blend_frames": 6,
+              "speed": 1.0
+            },
+            {
+              "clip_id": "clip_raise_arm_r",
+              "frame_start": 201,
+              "frame_end": 218,
+              "blend_frames": 6,
+              "speed": 1.0
+            }
+          ],
+          "expression_keys": [
+            {
+              "frame": 1,
+              "expression": "neutral"
+            },
+            {
+              "frame": 150,
+              "expression": "curious"
+            }
+          ],
+          "look_at": [],
+          "attachments": [
+            {
+              "prop_id": "prop_lantern",
+              "bone": "hand.R",
+              "from_frame": 1,
+              "to_frame": null
+            }
+          ]
+        },
+        {
+          "character_id": "char_fox",
+          "library_id": "lib_char_fox_a",
+          "outfit_id": "out_fox_default",
+          "path": [
+            {
+              "frame": 1,
+              "position_m": [
+                6.0,
+                4.0,
+                0.0
+              ],
+              "facing_deg": 200.0
+            }
+          ],
+          "clips": [
+            {
+              "clip_id": "clip_fox_sit",
+              "frame_start": 1,
+              "frame_end": 240,
+              "blend_frames": 0,
+              "speed": 1.0
+            }
+          ],
+          "expression_keys": [],
+          "look_at": [],
+          "attachments": []
+        }
+      ],
+      "props": [
+        {
+          "prop_id": "prop_lantern",
+          "library_id": "lib_prop_lantern",
+          "placement": "attached",
+          "keyframes": []
+        }
+      ],
+      "lights": [
+        {
+          "id": "key",
+          "type": "sun",
+          "position_m": null,
+          "rotation_deg": [
+            45.0,
+            0.0,
+            30.0
+          ],
+          "parent_prop_id": null,
+          "color": "#BFD4FF",
+          "energy": 3.0,
+          "preset": null
+        }
+      ],
+      "dialogue_timing": [
+        {
+          "line_id": "ln_01_01_01",
+          "speaker_id": "char_mia",
+          "frame_start": 145,
+          "frame_end": 175
+        }
+      ],
+      "transition_in": "cut",
+      "transition_out": "cut",
+      "clip_gaps": []
+    },
+    {
+      "shot_id": "sh_01_02",
+      "scene_id": "sc_01",
+      "frame_start": 241,
+      "frame_end": 360,
+      "environment": {
+        "library_id": "lib_env_forest_a",
+        "time_variant": "dusk"
+      },
+      "camera": {
+        "rig": "static",
+        "sensor_mm": 36.0,
+        "keyframes": [
+          {
+            "frame": 241,
+            "position_m": [
+              6.0,
+              1.0,
+              0.5
+            ],
+            "look_at_m": [
+              6.0,
+              4.0,
+              0.3
+            ],
+            "focal_mm": 35.0,
+            "roll_deg": 0.0
+          }
+        ],
+        "interpolation": "ease_in_out",
+        "depth_of_field": null
+      },
+      "characters": [
+        {
+          "character_id": "char_fox",
+          "library_id": "lib_char_fox_a",
+          "outfit_id": "out_fox_default",
+          "path": [
+            {
+              "frame": 241,
+              "position_m": [
+                6.0,
+                4.0,
+                0.0
+              ],
+              "facing_deg": 0.0
+            }
+          ],
+          "clips": [
+            {
+              "clip_id": "clip_fox_sit",
+              "frame_start": 241,
+              "frame_end": 360,
+              "blend_frames": 0,
+              "speed": 1.0
+            }
+          ],
+          "expression_keys": [],
+          "look_at": [],
+          "attachments": []
+        }
+      ],
+      "props": [
+        {
+          "prop_id": "prop_lantern",
+          "library_id": "lib_prop_lantern",
+          "placement": "attached",
+          "keyframes": []
+        }
+      ],
+      "lights": [
+        {
+          "id": "key",
+          "type": "sun",
+          "position_m": null,
+          "rotation_deg": [
+            45.0,
+            0.0,
+            30.0
+          ],
+          "parent_prop_id": null,
+          "color": "#BFD4FF",
+          "energy": 3.0,
+          "preset": null
+        }
+      ],
+      "dialogue_timing": [],
+      "transition_in": "cut",
+      "transition_out": "cut",
+      "clip_gaps": []
+    },
+    {
+      "shot_id": "sh_02_01",
+      "scene_id": "sc_02",
+      "frame_start": 1,
+      "frame_end": 360,
+      "environment": {
+        "library_id": "lib_env_forest_a",
+        "time_variant": "dusk"
+      },
+      "camera": {
+        "rig": "static",
+        "sensor_mm": 36.0,
+        "keyframes": [
+          {
+            "frame": 1,
+            "position_m": [
+              3.0,
+              -10.0,
+              1.5
+            ],
+            "look_at_m": [
+              2.0,
+              0.0,
+              0.6
+            ],
+            "focal_mm": 35.0,
+            "roll_deg": 0.0
+          }
+        ],
+        "interpolation": "ease_in_out",
+        "depth_of_field": null
+      },
+      "characters": [
+        {
+          "character_id": "char_mia",
+          "library_id": "lib_char_girl_a",
+          "outfit_id": "out_mia_default",
+          "path": [
+            {
+              "frame": 1,
+              "position_m": [
+                -0.6,
+                -0.8,
+                0.0
+              ],
+              "facing_deg": 0.0
+            }
+          ],
+          "clips": [
+            {
+              "clip_id": "clip_walk_cautious",
+              "frame_start": 1,
+              "frame_end": 360,
+              "blend_frames": 0,
+              "speed": 1.0
+            }
+          ],
+          "expression_keys": [],
+          "look_at": [],
+          "attachments": [
+            {
+              "prop_id": "prop_lantern",
+              "bone": "hand.R",
+              "from_frame": 1,
+              "to_frame": null
+            }
+          ]
+        },
+        {
+          "character_id": "char_fox",
+          "library_id": "lib_char_fox_a",
+          "outfit_id": "out_fox_default",
+          "path": [
+            {
+              "frame": 1,
+              "position_m": [
+                6.0,
+                4.0,
+                0.0
+              ],
+              "facing_deg": 200.0
+            }
+          ],
+          "clips": [
+            {
+              "clip_id": "clip_fox_sit",
+              "frame_start": 1,
+              "frame_end": 360,
+              "blend_frames": 0,
+              "speed": 1.0
+            }
+          ],
+          "expression_keys": [],
+          "look_at": [],
+          "attachments": []
+        }
+      ],
+      "props": [
+        {
+          "prop_id": "prop_lantern",
+          "library_id": "lib_prop_lantern",
+          "placement": "attached",
+          "keyframes": []
+        }
+      ],
+      "lights": [
+        {
+          "id": "key",
+          "type": "sun",
+          "position_m": null,
+          "rotation_deg": [
+            45.0,
+            0.0,
+            30.0
+          ],
+          "parent_prop_id": null,
+          "color": "#BFD4FF",
+          "energy": 3.0,
+          "preset": null
+        }
+      ],
+      "dialogue_timing": [],
+      "transition_in": "cut",
+      "transition_out": "cut",
+      "clip_gaps": []
+    }
+  ],
+  "build_requests": []
+}
