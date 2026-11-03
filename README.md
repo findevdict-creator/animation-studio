@@ -20,6 +20,7 @@ revisited on its branch and merged back into `main`.
 | `06-scene-builder` | `studio/agents/scene_builder.py` | Beats into scenes, locations with anchors, props, build requests |
 | `07-director` | `studio/agents/director.py` | Style guide, then a shot list per scene (parallel, partial retries) |
 | `08-layout-td` | `studio/agents/layout_td.py` | Per-scene staging drafts; code owns frames, environment, library ids |
+| `09-continuity-checker` | `studio/agents/continuity_checker.py` | Reads the whole package for story and continuity problems; routed to owner agents |
 
 ## Setup
 
@@ -27,5 +28,22 @@ revisited on its branch and merged back into `main`.
 pip install -e ".[dev]"
 pytest
 ```
+
+## Running
+
+```
+# dry run with canned agents, no API key needed
+studio run --story tests/fixtures/lantern_fox/story.txt --run-dir runs/demo --agents stub
+
+# the real agents (needs ANTHROPIC_API_KEY; STUDIO_MODEL overrides the default claude-opus-5-5)
+studio run --story story.txt --run-dir runs/film --duration 90 --agents claude
+studio status runs/film
+studio approve runs/film story_analyst      # or: studio revise runs/film story_analyst "notes"
+                                            #     studio edit runs/film story_analyst fixed.json
+# then `studio run ...` again to resume from the gate; human_approval.mode "none" skips the gates
+```
+
+Each agent is one structured-output call (`client.messages.parse` with its Pydantic schema); the
+Director and the Layout TD make one call per scene and only redo the scenes that fail a check.
 
 Design docs: "Animation Studio: Stage 1 Agent Design" and "Asset Build Implementation Plan".

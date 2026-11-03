@@ -1,6 +1,6 @@
-"""LLM agents on the Claude API. Each module exposes one agent class; ``claude_registry`` wires
-them up. Agents not yet implemented fall back to nothing: the coordinator raises a clear
-KeyError when it reaches one, so a partial registry still runs the agents that exist."""
+"""LLM agents on the Claude API. Each module exposes one agent class; ``claude_registry``
+wires up all six. Pass a client to reuse a configured ``anthropic.Anthropic`` (or a fake
+in tests); ``STUDIO_MODEL`` and ``STUDIO_EFFORT`` override the defaults."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from studio.coordinator.agents import AgentRegistry
 
 def claude_registry(client: anthropic.Anthropic | None = None, model: str | None = None) -> AgentRegistry:
     from studio.agents.character_designer import CharacterDesigner
+    from studio.agents.continuity_checker import ContinuityChecker
     from studio.agents.director import Director
     from studio.agents.layout_td import LayoutTD
     from studio.agents.scene_builder import SceneBuilder
@@ -25,4 +26,5 @@ def claude_registry(client: anthropic.Anthropic | None = None, model: str | None
     registry.register(SceneBuilder(**kwargs))
     registry.register(Director(**kwargs))
     registry.register(LayoutTD(**kwargs))
+    registry.register(ContinuityChecker(**kwargs))
     return registry
