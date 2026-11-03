@@ -96,24 +96,22 @@ class ClaudeAgent:
         return "\n\n".join(parts)
 
     # ------------------------------------------------------------- the call
-    def run(self, ctx: AgentContext) -> StudioModel:
-        user_message = self.build_user_message(ctx)
-        log.info("%s: calling %s (%d chars)", self.name, self.model, len(user_message))
+    def call(self, user_message: str, output_model: type[StudioModel], system_prompt: str | None = None) -> StudioModel:
+        """One structured-output call. Agents that split their work (the Director works
+        per scene) call this several times from ``run``."""
+        log.info("%s: calling %s for %s (%d chars)", self.name, self.model, output_model.__name__, len(user_message))
         response = self.client.messages.parse(
             model=self.model,
             max_tokens=self.max_tokens,
-            system=[{"type": "text", "text": self.system_prompt, "cache_control": {"type": "ephemeral"}}],
+            system=[{"type": "text", "text": system_prompt or self.system_prompt, "cache_control": {"type": "ephemeral"}}],
             output_config={"effort": self.effort},
-            output_format=self.output_model,
+            output_format=output_model,
             messages=[{"role": "user", "content": user_message}],
         )
         usage = getattr(response, "usage", None)
         if usage is not None:
-            self.last_usage = {
-                "input_tokens": getattr(usage, "input_tokens", 0),
-                "output_tokens": getattr(usage, "output_tokens", 0),
-                "cache_read_input_tokens": getattr(usage, "cache_read_input_tokens", 0) or 0,
-            }
+            for key in ("input_tokens", "output_tokens", "cache_read_input_tokens"):
+                self.last_usage[key] = self.last_usage.get(key, 0) + (getattr(usage, key, 0) or 0)
         if response.stop_reason == "refusal":
             details = getattr(response, "stop_details", None)
             raise AgentRefused(f"{self.name}: request declined ({getattr(details, 'category', None)})")
@@ -123,3 +121,7 @@ class ClaudeAgent:
         if parsed is None:
             raise RuntimeError(f"{self.name}: no parsed output in the response")
         return parsed
+
+    def run(self, ctx: AgentContext) -> StudioModel:
+        self.last_usage = {}
+        return self.call(self.build_user_message(ctx), self.output_model)
