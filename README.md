@@ -19,6 +19,7 @@ revisited on its branch and merged back into `main`.
 | `05-character-designer` | `studio/agents/character_designer.py` | Character sheets bound to library, parametric or build-request assets |
 | `06-scene-builder` | `studio/agents/scene_builder.py` | Beats into scenes, locations with anchors, props, build requests |
 | `07-director` | `studio/agents/director.py` | Style guide, then a shot list per scene (parallel, partial retries) |
+| `08-layout-td` | `studio/agents/layout_td.py` | Per-scene staging drafts; code owns frames, environment, library ids |
 
 ## Setup
 

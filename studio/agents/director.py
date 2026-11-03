@@ -13,9 +13,8 @@ import json
 from concurrent.futures import ThreadPoolExecutor
 from typing import Any
 
-from studio.agents.base import ClaudeAgent
+from studio.agents.base import ClaudeAgent, scenes_to_redo
 from studio.coordinator.agents import AgentContext
-from studio.ids import shot_scene
 from studio.schemas import Direction, StudioModel
 from studio.schemas.continuity import Issue
 from studio.schemas.direction import SceneDirection, StyleGuide
@@ -191,40 +190,21 @@ class Director(ClaudeAgent):
         return "\n\n".join(parts)
 
     # ---------------------------------------------------------------- run
-    @staticmethod
-    def _scene_of_issue(issue: Issue, bible, world) -> str | None:
-        where = issue.where or ""
-        if where.startswith("sh_"):
-            return shot_scene(where)
-        if where.startswith("sc_"):
-            return where
-        if where.startswith("beat_"):
-            return next((s.id for s in world.scenes if where in s.beat_ids), None)
-        return None
-
     def run(self, ctx: AgentContext) -> StudioModel:
         self.last_usage = {}
         common = self._common(ctx)
         world = common["world"]
         scene_ids = [s.id for s in world.scenes]
 
-        # Which scenes to (re)do.
-        redo = set(scene_ids)
+        # Which scenes to (re)do. With nothing kept from a previous attempt every scene
+        # is redone, but the feedback still reaches the scenes it belongs to.
         previous_scenes: dict[str, SceneDirection] = {}
-        per_scene: dict[str, list[Issue]] = {sid: [] for sid in scene_ids}
+        redo, per_scene = scenes_to_redo([] if ctx.revise_notes else ctx.feedback, scene_ids, world)
         if self._previous is not None and ctx.feedback and not ctx.revise_notes:
             previous_scenes = {s.scene_id: s for s in self._previous.scenes}
-            redo = set()
-            for issue in ctx.feedback:
-                sid = self._scene_of_issue(issue, common["bible"], world)
-                if sid in per_scene:
-                    per_scene[sid].append(issue)
-                    redo.add(sid)
-                else:  # global problem: everyone hears it, everything is redone
-                    redo = set(scene_ids)
-                    for sid2 in scene_ids:
-                        per_scene[sid2].append(issue)
             redo |= {sid for sid in scene_ids if sid not in previous_scenes}
+        else:
+            redo = set(scene_ids)
 
         style = self._previous.style_guide if (self._previous is not None and ctx.feedback and not ctx.revise_notes) else None
         if style is None:

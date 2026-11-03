@@ -17,7 +17,9 @@ from typing import Any
 import anthropic
 
 from studio.coordinator.agents import AgentContext
+from studio.ids import shot_scene
 from studio.schemas import StudioModel
+from studio.schemas.continuity import Issue
 
 log = logging.getLogger("studio.agents")
 
@@ -125,3 +127,34 @@ class ClaudeAgent:
     def run(self, ctx: AgentContext) -> StudioModel:
         self.last_usage = {}
         return self.call(self.build_user_message(ctx), self.output_model)
+
+
+def scene_of_issue(issue: Issue, world) -> str | None:
+    """Which scene an issue belongs to, from its ``where`` (shot, scene or beat id)."""
+    where = issue.where or ""
+    if where.startswith("sh_"):
+        return shot_scene(where)
+    if where.startswith("sc_"):
+        return where
+    if where.startswith("beat_"):
+        return next((s.id for s in world.scenes if where in s.beat_ids), None)
+    return None
+
+
+def scenes_to_redo(feedback: list[Issue], scene_ids: list[str], world) -> tuple[set[str], dict[str, list[Issue]]]:
+    """Per-scene agents redo only the scenes that own an issue. An issue that cannot be
+    placed is global: every scene hears it and is redone. No feedback means do everything."""
+    per_scene: dict[str, list[Issue]] = {sid: [] for sid in scene_ids}
+    if not feedback:
+        return set(scene_ids), per_scene
+    redo: set[str] = set()
+    for issue in feedback:
+        sid = scene_of_issue(issue, world)
+        if sid in per_scene:
+            per_scene[sid].append(issue)
+            redo.add(sid)
+        else:
+            redo = set(scene_ids)
+            for other in scene_ids:
+                per_scene[other].append(issue)
+    return redo, per_scene
