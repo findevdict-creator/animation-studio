@@ -16,6 +16,7 @@ revisited on its branch and merged back into `main`.
 | `02-coordinator` | `studio/coordinator` | Runs agents in order, validates, retries, approval gates, flags, merge, exports |
 | `03-library-scanner` | `tools/` | Blender headless scripts: scan the asset library into `manifest.json`, lint, turntables |
 | `04-story-analyst` | `studio/agents/story_analyst.py` | First agent on the Claude API with structured output |
+| `05-character-designer` | `studio/agents/character_designer.py` | Character sheets bound to library, parametric or build-request assets |
 
 ## Setup
 
