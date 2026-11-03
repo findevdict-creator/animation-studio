@@ -75,8 +75,9 @@ def test_bad_sheet_is_retried_with_check_feedback(tmp_path, config, bible, chara
 def test_two_claude_agents_in_one_pipeline(tmp_path, config, bible, characters):
     client = FakeClient(by_schema={StoryBible: FakeResponse(bible), Characters: FakeResponse(characters)})
     registry = stub_registry()
-    for agent in claude_registry(client=client)._agents.values():
-        registry.register(agent)
+    claude = claude_registry(client=client)
+    for name in ("story_analyst", "character_designer"):
+        registry.register(claude.get(name))
     Coordinator(config, load_manifest(FIXTURE_DIR / "manifest.json"), registry, RunStore(tmp_path / "run")).run()
     assert [c["output_format"] for c in client.messages.calls] == [StoryBible, Characters]
     bible_json = json.loads(client.messages.calls[1]["messages"][0]["content"].split("## Story bible")[1].split("## Library")[0].split("\n", 1)[1])
