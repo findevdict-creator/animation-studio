@@ -135,11 +135,20 @@ class Coordinator:
                 model = self._run_checker(agent, ctx)
                 issues: list[Issue] = []
             else:
-                raw = agent.run(ctx)
                 try:
+                    raw = agent.run(ctx)
                     model = raw if isinstance(raw, schema) else schema.model_validate(raw)
                 except ValidationError as exc:
                     issues = schema_issues(agent_name, exc)
+                    model = None  # type: ignore[assignment]
+                except Exception as exc:  # API refusal, truncation, network: a failed attempt
+                    log.warning("%s: call failed: %s", agent_name, exc)
+                    issues = [
+                        Issue(
+                            id="iss_001", severity="error", category="schema",
+                            message=f"The previous call failed: {exc}", owner_agent=agent_name,  # type: ignore[arg-type]
+                        )
+                    ]
                     model = None  # type: ignore[assignment]
                 else:
                     issues = [i for i in self._hard_checks(agent_name, model, ctx.upstream) if i.severity == "error"]
