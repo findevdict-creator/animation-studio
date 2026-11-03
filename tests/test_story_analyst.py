@@ -6,9 +6,7 @@ without network access."""
 from __future__ import annotations
 
 import json
-from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
 
 import pytest
 
@@ -20,36 +18,7 @@ from studio.coordinator import AgentContext, Coordinator, PipelineError, RunStor
 from studio.coordinator.pipeline import load_manifest
 from studio.schemas import Config, StoryBible
 from studio.schemas.continuity import Issue
-
-
-@dataclass
-class FakeUsage:
-    input_tokens: int = 1000
-    output_tokens: int = 500
-    cache_read_input_tokens: int = 0
-
-
-@dataclass
-class FakeResponse:
-    parsed_output: Any
-    stop_reason: str = "end_turn"
-    stop_details: Any = None
-    usage: FakeUsage = field(default_factory=FakeUsage)
-
-
-class FakeMessages:
-    def __init__(self, responses):
-        self.responses = list(responses)
-        self.calls: list[dict[str, Any]] = []
-
-    def parse(self, **kwargs):
-        self.calls.append(kwargs)
-        return self.responses.pop(0) if len(self.responses) > 1 else self.responses[0]
-
-
-class FakeClient:
-    def __init__(self, *responses):
-        self.messages = FakeMessages(responses)
+from tests.fakes import FakeClient, FakeMessages, FakeResponse
 
 
 @pytest.fixture
@@ -110,8 +79,7 @@ def test_story_analyst_inside_the_coordinator(tmp_path, config, bible_payload):
     """Real agent for story_analyst, stubs for the rest, full pipeline to a package."""
     client = FakeClient(FakeResponse(StoryBible.model_validate(bible_payload)))
     registry = stub_registry()
-    for name, agent in claude_registry(client=client)._agents.items():
-        registry.register(agent)
+    registry.register(claude_registry(client=client).get("story_analyst"))
     store = RunStore(tmp_path / "run")
     path = Coordinator(config, load_manifest(FIXTURE_DIR / "manifest.json"), registry, store).run()
     assert Path(path).exists()

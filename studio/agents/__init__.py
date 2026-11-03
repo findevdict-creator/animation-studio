@@ -10,6 +10,7 @@ from studio.coordinator.agents import AgentRegistry
 
 
 def claude_registry(client: anthropic.Anthropic | None = None, model: str | None = None) -> AgentRegistry:
+    from studio.agents.character_designer import CharacterDesigner
     from studio.agents.story_analyst import StoryAnalyst
 
     kwargs = {"client": client}
@@ -17,4 +18,5 @@ def claude_registry(client: anthropic.Anthropic | None = None, model: str | None
         kwargs["model"] = model
     registry = AgentRegistry()
     registry.register(StoryAnalyst(**kwargs))
+    registry.register(CharacterDesigner(**kwargs))
     return registry
