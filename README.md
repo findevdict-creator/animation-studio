@@ -37,8 +37,10 @@ studio run --story tests/fixtures/lantern_fox/story.txt --run-dir runs/demo --ag
 
 # the real agents (needs ANTHROPIC_API_KEY; STUDIO_MODEL overrides the default claude-opus-5-5)
 studio run --story story.txt --run-dir runs/film --duration 90 --agents claude
-studio status --run-dir runs/film
-studio approve --run-dir runs/film --agent story_analyst   # or revise / edit, when human_approval gates
+studio status runs/film
+studio approve runs/film story_analyst      # or: studio revise runs/film story_analyst "notes"
+                                            #     studio edit runs/film story_analyst fixed.json
+# then `studio run ...` again to resume from the gate; human_approval.mode "none" skips the gates
 ```
 
 Each agent is one structured-output call (`client.messages.parse` with its Pydantic schema); the
