@@ -1,0 +1,203 @@
+{
+  "library_version": "d2b7c80",
+  "units": "metres",
+  "characters": [
+    {
+      "id": "lib_char_fox_a",
+      "file": "characters/lib_char_fox_a.blend",
+      "rig_type": "rigify_quadruped",
+      "height_m": 0.495,
+      "outfit_slots": [],
+      "shape_keys": [
+        "smile",
+        "ears_back",
+        "mouth_open"
+      ],
+      "tags": [
+        "fox",
+        "quadruped",
+        "animal"
+      ]
+    },
+    {
+      "id": "lib_char_girl_a",
+      "file": "characters/lib_char_girl_a.blend",
+      "rig_type": "rigify_human",
+      "height_m": 1.176,
+      "outfit_slots": [
+        "top",
+        "bottom",
+        "shoes",
+        "coat",
+        "hat",
+        "accessory"
+      ],
+      "shape_keys": [
+        "smile",
+        "frown",
+        "brow_up",
+        "mouth_open",
+        "blink_l",
+        "blink_r"
+      ],
+      "tags": [
+        "human",
+        "child"
+      ]
+    }
+  ],
+  "props": [
+    {
+      "id": "lib_prop_lantern",
+      "file": "props/lib_prop_lantern.blend",
+      "bounds_m": [
+        0.18,
+        0.18,
+        0.38
+      ],
+      "attach_bone": "hand.R",
+      "tags": [
+        "handheld",
+        "light",
+        "brass"
+      ]
+    }
+  ],
+  "environments": [
+    {
+      "id": "lib_env_forest_a",
+      "file": "envs/lib_env_forest_a.blend",
+      "bounds_m": [
+        60.0,
+        60.0,
+        11.1
+      ],
+      "anchors": [
+        "center",
+        "path_entry",
+        "stream_bank",
+        "stump"
+      ],
+      "time_variants": [
+        "day",
+        "dusk",
+        "night"
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "id": "clip_idle_breath",
+      "rig_type": "rigify_human",
+      "frames": 48,
+      "loop": true,
+      "root_motion_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tags": [
+        "idle"
+      ],
+      "source": "seed/procedural",
+      "licence": "CC0"
+    },
+    {
+      "id": "clip_raise_arm_r",
+      "rig_type": "rigify_human",
+      "frames": 18,
+      "loop": false,
+      "root_motion_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tags": [
+        "gesture"
+      ],
+      "source": "seed/procedural",
+      "licence": "CC0"
+    },
+    {
+      "id": "clip_walk_cautious",
+      "rig_type": "rigify_human",
+      "frames": 32,
+      "loop": true,
+      "root_motion_m": [
+        0.0,
+        1.1,
+        0.0
+      ],
+      "tags": [
+        "locomotion",
+        "slow",
+        "forward"
+      ],
+      "source": "seed/procedural",
+      "licence": "CC0"
+    },
+    {
+      "id": "clip_fox_sit",
+      "rig_type": "rigify_quadruped",
+      "frames": 24,
+      "loop": true,
+      "root_motion_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tags": [
+        "idle"
+      ],
+      "source": "seed/procedural",
+      "licence": "CC0"
+    }
+  ],
+  "camera_rigs": [
+    "static",
+    "dolly",
+    "crane",
+    "handheld_noise"
+  ],
+  "bases": [
+    {
+      "id": "base_human_child",
+      "rig_type": "rigify_human",
+      "proportion_sliders": [
+        "head_scale",
+        "limb_length"
+      ],
+      "material_slots": [
+        "skin",
+        "hair",
+        "eyes"
+      ],
+      "outfit_slots": [
+        "top",
+        "bottom",
+        "shoes",
+        "coat",
+        "hat",
+        "accessory"
+      ],
+      "shape_keys": [
+        "smile",
+        "frown",
+        "brow_up",
+        "mouth_open",
+        "blink_l",
+        "blink_r"
+      ]
+    }
+  ],
+  "garments": [],
+  "hair": [],
+  "kits": [],
+  "generators": [],
+  "lighting_presets": [
+    "day",
+    "dusk",
+    "night",
+    "interior_warm"
+  ]
+}
