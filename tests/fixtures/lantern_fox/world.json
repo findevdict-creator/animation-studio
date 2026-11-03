@@ -1,0 +1,142 @@
+{
+  "schema_version": "2.0",
+  "locations": [
+    {
+      "id": "loc_forest_clearing",
+      "name": "Forest clearing",
+      "setting_type": "exterior",
+      "description": "",
+      "key_features": [],
+      "color_palette": [],
+      "asset": {
+        "status": "library",
+        "library_id": "lib_env_forest_a",
+        "time_variant": "dusk",
+        "build_request_id": null,
+        "kit_id": null,
+        "seed": null,
+        "bounds_m": null,
+        "terrain": null,
+        "pieces": [],
+        "scatter": [],
+        "lighting_preset": null
+      },
+      "anchors": [
+        {
+          "id": "anc_stump",
+          "library_anchor": "stump",
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "facing_deg": 0.0
+        },
+        {
+          "id": "anc_path_entry",
+          "library_anchor": "path_entry",
+          "position_m": [
+            -8.0,
+            -12.0,
+            0.0
+          ],
+          "facing_deg": 35.0
+        },
+        {
+          "id": "anc_fox_spot",
+          "library_anchor": null,
+          "position_m": [
+            6.0,
+            4.0,
+            0.0
+          ],
+          "facing_deg": 200.0
+        }
+      ],
+      "set_dressing": [],
+      "inferred_fields": []
+    }
+  ],
+  "props": [
+    {
+      "id": "prop_lantern",
+      "name": "Brass lantern",
+      "description": "",
+      "owner_id": "char_mia",
+      "asset": {
+        "status": "library",
+        "library_id": "lib_prop_lantern",
+        "build_request_id": null
+      },
+      "emits_light": {
+        "color": "#FFB347",
+        "energy_w": 40.0
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "sc_01",
+      "order": 1,
+      "title": "The glow",
+      "beat_ids": [
+        "beat_001"
+      ],
+      "location_id": "loc_forest_clearing",
+      "time_of_day": "dusk",
+      "weather": "",
+      "cast": [
+        {
+          "character_id": "char_mia",
+          "outfit_id": "out_mia_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": "anc_path_entry"
+        },
+        {
+          "character_id": "char_fox",
+          "outfit_id": "out_fox_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": "anc_fox_spot"
+        }
+      ],
+      "prop_ids": [
+        "prop_lantern"
+      ],
+      "summary": "",
+      "dramatic_purpose": "",
+      "mood": "",
+      "estimated_duration_sec": 15.0
+    },
+    {
+      "id": "sc_02",
+      "order": 2,
+      "title": "The wait",
+      "beat_ids": [
+        "beat_002"
+      ],
+      "location_id": "loc_forest_clearing",
+      "time_of_day": "dusk",
+      "weather": "",
+      "cast": [
+        {
+          "character_id": "char_mia",
+          "outfit_id": "out_mia_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": null
+        },
+        {
+          "character_id": "char_fox",
+          "outfit_id": "out_fox_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": null
+        }
+      ],
+      "prop_ids": [],
+      "summary": "",
+      "dramatic_purpose": "",
+      "mood": "",
+      "estimated_duration_sec": 15.0
+    }
+  ],
+  "build_requests": []
+}

@@ -1,0 +1,146 @@
+{
+  "schema_version": "2.0",
+  "style_guide": {
+    "visual_style": "toon",
+    "aspect_ratio": "16:9",
+    "fps": 24,
+    "pacing": "",
+    "lens_set_mm": [
+      24.0,
+      35.0,
+      50.0,
+      85.0
+    ],
+    "color_script": []
+  },
+  "scenes": [
+    {
+      "scene_id": "sc_01",
+      "duration_sec": 15.0,
+      "shots": [
+        {
+          "id": "sh_01_01",
+          "order": 1,
+          "beat_id": "beat_001",
+          "duration_sec": 10.0,
+          "shot_type": "LS",
+          "camera_angle": "eye_level",
+          "camera_movement": "static",
+          "subject_id": "char_mia",
+          "composition": "",
+          "characters": [
+            {
+              "character_id": "char_mia",
+              "outfit_id": "out_mia_default",
+              "from_anchor_id": "anc_path_entry",
+              "to_anchor_id": "anc_stump",
+              "expression": "curious",
+              "action": "Walks to the stump.",
+              "action_tags": [
+                "locomotion",
+                "slow"
+              ]
+            },
+            {
+              "character_id": "char_fox",
+              "outfit_id": "out_fox_default",
+              "from_anchor_id": null,
+              "to_anchor_id": null,
+              "expression": "alert",
+              "action": "",
+              "action_tags": []
+            }
+          ],
+          "prop_ids": [
+            "prop_lantern"
+          ],
+          "action": "",
+          "lighting": "",
+          "dialogue": [
+            {
+              "line_id": "ln_01_01_01",
+              "speaker_id": "char_mia",
+              "text": "Who's there?",
+              "emotion": "",
+              "delivery": "",
+              "start_sec": 6.0
+            }
+          ],
+          "transition_in": "cut",
+          "transition_out": "cut"
+        },
+        {
+          "id": "sh_01_02",
+          "order": 2,
+          "beat_id": "beat_001",
+          "duration_sec": 5.0,
+          "shot_type": "CU",
+          "camera_angle": "eye_level",
+          "camera_movement": "static",
+          "subject_id": null,
+          "composition": "",
+          "characters": [
+            {
+              "character_id": "char_fox",
+              "outfit_id": "out_fox_default",
+              "from_anchor_id": null,
+              "to_anchor_id": null,
+              "expression": "alert",
+              "action": "",
+              "action_tags": []
+            }
+          ],
+          "prop_ids": [],
+          "action": "",
+          "lighting": "",
+          "dialogue": [],
+          "transition_in": "cut",
+          "transition_out": "cut"
+        }
+      ]
+    },
+    {
+      "scene_id": "sc_02",
+      "duration_sec": 15.0,
+      "shots": [
+        {
+          "id": "sh_02_01",
+          "order": 1,
+          "beat_id": "beat_002",
+          "duration_sec": 15.0,
+          "shot_type": "MS",
+          "camera_angle": "eye_level",
+          "camera_movement": "static",
+          "subject_id": null,
+          "composition": "",
+          "characters": [
+            {
+              "character_id": "char_mia",
+              "outfit_id": "out_mia_default",
+              "from_anchor_id": null,
+              "to_anchor_id": null,
+              "expression": "neutral",
+              "action": "",
+              "action_tags": []
+            },
+            {
+              "character_id": "char_fox",
+              "outfit_id": "out_fox_default",
+              "from_anchor_id": null,
+              "to_anchor_id": null,
+              "expression": "neutral",
+              "action": "",
+              "action_tags": []
+            }
+          ],
+          "prop_ids": [],
+          "action": "",
+          "lighting": "",
+          "dialogue": [],
+          "transition_in": "cut",
+          "transition_out": "cut"
+        }
+      ]
+    }
+  ]
+}

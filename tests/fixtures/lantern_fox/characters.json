@@ -1,0 +1,120 @@
+{
+  "schema_version": "2.0",
+  "characters": [
+    {
+      "id": "char_mia",
+      "name": "Mia",
+      "role": "protagonist",
+      "species": "human",
+      "age": "",
+      "gender": "",
+      "personality": [],
+      "goal": "",
+      "arc": "",
+      "appearance": {
+        "height_class": "",
+        "build": "",
+        "skin": "",
+        "hair": "",
+        "eyes": "",
+        "distinguishing_features": []
+      },
+      "color_palette": [],
+      "default_outfit_id": "out_mia_default",
+      "outfits": [
+        {
+          "id": "out_mia_default",
+          "description": "red raincoat",
+          "slots": {
+            "coat": {
+              "garment_id": null,
+              "base_color": "#C0392B",
+              "roughness": 0.5
+            }
+          }
+        }
+      ],
+      "expressions": {
+        "neutral": {},
+        "curious": {
+          "brow_up": 0.7
+        }
+      },
+      "asset": {
+        "status": "library",
+        "library_id": "lib_char_girl_a",
+        "base_id": null,
+        "rig_type": "rigify_human",
+        "height_m": 1.2,
+        "proportions": {},
+        "proportion_overrides": {},
+        "materials": {},
+        "hair_id": null,
+        "build_request_id": null
+      },
+      "signature_prop_ids": [
+        "prop_lantern"
+      ],
+      "relationships": [],
+      "voice_notes": "",
+      "reference_images": [],
+      "design_brief": "",
+      "source_evidence": [],
+      "inferred_fields": []
+    },
+    {
+      "id": "char_fox",
+      "name": "The fox",
+      "role": "supporting",
+      "species": "fox",
+      "age": "",
+      "gender": "",
+      "personality": [],
+      "goal": "",
+      "arc": "",
+      "appearance": {
+        "height_class": "",
+        "build": "",
+        "skin": "",
+        "hair": "",
+        "eyes": "",
+        "distinguishing_features": []
+      },
+      "color_palette": [],
+      "default_outfit_id": "out_fox_default",
+      "outfits": [
+        {
+          "id": "out_fox_default",
+          "description": "",
+          "slots": {}
+        }
+      ],
+      "expressions": {
+        "neutral": {},
+        "alert": {
+          "ears_back": 0.5
+        }
+      },
+      "asset": {
+        "status": "library",
+        "library_id": "lib_char_fox_a",
+        "base_id": null,
+        "rig_type": "rigify_quadruped",
+        "height_m": 0.5,
+        "proportions": {},
+        "proportion_overrides": {},
+        "materials": {},
+        "hair_id": null,
+        "build_request_id": null
+      },
+      "signature_prop_ids": [],
+      "relationships": [],
+      "voice_notes": "",
+      "reference_images": [],
+      "design_brief": "",
+      "source_evidence": [],
+      "inferred_fields": []
+    }
+  ],
+  "build_requests": []
+}

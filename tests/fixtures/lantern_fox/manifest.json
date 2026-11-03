@@ -1,0 +1,160 @@
+{
+  "library_version": "test",
+  "units": "metres",
+  "characters": [
+    {
+      "id": "lib_char_girl_a",
+      "file": "chars/girl_a.blend",
+      "rig_type": "rigify_human",
+      "height_m": 1.2,
+      "outfit_slots": [
+        "top",
+        "bottom",
+        "shoes",
+        "coat"
+      ],
+      "shape_keys": [
+        "smile",
+        "frown",
+        "brow_up",
+        "mouth_open"
+      ],
+      "tags": []
+    },
+    {
+      "id": "lib_char_fox_a",
+      "file": "chars/fox_a.blend",
+      "rig_type": "rigify_quadruped",
+      "height_m": 0.5,
+      "outfit_slots": [],
+      "shape_keys": [
+        "smile",
+        "ears_back"
+      ],
+      "tags": []
+    }
+  ],
+  "props": [
+    {
+      "id": "lib_prop_lantern",
+      "file": "props/lantern.blend",
+      "bounds_m": [
+        0.2,
+        0.2,
+        0.35
+      ],
+      "attach_bone": "hand.R",
+      "tags": []
+    }
+  ],
+  "environments": [
+    {
+      "id": "lib_env_forest_a",
+      "file": "envs/forest_a.blend",
+      "bounds_m": [
+        60.0,
+        60.0,
+        20.0
+      ],
+      "anchors": [
+        "center",
+        "stump",
+        "path_entry"
+      ],
+      "time_variants": [
+        "day",
+        "dusk",
+        "night"
+      ]
+    }
+  ],
+  "clips": [
+    {
+      "id": "clip_walk_cautious",
+      "rig_type": "rigify_human",
+      "frames": 32,
+      "loop": true,
+      "root_motion_m": [
+        0.0,
+        1.1,
+        0.0
+      ],
+      "tags": [
+        "locomotion",
+        "slow"
+      ],
+      "source": null,
+      "licence": null
+    },
+    {
+      "id": "clip_raise_arm_r",
+      "rig_type": "rigify_human",
+      "frames": 18,
+      "loop": false,
+      "root_motion_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tags": [
+        "gesture"
+      ],
+      "source": null,
+      "licence": null
+    },
+    {
+      "id": "clip_fox_sit",
+      "rig_type": "rigify_quadruped",
+      "frames": 24,
+      "loop": true,
+      "root_motion_m": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "tags": [
+        "idle"
+      ],
+      "source": null,
+      "licence": null
+    }
+  ],
+  "camera_rigs": [
+    "static",
+    "dolly",
+    "crane",
+    "handheld_noise"
+  ],
+  "bases": [
+    {
+      "id": "base_human_child",
+      "rig_type": "rigify_human",
+      "proportion_sliders": [
+        "head_scale",
+        "limb_length"
+      ],
+      "material_slots": [
+        "skin",
+        "hair",
+        "eyes"
+      ],
+      "outfit_slots": [
+        "top",
+        "bottom",
+        "shoes",
+        "coat"
+      ],
+      "shape_keys": [
+        "smile",
+        "frown",
+        "brow_up",
+        "mouth_open"
+      ]
+    }
+  ],
+  "garments": [],
+  "hair": [],
+  "kits": [],
+  "generators": [],
+  "lighting_presets": []
+}
