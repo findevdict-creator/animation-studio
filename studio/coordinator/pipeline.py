@@ -131,27 +131,26 @@ class Coordinator:
                 revise_notes=revise_notes,
             )
             log.info("%s attempt %d", agent_name, attempt)
-            if agent_name == "continuity_checker":
-                model = self._run_checker(agent, ctx)
-                issues: list[Issue] = []
-            else:
-                try:
+            try:
+                if agent_name == "continuity_checker":
+                    model = self._run_checker(agent, ctx)
+                else:
                     raw = agent.run(ctx)
                     model = raw if isinstance(raw, schema) else schema.model_validate(raw)
-                except ValidationError as exc:
-                    issues = schema_issues(agent_name, exc)
-                    model = None  # type: ignore[assignment]
-                except Exception as exc:  # API refusal, truncation, network: a failed attempt
-                    log.warning("%s: call failed: %s", agent_name, exc)
-                    issues = [
-                        Issue(
-                            id="iss_001", severity="error", category="schema",
-                            message=f"The previous call failed: {exc}", owner_agent=agent_name,  # type: ignore[arg-type]
-                        )
-                    ]
-                    model = None  # type: ignore[assignment]
-                else:
-                    issues = [i for i in self._hard_checks(agent_name, model, ctx.upstream) if i.severity == "error"]
+            except ValidationError as exc:
+                issues = schema_issues(agent_name, exc)
+                model = None  # type: ignore[assignment]
+            except Exception as exc:  # API refusal, truncation, network: a failed attempt
+                log.warning("%s: call failed: %s", agent_name, exc)
+                issues = [
+                    Issue(
+                        id="iss_001", severity="error", category="schema",
+                        message=f"The previous call failed: {exc}", owner_agent=agent_name,  # type: ignore[arg-type]
+                    )
+                ]
+                model = None  # type: ignore[assignment]
+            else:
+                issues = [i for i in self._hard_checks(agent_name, model, ctx.upstream) if i.severity == "error"]
 
             if issues:
                 failures += 1
@@ -193,6 +192,7 @@ class Coordinator:
 
     def _run_checker(self, agent: Agent, ctx: AgentContext) -> ContinuityReport:
         code_report = self.code_continuity_report(ctx.upstream)
+        ctx.code_report = code_report
         raw = agent.run(ctx)
         llm_report = raw if isinstance(raw, ContinuityReport) else ContinuityReport.model_validate(raw)
         issues = list(code_report.issues) + list(llm_report.issues)

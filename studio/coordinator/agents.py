@@ -25,6 +25,7 @@ class AgentContext:
     attempt: int = 1
     feedback: list[Issue] = field(default_factory=list)
     revise_notes: str = ""
+    code_report: Any = None  # ContinuityReport from the hard checks, set for the continuity checker
 
     @property
     def story_text(self) -> str:
