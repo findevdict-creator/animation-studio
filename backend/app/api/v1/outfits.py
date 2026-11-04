@@ -161,6 +161,24 @@ class OutfitVersionJobOut(BaseModel):
     job: JobOut
 
 
+class FitParty(BaseModel):
+    """One side of a compatibility record: the character or the outfit, at its version."""
+    id: uuid.UUID
+    code: str
+    name: str | None
+    version_id: uuid.UUID
+    version: str | None
+    status: str
+
+
+class FitFile(BaseModel):
+    name: str
+    role: str
+    sha256: str
+    size_bytes: int
+    url: str
+
+
 class FitOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
     id: uuid.UUID
@@ -176,11 +194,11 @@ class FitOut(BaseModel):
     decided_by: uuid.UUID | None
     decided_at: datetime | None
     notes: str
-    failed: list[str] = []
-    current: bool = Field(default=True, description="the record describes the outfit version's current outfit.blend")
-    character: dict[str, Any] = Field(default_factory=dict)
-    outfit: dict[str, Any] = Field(default_factory=dict)
-    files: list[dict[str, Any]] = Field(default_factory=list, description="name, role, url")
+    failed: list[str]
+    current: bool = Field(description="the record describes the outfit version's current outfit.blend")
+    character: FitParty
+    outfit: FitParty
+    files: list[FitFile] = Field(description="report, thumbnail, pose sheet and try-on GLB, with presigned URLs")
 
 
 class FitDetail(FitOut):
@@ -251,20 +269,25 @@ def _draft(session: Session, outfit_id: uuid.UUID, draft_id: uuid.UUID) -> Outfi
 
 
 def _fit(session: Session, row: OutfitCompatibility, cls=FitOut) -> Any:
-    out = cls.model_validate(row, from_attributes=True)
     ov = session.get(OutfitVersion, row.outfit_version_id)
     cv = session.get(CharacterVersion, row.character_version_id)
     blend = svc.blend_file(ov)
-    out.current = row.outfit_blend_sha256 is None or (blend is not None and blend.sha256 == row.outfit_blend_sha256)
-    out.failed = list((row.report or {}).get("failed", []))
-    out.character = {"id": str(cv.character_id), "code": cv.entry.display_code, "name": cv.spec.get("name"),
-                     "version_id": str(cv.id), "version": cv.version_label, "status": cv.status}
-    out.outfit = {"id": str(ov.outfit_id), "code": ov.entry.display_code, "name": ov.spec.get("name"),
-                  "version_id": str(ov.id), "version": ov.version_label, "status": ov.status}
     store = Storage.for_bucket("work")
-    out.files = [{"name": f["storage_key"].rsplit("/", 1)[-1], "role": f["role"], "sha256": f["sha256"],
-                  "size_bytes": f["size_bytes"], "url": store.presign_get(f["storage_key"])} for f in row.files or []]
-    return out
+    fields = {k: getattr(row, k) for k in ("id", "outfit_version_id", "character_version_id", "status", "fit_job_id",
+                                           "fit_profile", "fit_profile_declared", "outfit_blend_sha256",
+                                           "character_blend_sha256", "checked_at", "decided_by", "decided_at", "notes")}
+    if cls is FitDetail:
+        fields["report"] = row.report
+    return cls(
+        **fields,
+        current=row.outfit_blend_sha256 is None or (blend is not None and blend.sha256 == row.outfit_blend_sha256),
+        failed=list((row.report or {}).get("failed", [])),
+        character=FitParty(id=cv.character_id, code=cv.entry.display_code, name=cv.spec.get("name"), version_id=cv.id,
+                           version=cv.version_label, status=cv.status),
+        outfit=FitParty(id=ov.outfit_id, code=ov.entry.display_code, name=ov.spec.get("name"), version_id=ov.id,
+                        version=ov.version_label, status=ov.status),
+        files=[FitFile(name=f["storage_key"].rsplit("/", 1)[-1], role=f["role"], sha256=f["sha256"],
+                       size_bytes=f["size_bytes"], url=store.presign_get(f["storage_key"])) for f in row.files or []])
 
 
 # ---------------------------------------------------------------- identity
