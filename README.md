@@ -26,6 +26,7 @@ revisited on its branch and merged back into `main`.
 | `12-clip-pipeline` | `tools/retarget.py`, `tools/tag_clips.py`, `tools/procedural.py`, `studio/assets/clips.py` | Asset build phase 2: mocap retargeting to base rigs, tagging, procedural layers, clip search and transitions |
 | `13-asset-builder` | `tools/asset_builder/`, `studio/agents/asset_builder.py`, `studio/agents/render_qa.py`, `studio/assets/builder.py` | Asset build phase 4: an agent writes bpy scripts for prop requests, a sandbox runs them, Render QA scores the turntable, accepted scripts join the generator library |
 | `14-build-queue` | `studio/assets/queue.py` | Asset build phase 5: build requests ranked by screen time, routed variant → generator → asset_builder → image_to_3d → human, deduplicated, with per-story metrics |
+| `15-gui` | `studio/gui/` | Local web GUI: start runs, answer approval gates, browse outputs, the package, the build queue and the library |
 
 ## Setup
 
@@ -47,6 +48,25 @@ studio approve runs/film story_analyst      # or: studio revise runs/film story_
                                             #     studio edit runs/film story_analyst fixed.json
 # then `studio run ...` again to resume from the gate; human_approval.mode "none" skips the gates
 ```
+
+## GUI
+
+```
+studio gui                                   # http://127.0.0.1:8765/, opens a browser tab
+studio gui --agents stub --runs-dir runs     # preselect the offline stub agents
+```
+
+A local web page over the same run directories the CLI uses, so a run can be started in one
+and finished in the other. It starts a run from a story (paste or load a .txt) with the config
+and every flag as form fields, runs the coordinator in a background thread and shows each
+agent's state and the log live. At an open gate it shows the output with Approve, Revise
+(notes go back to the agent) and Edit (corrected JSON, validated and hard-checked); the run
+continues on its own after the decision unless `--no-auto-resume` is given. It also browses
+every agent output and version, the production package with its exports, the ranked and
+routed build queue (with the same `--save` as `studio build-requests`) and the library
+manifest with turntable previews. Flags: `--runs-dir`, `--library`, `--agents`,
+`--allow-agents claude,stub`, `--host`, `--port`, `--no-browser`, `--no-auto-resume`. It
+binds to 127.0.0.1 and has no login; it uses only the standard library.
 
 Each agent is one structured-output call (`client.messages.parse` with its Pydantic schema); the
 Director and the Layout TD make one call per scene and only redo the scenes that fail a check.

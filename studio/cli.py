@@ -7,6 +7,7 @@
     studio status runs/lantern
     studio build-characters runs/lantern [--library library] [--toon]   (asset build phase 1; needs bpy)
     studio build-environments runs/lantern [--library library]          (asset build phase 3; needs bpy)
+    studio gui [--runs-dir runs] [--library library] [--agents claude|stub] [--port 8765]
 """
 
 from __future__ import annotations
@@ -197,6 +198,23 @@ def cmd_build_requests(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_gui(args: argparse.Namespace) -> int:
+    from studio.gui import StudioService, serve
+
+    allowed = tuple(a for a in args.allow_agents.split(",") if a) if args.allow_agents else ("claude", "stub")
+    unknown = [a for a in allowed if a not in ("claude", "stub")]
+    if unknown:
+        raise SystemExit(f"unknown agent set(s) in --allow-agents: {', '.join(unknown)}")
+    if args.agents not in allowed:
+        allowed = (args.agents, *allowed)
+    service = StudioService(
+        runs_dir=args.runs_dir, library=args.library, agents=args.agents,
+        allowed_agents=allowed, auto_resume=not args.no_auto_resume,
+    )
+    serve(service, host=args.host, port=args.port, open_browser=not args.no_browser)
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     store = RunStore(Path(args.run_dir))
     state = store.load_state()
@@ -253,6 +271,16 @@ def main(argv: list[str] | None = None) -> int:
     breq.add_argument("--save", action="store_true", help="write screen time and routes back into the run's outputs")
     breq.add_argument("--json", action="store_true")
 
+    gui = sub.add_parser("gui", help="serve the local web GUI")
+    gui.add_argument("--runs-dir", default="runs", help="directory holding one folder per run")
+    gui.add_argument("--library", default="library", help="asset library (manifest.json, preview/, generators/)")
+    gui.add_argument("--agents", default="claude", choices=["claude", "stub"], help="agent set preselected for new runs")
+    gui.add_argument("--allow-agents", default="", help="comma list of agent sets the GUI may start (default claude,stub)")
+    gui.add_argument("--host", default="127.0.0.1", help="bind address; anything but loopback exposes the GUI without a login")
+    gui.add_argument("--port", type=int, default=8765)
+    gui.add_argument("--no-browser", action="store_true", help="do not open a browser tab")
+    gui.add_argument("--no-auto-resume", action="store_true", help="after a gate decision, wait for Resume instead of continuing")
+
     args = parser.parse_args(argv)
     if args.cmd == "run":
         return cmd_run(args)
@@ -268,6 +296,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_build_props(args)
     if args.cmd == "build-requests":
         return cmd_build_requests(args)
+    if args.cmd == "gui":
+        return cmd_gui(args)
     return 1
 
 
