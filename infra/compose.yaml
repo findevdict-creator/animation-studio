@@ -1,0 +1,140 @@
+# Development stack: everything Phase 1 needs, on one machine.
+#
+#   docker compose -f infra/compose.yaml up -d --build
+#   open http://localhost:8000/api/docs        API
+#        http://localhost:8080                 Keycloak (admin / admin), realm "studio"
+#
+# Credentials here are development values only (see infra/env/.env.example).
+
+name: studio
+
+x-backend-env: &backend-env
+  STUDIO_ENV: dev
+  STUDIO_DATABASE_URL: postgresql+psycopg://studio:studio@postgres:5432/studio
+  STUDIO_REDIS_URL: redis://redis:6379/0
+  STUDIO_S3_ENDPOINT_URL: http://seaweedfs:8333
+  STUDIO_S3_PUBLIC_ENDPOINT_URL: ${STUDIO_S3_PUBLIC_ENDPOINT_URL:-http://localhost:8333}
+  STUDIO_AUTH_ISSUER: ${STUDIO_AUTH_ISSUER:-http://localhost:8080/realms/studio}
+  STUDIO_AUTH_JWKS_URL: http://keycloak:8080/realms/studio/protocol/openid-connect/certs
+
+x-build-args: &build-args
+  PYTHON_BASE: ${PYTHON_BASE:-python:3.13-slim-bookworm}
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: studio
+      POSTGRES_PASSWORD: studio
+      POSTGRES_DB: studio
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U studio -d studio"]
+      interval: 3s
+      retries: 20
+
+  redis:
+    image: redis:7
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes: [redisdata:/data]
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 3s
+      retries: 20
+
+  seaweedfs:
+    image: chrislusf/seaweedfs:${SEAWEEDFS_VERSION:-4.50}
+    command: ["server", "-dir=/data", "-ip=seaweedfs", "-ip.bind=0.0.0.0", "-s3", "-s3.port=8333",
+              "-s3.config=/etc/seaweedfs/s3.json"]
+    volumes:
+      - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
+      - s3data:/data
+    ports: ["8333:8333"]
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "http://127.0.0.1:9333/cluster/status"]
+      interval: 3s
+      retries: 30
+
+  keycloak:
+    image: keycloak/keycloak:${KEYCLOAK_VERSION:-26.4}
+    command: ["start-dev", "--import-realm"]
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+      KC_HOSTNAME: http://localhost:8080
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: "true"
+      KC_HEALTH_ENABLED: "true"
+    volumes: [./keycloak/realm-studio.json:/opt/keycloak/data/import/realm-studio.json:ro]
+    ports: ["8080:8080"]
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/9000 && printf 'GET /health/ready HTTP/1.0\\r\\n\\r\\n' >&3 && grep -q UP <&3"]
+      interval: 5s
+      retries: 40
+
+  storage-init:
+    build: {context: .., dockerfile: infra/docker/backend.Dockerfile, target: api, args: *build-args}
+    image: studio-backend:dev
+    environment:
+      <<: *backend-env
+    command: ["python", "-m", "app.cli", "init-storage", "--access-key", "dev-admin", "--secret-key", "dev-admin-secret"]
+    depends_on: {seaweedfs: {condition: service_healthy}}
+    restart: "no"
+
+  migrate:
+    image: studio-backend:dev
+    environment:
+      <<: *backend-env
+    command: ["alembic", "upgrade", "head"]
+    depends_on:
+      postgres: {condition: service_healthy}
+      storage-init: {condition: service_completed_successfully}
+    restart: "no"
+
+  api:
+    image: studio-backend:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-api
+      STUDIO_S3_SECRET_KEY: dev-api-secret
+    ports: ["8000:8000"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+      keycloak: {condition: service_healthy}
+
+  worker-blender:
+    build: {context: .., dockerfile: infra/docker/worker.Dockerfile, args: *build-args}
+    image: studio-worker:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-worker
+      STUDIO_S3_SECRET_KEY: dev-worker-secret
+    volumes: [work:/work]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 4g
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
+  beat:
+    image: studio-worker:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-worker
+      STUDIO_S3_SECRET_KEY: dev-worker-secret
+    command: ["celery", "-A", "studio_workers.tasks", "beat", "--schedule", "/tmp/celerybeat-schedule"]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
+volumes:
+  pgdata:
+  redisdata:
+  s3data:
+  work:

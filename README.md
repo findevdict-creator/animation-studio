@@ -18,6 +18,7 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-03-storage` | S3 storage layer: library and work buckets, write-once `put_immutable` with server-side conditional writes, SHA-256 on every object, presigned URLs, per-identity access |
 | `v2-04-jobs` | Jobs in PostgreSQL with Celery on Redis as transport, the Blender engine package and entry point, the worker supervisor (one Blender process per job, progress, cancel, timeout, crash retry, output upload), `blender_smoke` job, job and asset metadata API |
 | `v2-05-auth` | OIDC bearer tokens (JWKS, issuer, audience, expiry), users created on first login with roles synced from the token, permission checks from the database, audit entries, `/me`, dev Keycloak realm |
+| `v2-06-docker` | API and Blender worker images, a compose stack (PostgreSQL, Redis, SeaweedFS, Keycloak, migrations, API, worker, beat) and the Phase 1 acceptance script |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the
@@ -33,6 +34,19 @@ infra/            dev service configuration (SeaweedFS identities, Keycloak real
 backend/          FastAPI app (app/), Alembic migrations, shared test fixtures (studio_testing), tests
 docs/architecture/
 ```
+
+## Running the stack
+
+```
+docker compose -f infra/compose.yaml up -d --build
+python scripts/phase1_acceptance.py        # logs in through Keycloak, runs a Blender job, checks the file
+```
+
+API docs at http://localhost:8000/api/docs, Keycloak at http://localhost:8080 (admin/admin).
+Dev users `admin`, `creator`, `director`, `reviewer`, each with password `dev-<name>`. The
+worker image installs Blender as the `bpy` 5.2.3 wheel by default; build with
+`--build-arg BLENDER_SOURCE=binary --build-arg BLENDER_SHA256=<sha>` for the official
+binary (needed for GPU rendering later).
 
 ## Development
 

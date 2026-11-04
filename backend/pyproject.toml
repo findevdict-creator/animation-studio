@@ -14,6 +14,7 @@ dependencies = [
     "boto3>=1.35",
     "celery[redis]>=5.4",
     "pyjwt[crypto]>=2.9",
+    "tzdata",  # zoneinfo data for Celery/kombu on images without the OS package
 ]
 
 [project.optional-dependencies]
