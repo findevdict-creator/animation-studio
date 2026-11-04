@@ -119,6 +119,28 @@ services:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
 
+  # AI tasks (interpret_character, …). No Blender runs here; this is the only service that
+  # gets provider API keys. Set them in the shell or infra/.env; without one, AI jobs fail
+  # with a clear "set ANTHROPIC_API_KEY" error.
+  worker-ai:
+    image: studio-worker:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-worker
+      STUDIO_S3_SECRET_KEY: dev-worker-secret
+      STUDIO_AI_PROVIDER: ${STUDIO_AI_PROVIDER:-anthropic}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+    command: ["celery", "-A", "studio_workers.tasks", "worker", "-Q", "ai", "--concurrency", "4", "--hostname", "ai@%h"]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
   beat:
     image: studio-worker:dev
     environment:

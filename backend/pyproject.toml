@@ -19,6 +19,8 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8", "httpx>=0.27", "jsonschema>=4.23"]
+# Provider SDKs, imported lazily: install the ones a deployment uses (the ai worker image has all three).
+ai = ["anthropic>=2.4", "openai>=3.40", "google-genai>=2.30"]
 
 [project.entry-points.pytest11]
 studio = "studio_testing.plugin"

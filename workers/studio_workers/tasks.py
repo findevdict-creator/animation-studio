@@ -1,6 +1,7 @@
 """Celery tasks. The worker process imports this module::
 
     celery -A studio_workers.tasks worker -Q blender --concurrency 1
+    celery -A studio_workers.tasks worker -Q ai --concurrency 4
     celery -A studio_workers.tasks beat        # runs the outbox sweeper
 """
 
@@ -10,12 +11,15 @@ import logging
 import uuid
 from datetime import timedelta
 
+from sqlalchemy import select
+
 from app.config import get_settings
 from app.core.database import get_sessionmaker
 from app.core.logging import configure_logging
 from app.jobs import service
 from app.jobs.queue import RUN_JOB_TASK, celery_app, get_dispatcher
 from app.models.jobs import Job
+from studio_contracts.jobs import JOB_QUEUES, JobType, Queue
 from studio_workers.supervisor import Supervisor
 
 configure_logging(get_settings().log_level, get_settings().log_json)
@@ -27,7 +31,18 @@ app.conf.beat_schedule = {"sweep-outbox": {"task": SWEEP_TASK, "schedule": 60.0}
 
 @app.task(name=RUN_JOB_TASK, acks_late=True)
 def run_job(job_id: str) -> str:
-    outcome = Supervisor().run(uuid.UUID(job_id))
+    jid = uuid.UUID(job_id)
+    with get_sessionmaker()() as s:
+        job_type = s.scalar(select(Job.type).where(Job.id == jid))
+    if job_type is None:
+        log.warning("job %s does not exist", job_id)
+        return "missing"
+    if JOB_QUEUES[JobType(job_type)] == Queue.ai:
+        from studio_workers.ai_runner import AIRunner
+
+        outcome = AIRunner().run(jid)
+    else:
+        outcome = Supervisor().run(jid)
     return outcome.status.value if outcome.status else "not_claimed"
 
 

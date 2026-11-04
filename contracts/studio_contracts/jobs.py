@@ -47,14 +47,31 @@ class BlenderSmokeParams(Model):
     size_m: float = Field(default=1.0, gt=0, le=100)
 
 
+class InterpretCharacterParams(Model):
+    """AI: a description (and optional reference images) to a validated CharacterSpecification."""
+
+    description: str = Field(min_length=3, max_length=4000)
+    name: str | None = Field(default=None, max_length=80, description="keeps the AI from renaming the character")
+    style_profile: str = Field(default="family_cartoon@1.0", pattern=r"^[a-z][a-z0-9_]*(@\d+\.\d+)?$")
+    reference_image_keys: list[str] = Field(default_factory=list, max_length=4,
+                                            description="work-bucket keys under uploads/ (PNG or JPEG)")
+    provider: str | None = Field(default=None, max_length=120, description="provider[:model]; default from settings")
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
+    interpret_character = "interpret_character"
 
 
-JOB_PARAMS: dict[JobType, type[Model]] = {JobType.blender_smoke: BlenderSmokeParams}
-JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender}
+JOB_PARAMS: dict[JobType, type[Model]] = {
+    JobType.blender_smoke: BlenderSmokeParams,
+    JobType.interpret_character: InterpretCharacterParams,
+}
+JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
-RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True}
+RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True}
+#: permissions a caller needs on top of job.submit to submit the type
+JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create")}
 
 
 class InputFile(Model):

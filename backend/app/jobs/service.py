@@ -14,7 +14,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import ApiError
 from app.models.jobs import Job, JobEvent
-from studio_contracts.jobs import JOB_PARAMS, JOB_QUEUES, TERMINAL_STATUSES, JobStatus, JobType
+from studio_contracts.jobs import JOB_PARAMS, JOB_PERMISSIONS, JOB_QUEUES, TERMINAL_STATUSES, JobStatus, JobType
 
 
 def _now() -> datetime:
@@ -23,6 +23,13 @@ def _now() -> datetime:
 
 def event(session: Session, job_id: uuid.UUID, kind: str, message: str = "", data: dict[str, Any] | None = None) -> None:
     session.add(JobEvent(job_id=job_id, kind=kind, message=message[:4000], data=data))
+
+
+def extra_permissions(job_type: str) -> tuple[str, ...]:
+    try:
+        return JOB_PERMISSIONS.get(JobType(job_type), ())
+    except ValueError:
+        return ()
 
 
 def submit(

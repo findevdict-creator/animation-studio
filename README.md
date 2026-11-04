@@ -21,6 +21,8 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-05-auth` | OIDC bearer tokens (JWKS, issuer, audience, expiry), users created on first login with roles synced from the token, permission checks from the database, audit entries, `/me`, dev Keycloak realm |
 | `v2-06-docker` | API and Blender worker images, a compose stack (PostgreSQL, Redis, SeaweedFS, Keycloak, migrations, API, worker, beat) and the Phase 1 acceptance script |
 | `v2-07-spikes` | Blender spikes kept as regression tests (link and override assembly, headless Rigify), spike report, Phase 1 demonstration record, architecture updated with the results |
+| `v2-08-character-spec` | Phase 2: `CharacterSpecification`, the `family_cartoon@1.0` style profile, the `cartoon_humanoid@1.0` rig profile, spec validation and resolution, `/characters/spec/validate` and profile endpoints |
+| `v2-09-ai-interpret` | LLM providers ported from `studio/llm` to `app/ai/providers`, the `interpret_character` AI job (closed proposal schema, validation, repair, `ai_generations` log), the `ai` worker queue |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the

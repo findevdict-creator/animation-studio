@@ -55,6 +55,14 @@ class Settings(BaseSettings):
     auth_leeway_s: int = 30
     auth_roles_claim: str = Field(default="realm_access.roles", description="dotted path to the role list in the token")
 
+    # AI (architecture D12). Provider API keys stay in the provider's own env var (ANTHROPIC_API_KEY, …)
+    # and only the ai worker gets them.
+    ai_provider: str | None = Field(default=None, description="anthropic | openai | gemini | deepseek | openai_compatible")
+    ai_model: str | None = None
+    ai_tasks: dict[str, str] = Field(default_factory=dict, description='per task "provider[:model]"')
+    ai_json_repairs: int = Field(default=1, ge=0, le=3)
+    ai_semantic_repairs: int = Field(default=1, ge=0, le=3, description="repair turns for style-profile issues")
+
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
 

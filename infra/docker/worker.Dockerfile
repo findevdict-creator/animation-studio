@@ -21,7 +21,7 @@ COPY contracts/ contracts/
 COPY backend/ backend/
 COPY blender_engine/ blender_engine/
 COPY workers/ workers/
-RUN pip install ./contracts ./backend ./blender_engine ./workers
+RUN pip install ./contracts "./backend[ai]" ./blender_engine ./workers
 
 FROM common AS blender-wheel
 ARG BPY_VERSION=5.2.3

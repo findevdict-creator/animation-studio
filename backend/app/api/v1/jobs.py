@@ -39,6 +39,9 @@ def submit_job(
     idempotency_key: str | None = Header(default=None, max_length=200),
     who: Principal = Depends(require("job.submit")),
 ) -> JobOut:
+    for permission in service.extra_permissions(body.type):
+        if not who.can(permission):
+            raise ApiError(403, "forbidden", f"{body.type} jobs need {permission}", required=permission)
     job, created = service.submit(session, body.type, body.params, idempotency_key=idempotency_key,
                                   requested_by=who.user_id)
     if created:
