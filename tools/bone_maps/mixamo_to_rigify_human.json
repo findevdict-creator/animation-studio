@@ -1,0 +1,19 @@
+{
+  "source_rig": "mixamo",
+  "target_rig_type": "rigify_human",
+  "root": "mixamorig:Hips",
+  "bones": {
+    "mixamorig:Hips": "root",
+    "mixamorig:Spine": "spine",
+    "mixamorig:Head": "head",
+    "mixamorig:RightArm": "upper_arm.R",
+    "mixamorig:RightHand": "hand.R",
+    "mixamorig:LeftArm": "upper_arm.L",
+    "mixamorig:LeftHand": "hand.L",
+    "mixamorig:RightUpLeg": "thigh.R",
+    "mixamorig:RightFoot": "foot.R",
+    "mixamorig:LeftUpLeg": "thigh.L",
+    "mixamorig:LeftFoot": "foot.L"
+  },
+  "feet": ["foot.R", "foot.L"]
+}

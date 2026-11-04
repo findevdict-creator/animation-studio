@@ -609,6 +609,12 @@ def check_layout(
                     f"{sid}: {b.shot_id} starts at {b.frame_start}, {a.shot_id} ends at {a.frame_end}",
                     where=sid, entity_ids=[a.shot_id, b.shot_id],
                 )
+
+    # Adjacent clips that need an intermediate clip or a longer blend (asset build phase 2).
+    from studio.assets.clips import check_transitions
+
+    for issue in check_transitions(layout, manifest):
+        out.add(issue.severity, issue.category, owner, issue.message, where=issue.where, entity_ids=issue.entity_ids, fix=issue.suggested_fix)
     return out.issues
 
 
