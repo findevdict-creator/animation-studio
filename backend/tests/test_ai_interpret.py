@@ -166,3 +166,16 @@ def test_transient_error_is_retried(api_as, db, dispatcher, storage_as):
 def test_ai_jobs_need_ai_use(api_as):
     r = api_as("reviewer").post("/api/v1/jobs", json={"type": "interpret_character", "params": {"description": "x y z"}})
     assert r.status_code == 403
+
+
+def test_missing_key_fails_at_once_with_a_clear_message(api_as, db, dispatcher, storage_as, monkeypatch):
+    from studio_workers.ai_runner import AIRunner
+
+    monkeypatch.setenv("ANTHROPIC_API_KEY", "")
+    monkeypatch.delenv("ANTHROPIC_AUTH_TOKEN", raising=False)
+    job = api_as("creator").post("/api/v1/jobs", json={"type": "interpret_character",
+                                                       "params": {"description": "anything"}}).json()
+    AIRunner(llm=LLMSettings(), work_storage=storage_as("worker", "work"), dispatcher=dispatcher).run(uuid.UUID(job["id"]))
+    with db() as s:
+        row = s.get(Job, uuid.UUID(job["id"]))
+        assert row.status == "failed" and row.attempt == 1 and "ANTHROPIC_API_KEY" in row.error["message"]

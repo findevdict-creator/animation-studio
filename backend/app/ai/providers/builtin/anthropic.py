@@ -27,8 +27,11 @@ class AnthropicProvider(LLMProvider):
         except ImportError as exc:  # pragma: no cover
             raise LLMConfigError("anthropic: pip install anthropic") from exc
         kwargs: dict[str, Any] = {}
-        if self.api_key:
-            kwargs["api_key"] = self.api_key
+        key = self.api_key or self.find_api_key()
+        if not key and not os.environ.get("ANTHROPIC_AUTH_TOKEN"):
+            raise LLMConfigError("anthropic: set ANTHROPIC_API_KEY (or ANTHROPIC_AUTH_TOKEN) to use this provider")
+        if key:
+            kwargs["api_key"] = key
         if self.base_url:
             kwargs["base_url"] = self.base_url
         return anthropic.Anthropic(**kwargs)

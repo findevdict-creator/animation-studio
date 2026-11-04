@@ -49,7 +49,7 @@ def submit(
     try:
         clean = JOB_PARAMS[jtype].model_validate(params).model_dump(mode="json")
     except ValidationError as exc:
-        raise ApiError(422, "invalid_job_params", "job params failed validation", errors=exc.errors(include_url=False)) from None
+        raise ApiError(422, "invalid_job_params", "job params failed validation", errors=exc.errors(include_url=False, include_context=False)) from None
 
     if idempotency_key:
         existing = session.scalar(select(Job).where(Job.idempotency_key == idempotency_key))

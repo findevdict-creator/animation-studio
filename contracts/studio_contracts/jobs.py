@@ -13,7 +13,7 @@ from enum import StrEnum
 from typing import Any, Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 
 class Model(BaseModel):
@@ -58,20 +58,53 @@ class InterpretCharacterParams(Model):
     provider: str | None = Field(default=None, max_length=120, description="provider[:model]; default from settings")
 
 
+class PreviewSettings(Model):
+    resolution: int = Field(default=512, ge=64, le=2048)
+    samples: int = Field(default=16, ge=1, le=256)
+    turntable_frames: int = Field(default=24, ge=4, le=120)
+    sheet_tile: int = Field(default=256, ge=64, le=1024)
+    turntable: bool = True
+    expression_sheet: bool = True
+    glb: bool = True
+
+
+class GenerateCharacterParams(Model):
+    """Blender: a validated CharacterSpecification to a rigged character draft with previews."""
+
+    spec: dict[str, Any]
+    previews: PreviewSettings = Field(default_factory=PreviewSettings)
+
+    @model_validator(mode="after")
+    def _spec_is_valid(self) -> "GenerateCharacterParams":
+        from studio_contracts.character import CharacterSpecification, validate_spec
+
+        spec = CharacterSpecification.model_validate(self.spec)
+        errors = [i for i in validate_spec(spec) if i.severity == "error"]
+        if errors:
+            raise ValueError("; ".join(f"{i.path}: {i.message}" for i in errors))
+        self.spec = spec.model_dump(mode="json")
+        return self
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
+    generate_character = "generate_character"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.blender_smoke: BlenderSmokeParams,
     JobType.interpret_character: InterpretCharacterParams,
+    JobType.generate_character: GenerateCharacterParams,
 }
-JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai}
+JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
+                                    JobType.generate_character: Queue.blender}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
-RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True}
+RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
+                                   JobType.generate_character: True}
 #: permissions a caller needs on top of job.submit to submit the type
-JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create")}
+JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
+                                                   JobType.generate_character: ("asset.create",)}
 
 
 class InputFile(Model):
@@ -100,7 +133,7 @@ class OutputFile(Model):
     """A file the process wrote under ``out/``. The worker hashes and uploads it."""
 
     path: str  # relative to out/
-    role: Literal["blend", "spec", "thumbnail", "turntable", "glb", "texture", "manifest", "log", "report"]
+    role: Literal["blend", "spec", "thumbnail", "turntable", "glb", "texture", "manifest", "log", "report", "preview"]
     mime_type: str
 
 

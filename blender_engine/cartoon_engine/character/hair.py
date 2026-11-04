@@ -84,6 +84,7 @@ def build_hair(sk: Skeleton, rc: ResolvedCharacter, layout, materials: dict, nam
     mesh = bpy.data.meshes.new(name)
     mesh.from_pydata(verts, [], faces)
     mesh.validate()
+    _outward_normals(mesh)
     mesh.materials.append(materials["hair"])
     for p in mesh.polygons:
         p.use_smooth = True
@@ -134,3 +135,14 @@ def _back_panel(verts, faces, sk: Skeleton, hit, hh, back_lat, thick_f) -> None:
         for j in range(cols - 1):
             a = base + i * cols + j
             faces.append((a, a + 1, a + cols + 1, a + cols))
+
+
+def _outward_normals(mesh) -> None:
+    """Consistent winding (the pole fan, rim and spikes are built in different orders)."""
+    import bmesh
+
+    bm = bmesh.new()
+    bm.from_mesh(mesh)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces[:])
+    bm.to_mesh(mesh)
+    bm.free()

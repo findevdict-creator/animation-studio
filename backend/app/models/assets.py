@@ -18,7 +18,7 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.models.base import Base, created_at, uuid_pk
 
 VERSION_STATUSES = ("draft", "review", "published", "deprecated")
-FILE_ROLES = ("blend", "spec", "thumbnail", "turntable", "glb", "texture", "manifest", "log", "report")
+FILE_ROLES = ("blend", "spec", "thumbnail", "turntable", "glb", "texture", "manifest", "log", "report", "preview")
 
 
 class AssetCodeCounter(Base):

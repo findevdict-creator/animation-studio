@@ -1,0 +1,125 @@
+{
+  "character": "Ali",
+  "spec_digest": "6816efcad0ba7b0d7ce3c22a784989929f55742f0f557037984147c9d4a559eb",
+  "rig_profile": "cartoon_humanoid@1.0",
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.2.0",
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "deform_bones",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "controls",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "deform_bones_prefixed",
+      "ok": true,
+      "stray": []
+    },
+    {
+      "name": "rig_profile_tag",
+      "ok": true,
+      "found": "cartoon_humanoid@1.0"
+    },
+    {
+      "name": "shape_keys",
+      "ok": true,
+      "missing": [],
+      "extra": []
+    },
+    {
+      "name": "shape_key_drivers",
+      "ok": true,
+      "undriven": [],
+      "not_simple": []
+    },
+    {
+      "name": "face_control_properties",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "skin_weights",
+      "ok": true,
+      "problems": {}
+    },
+    {
+      "name": "mask_groups",
+      "ok": true,
+      "empty": []
+    },
+    {
+      "name": "applied_transforms",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "armature_modifiers",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "materials",
+      "ok": true,
+      "missing": []
+    },
+    {
+      "name": "on_the_ground",
+      "ok": true,
+      "bottom_m": -0.0032
+    },
+    {
+      "name": "height",
+      "ok": true,
+      "measured_m": 1.2831,
+      "requested_m": 1.28
+    },
+    {
+      "name": "symmetric",
+      "ok": true,
+      "offset_m": -0.0
+    },
+    {
+      "name": "fk_arm_moves_hand_only",
+      "ok": true,
+      "hand_mean_m": 0.2936,
+      "chest_max_m": 0.0
+    },
+    {
+      "name": "no_explosion_fk",
+      "ok": true,
+      "max_m": 0.3637
+    },
+    {
+      "name": "ik_leg_lifts_foot",
+      "ok": true,
+      "lift_m": 0.0928,
+      "measured_m": 0.0927
+    },
+    {
+      "name": "head_turn",
+      "ok": true,
+      "head_max_m": 0.105
+    },
+    {
+      "name": "face_controls_move_face",
+      "ok": true,
+      "dead": []
+    },
+    {
+      "name": "visemes_override_mouth",
+      "ok": true,
+      "mouth": 0.0
+    },
+    {
+      "name": "eyes_track_target",
+      "ok": true
+    }
+  ]
+}

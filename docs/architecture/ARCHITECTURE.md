@@ -834,7 +834,7 @@ and is not in the MVP.
 ## 8. Character rig standard
 
 `cartoon_humanoid_v1` is a **rig profile version**, a contract document in `contracts`
-plus a validator in `blender_engine/rigging/profile_check.py`. A character, outfit or
+plus a validator in `blender_engine/cartoon_engine/character/validate.py` (8.4). A character, outfit or
 animation is compatible with a profile only if it passes the validator.
 
 ### 8.1 Body rig
@@ -887,7 +887,42 @@ rest-pose tolerances; height range; the `face_ctrl` properties. The validator al
 weights sum to 1, no unweighted deform vertices, no non-manifold or zero-area faces, scale 1,
 and renders a pose-suite contact sheet for the reviewer.
 
-### 8.4 Existing code
+### 8.4 Phase 2 implementation (stand-in template)
+
+Q2 (who authors the template) is still open, so Phase 2 built the engine against a
+procedural stand-in, `TPL-HUMANOID-STANDIN@0.1`, in `blender_engine/cartoon_engine/character/`.
+It satisfies this rig standard and every interface the artist-made template will plug into,
+but it is placeholder art, not the "professional quality" of R1. What differs from 8.1 to
+8.3 and why:
+
+- **Geometry** comes from code: skeleton landmarks (`skeleton.py`), a skin-modifier body,
+  a skull shaped by face shape and sliders, and face parts (eyelids, brows, mouth) generated
+  from a `FaceState`. Each shape key is the head rebuilt from one state, so the 43 keys
+  have exactly the profile's names. An artist template replaces `body.py`/`head.py`; the
+  landmarks, rig fitting, drivers, validator and previews stay.
+- **Weights** are deterministic distance-to-bone weights (at most four influences,
+  normalised, Rigify's split limb segments blended), not transferred from hand-painted
+  template weights. The head, hair and eyes are rigid.
+- **Facing**: the character faces -Y (Blender's front view, as Rigify's metarig does),
+  its left side is +X (`.L`).
+- **Rigify**: the metarig's own bone axes (`align_roll`) and connection flags must be kept
+  when bones are moved; reconnecting `spine.004` makes the head rig fail ("bone position is
+  disjoint"). Generation takes about 0.8 s once the face rig is removed (404 bones).
+- **Drivers** are simple expressions (`p`, and `p * (1 - min(1, v0 + … + v9))` for mouth
+  expressions), so they evaluate with auto-run scripts disabled. Setting an ID property
+  from code does not tag the depsgraph; the validator tags the rig before evaluating.
+- **Validator** (`validate.py`) checks structure (bones, controls, shape keys and drivers,
+  weights, masks, transforms, modifiers, materials, height, symmetry) and motion (FK arm,
+  IK leg, head turn, every face property, viseme override, eye tracking) on evaluated
+  meshes. Not yet checked: non-manifold geometry (the eyelids and mouth are open shells by
+  design) and a body pose-suite contact sheet.
+- **Previews** render with Cycles on the CPU: Eevee needs EGL/GPU, which headless workers
+  lack. MP4s are encoded by Blender's bundled FFmpeg through the sequencer (Blender 5 needs
+  `image_settings.media_type = "VIDEO"`). The GLB has DEF joints only and the 43 morph
+  targets, uncompressed (no Draco yet).
+- **Blender 5 detail**: new shape keys are created at value 1.0, so the builder sets 0.
+
+### 8.5 Existing code
 
 The seed library's `rigify_human` is an 11-bone placeholder rig made of boxes
 (`tools/make_seed_library.py`), not a Rigify rig. It is renamed `legacy_box_human_v0` in
@@ -1326,7 +1361,7 @@ Phase 1 starts.
 | # | Question | Proposed default |
 |---|---|---|
 | Q1 | Which Blender release do we pin? | **Decided in Phase 1:** 5.2.3 LTS, the current LTS, which the spikes verified. Every later upgrade is a planned migration that reruns the spike tests. |
-| Q2 ★ | Who authors the first character template and the first garment templates (R1)? | A commissioned or in-house 3D artist delivers one child template and three garments to the rig standard in section 8 before Phase 2; the engine work starts in parallel on a simplified stand-in. |
+| Q2 ★ | Who authors the first character template and the first garment templates (R1)? | A commissioned or in-house 3D artist delivers one child template and three garments to the rig standard in section 8 before Phase 2; the engine work starts in parallel on a simplified stand-in. **Still open.** Phase 2 shipped on the procedural stand-in `TPL-HUMANOID-STANDIN@0.1` (8.4). |
 | Q3 | Do we merge the existing 16-PR stack into `main` first? | **Answered by M:** no. The new platform starts from `main` on its own numbered branches; the stack stays unmerged as a reference, and code is ported from it when a phase needs it. |
 | Q4 ★ | Will artists hand-edit scene or character files in desktop Blender? | Not in the MVP. Character edits go through draft specs; scene edits through the scene manifest. A desktop check-in workflow is a later phase. |
 | Q5 | How is a reference image used? | As vision input to the AI interpretation step only (spec suggestions). No image-to-3D in the MVP; the queue keeps the `image_to_3d` route from PR #14 as a later option. |

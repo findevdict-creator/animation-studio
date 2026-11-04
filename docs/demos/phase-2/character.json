@@ -1,0 +1,101 @@
+{
+  "specification": {
+    "schema_version": "character_spec/1",
+    "name": "Ali",
+    "description": "",
+    "style_profile": {
+      "id": "family_cartoon",
+      "version": "1.0"
+    },
+    "template": null,
+    "rig_profile": null,
+    "body": {
+      "age_appearance": "child",
+      "body_type": "average",
+      "height_m": 1.28,
+      "head_body_ratio": null,
+      "proportions": {
+        "belly": -0.2,
+        "leg_length": 0.1
+      }
+    },
+    "face": {
+      "shape": "rounded",
+      "eye_shape": "large_rounded",
+      "eye_size": 0.7,
+      "eye_color": "brown",
+      "nose": "small",
+      "mouth": "friendly",
+      "ears": "default",
+      "sliders": {
+        "cheek_fullness": 0.3
+      }
+    },
+    "hair": {
+      "style": "short",
+      "color": "black",
+      "asset": null
+    },
+    "materials": {
+      "skin": {
+        "preset": "warm_medium",
+        "color": null
+      }
+    },
+    "preview_outfit": null,
+    "expressions": "rig_profile_default",
+    "reference_images": [],
+    "overrides": {},
+    "seed": 0
+  },
+  "resolved": {
+    "name": "Ali",
+    "style_profile": "family_cartoon@1.0",
+    "template": "TPL-HUMANOID-STANDIN@0.1",
+    "rig_profile": "cartoon_humanoid@1.0",
+    "fit_profile": "child_average",
+    "age_appearance": "child",
+    "body_type": "average",
+    "height_m": 1.28,
+    "head_body_ratio": 0.32,
+    "limb_thickness": 0.055,
+    "torso_width": 1.0,
+    "belly": 1.0,
+    "limb": 1.0,
+    "proportions": {
+      "shoulder_width": 0.0,
+      "arm_length": 0.0,
+      "leg_length": 0.1,
+      "torso_length": 0.0,
+      "belly": -0.2,
+      "hip_width": 0.0,
+      "hand_size": 0.0,
+      "foot_size": 0.0,
+      "neck_length": 0.0
+    },
+    "face_shape": "rounded",
+    "eye_shape": "large_rounded",
+    "eye_size": 0.7,
+    "eye_color": "#5A3A1E",
+    "nose": "small",
+    "mouth": "friendly",
+    "ears": "default",
+    "face_sliders": {
+      "brow_height": 0.0,
+      "cheek_fullness": 0.3,
+      "jaw_width": 0.0,
+      "eye_spacing": 0.0,
+      "chin_length": 0.0
+    },
+    "hair_style": "short",
+    "hair_color": "#151010",
+    "skin_color": "#D9A07A",
+    "skin_roughness": 0.65,
+    "skin_specular": 0.25,
+    "skin_subsurface": 0.05,
+    "hair_roughness": 0.55,
+    "eye_roughness": 0.15,
+    "seed": 0
+  },
+  "resolved_digest": "6816efcad0ba7b0d7ce3c22a784989929f55742f0f557037984147c9d4a559eb"
+}
