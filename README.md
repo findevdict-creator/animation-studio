@@ -1,27 +1,45 @@
 # Animation Studio
 
-Story text in, a validated production package out. Six text agents (Story Analyst, Character
-Designer, World and Scene Builder, Director, Layout TD, Continuity Checker) run under a code
-coordinator. Rendering is deterministic Blender code in a later stage; no generative model is in
-the render path.
+An AI-assisted 3D cartoon production platform: reusable, immutably versioned characters,
+outfits and assets built by deterministic Blender code from AI-interpreted specifications,
+then assembled into scenes and episodes.
 
-## Modules
+The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md).
 
-Each module lives on its own numbered branch, built on the branch before it, so a module can be
-revisited on its branch and merged back into `main`.
+## Branches
 
-| Branch | Module | What it adds |
-| --- | --- | --- |
-| `01-schemas` | `studio/schemas`, `studio/checks.py` | Pydantic models for every pipeline file, ID formats, cross-reference checks |
-| `02-coordinator` | `studio/coordinator` | Runs agents in order, validates, retries, approval gates, flags, merge, exports |
-| `03-library-scanner` | `tools/` | Blender headless scripts: scan the asset library into `manifest.json`, lint, turntables |
-| `04-story-analyst` | `studio/agents/story_analyst.py` | First agent on the Claude API with structured output |
+The platform is built as a stack of numbered branches starting from `main`, each on top of
+the one before, so each step can be reviewed and merged on its own.
 
-## Setup
+| Branch | What it adds |
+| --- | --- |
+| `v2-01-architecture` | The architecture document (SRS section 34) |
+| `v2-02-backend` | Repository layout, `contracts` package, FastAPI app, Alembic baseline with immutability guards and seeded roles |
+
+The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
+and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the
+new phases port pieces of it when they need them.
+
+## Layout
 
 ```
-pip install -e ".[dev]"
-pytest
+contracts/        shared Pydantic contracts (IDs, versions, job envelopes); no other deps
+backend/          FastAPI app (app/), Alembic migrations, tests
+docs/architecture/
 ```
 
-Design docs: "Animation Studio: Stage 1 Agent Design" and "Asset Build Implementation Plan".
+## Development
+
+Needs Python 3.13 and PostgreSQL 16 or later.
+
+```
+python3.13 -m venv .venv && . .venv/bin/activate
+make install
+createdb studio && createdb studio_test           # role studio/studio, or set the URLs below
+export STUDIO_DATABASE_URL=postgresql+psycopg://studio:studio@localhost:5432/studio
+make migrate
+make test          # uses STUDIO_TEST_DATABASE_URL (default: .../studio_test)
+make api           # http://127.0.0.1:8000/api/docs
+```
+
+Settings are environment variables prefixed `STUDIO_` (see `backend/app/config.py`).

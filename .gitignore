@@ -9,3 +9,6 @@ dist/
 runs/
 library/preview/
 *.blend1
+node_modules/
+/work/
+*.blend@

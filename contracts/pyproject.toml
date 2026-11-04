@@ -1,0 +1,13 @@
+[project]
+name = "studio-contracts"
+version = "0.1.0"
+description = "Shared specifications and job envelopes. Pure Pydantic; imported by the API, the workers and the Blender engine."
+requires-python = ">=3.13"
+dependencies = ["pydantic>=2.9"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["studio_contracts*"]
