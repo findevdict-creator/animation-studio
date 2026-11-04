@@ -24,6 +24,48 @@ os.environ.setdefault("STUDIO_LOG_JSON", "false")
 S3_ENDPOINT = os.environ.get("STUDIO_TEST_S3_ENDPOINT", "http://localhost:8333")
 os.environ["STUDIO_S3_ENDPOINT_URL"] = S3_ENDPOINT
 os.environ.setdefault("STUDIO_S3_ACCESS_KEY", "dev-api")
+
+# Authentication: a signing key made for this test session, served as a static JWKS.
+TEST_ISSUER = "http://test-idp.local/realms/studio"
+TEST_AUDIENCE = "studio-api"
+_TEST_KEY = None
+
+
+def _signing_key():
+    global _TEST_KEY
+    if _TEST_KEY is None:
+        from cryptography.hazmat.primitives.asymmetric import rsa
+
+        _TEST_KEY = rsa.generate_private_key(public_exponent=65537, key_size=2048)
+    return _TEST_KEY
+
+
+def _jwks() -> str:
+    import json as _json
+
+    import jwt as _jwt
+
+    jwk = _json.loads(_jwt.algorithms.RSAAlgorithm.to_jwk(_signing_key().public_key()))
+    jwk.update(kid="test-key", use="sig", alg="RS256")
+    return _json.dumps({"keys": [jwk]})
+
+
+os.environ["STUDIO_AUTH_ISSUER"] = TEST_ISSUER
+os.environ["STUDIO_AUTH_AUDIENCE"] = TEST_AUDIENCE
+os.environ["STUDIO_AUTH_JWKS_JSON"] = _jwks()
+
+
+def make_token(sub: str = "user-admin", roles: list[str] | None = None, *, key=None, kid: str = "test-key",
+               issuer: str = TEST_ISSUER, audience: str = TEST_AUDIENCE, expires_in: int = 300, **claims) -> str:
+    import time as _time
+
+    import jwt as _jwt
+
+    now = int(_time.time())
+    payload = {"sub": sub, "iss": issuer, "aud": audience, "iat": now, "exp": now + expires_in,
+               "realm_access": {"roles": roles if roles is not None else ["admin"]},
+               "email": f"{sub}@studio.test", "preferred_username": sub, **claims}
+    return _jwt.encode(payload, key or _signing_key(), algorithm="RS256", headers={"kid": kid})
 os.environ.setdefault("STUDIO_S3_SECRET_KEY", "dev-api-secret")
 DEV_KEYS = {
     "admin": ("dev-admin", "dev-admin-secret"),
@@ -129,10 +171,37 @@ def db(migrated):
 
 
 @pytest.fixture
-def api(migrated, s3_buckets, dispatcher):
+def anon(migrated, s3_buckets, dispatcher):
+    """An API client without credentials."""
     from fastapi.testclient import TestClient
 
     from app.main import create_app
 
     with TestClient(create_app()) as client:
         yield client
+
+
+@pytest.fixture
+def api_as(migrated, s3_buckets, dispatcher):
+    """api_as("creator") -> an API client whose requests carry a token with that role."""
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+
+    clients = []
+
+    def make(*roles: str, sub: str | None = None):
+        c = TestClient(create_app())
+        c.headers["Authorization"] = f"Bearer {make_token(sub or 'user-' + '-'.join(roles or ('none',)), list(roles))}"
+        clients.append(c)
+        return c
+
+    yield make
+    for c in clients:
+        c.close()
+
+
+@pytest.fixture
+def api(api_as):
+    """An API client authenticated as an administrator."""
+    return api_as("admin")

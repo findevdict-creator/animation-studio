@@ -1,0 +1,172 @@
+{
+  "realm": "studio",
+  "enabled": true,
+  "displayName": "Animation Studio (development)",
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "loginWithEmailAllowed": true,
+  "accessTokenLifespan": 900,
+  "ssoSessionIdleTimeout": 28800,
+  "roles": {
+    "realm": [
+      {
+        "name": "admin",
+        "description": "Administrator"
+      },
+      {
+        "name": "creator",
+        "description": "Creator / Artist"
+      },
+      {
+        "name": "director",
+        "description": "Director / Producer"
+      },
+      {
+        "name": "reviewer",
+        "description": "Viewer / Reviewer"
+      }
+    ]
+  },
+  "clients": [
+    {
+      "clientId": "studio-api",
+      "name": "Studio API (resource server)",
+      "enabled": true,
+      "publicClient": false,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": false,
+      "serviceAccountsEnabled": false,
+      "secret": "dev-studio-api-secret",
+      "protocol": "openid-connect"
+    },
+    {
+      "clientId": "studio-web",
+      "name": "Studio web app",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "implicitFlowEnabled": false,
+      "redirectUris": [
+        "http://localhost:5173/*"
+      ],
+      "webOrigins": [
+        "http://localhost:5173"
+      ],
+      "attributes": {
+        "pkce.code.challenge.method": "S256",
+        "post.logout.redirect.uris": "http://localhost:5173/*"
+      },
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "studio-api audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "studio-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    },
+    {
+      "clientId": "studio-dev-cli",
+      "name": "Development CLI (password grant, dev realm only)",
+      "enabled": true,
+      "publicClient": true,
+      "standardFlowEnabled": false,
+      "directAccessGrantsEnabled": true,
+      "protocol": "openid-connect",
+      "protocolMappers": [
+        {
+          "name": "studio-api audience",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-audience-mapper",
+          "consentRequired": false,
+          "config": {
+            "included.client.audience": "studio-api",
+            "id.token.claim": "false",
+            "access.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "admin",
+      "email": "admin@studio.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Admin",
+      "lastName": "Dev",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-admin",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "admin"
+      ]
+    },
+    {
+      "username": "creator",
+      "email": "creator@studio.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Creator",
+      "lastName": "Dev",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-creator",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "creator"
+      ]
+    },
+    {
+      "username": "director",
+      "email": "director@studio.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Director",
+      "lastName": "Dev",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-director",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "director"
+      ]
+    },
+    {
+      "username": "reviewer",
+      "email": "reviewer@studio.local",
+      "emailVerified": true,
+      "enabled": true,
+      "firstName": "Reviewer",
+      "lastName": "Dev",
+      "credentials": [
+        {
+          "type": "password",
+          "value": "dev-reviewer",
+          "temporary": false
+        }
+      ],
+      "realmRoles": [
+        "reviewer"
+      ]
+    }
+  ]
+}

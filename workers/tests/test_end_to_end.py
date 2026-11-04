@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 
 from app.jobs.queue import set_dispatcher
 from app.main import create_app
+from studio_testing.plugin import make_token
 
 
 @pytest.fixture
@@ -40,6 +41,7 @@ def celery_worker(migrated, s3_buckets, tmp_path):
 def test_api_to_blender_to_storage_and_back(celery_worker):
     set_dispatcher(None)  # the real Celery dispatcher
     with TestClient(create_app()) as api:
+        api.headers["Authorization"] = f"Bearer {make_token('e2e-creator', ['creator'])}"
         r = api.post("/api/v1/jobs", json={"type": "blender_smoke", "params": {"object_name": "e2e_cube"}})
         assert r.status_code == 202, r.text
         job_id = r.json()["id"]

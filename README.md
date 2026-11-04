@@ -17,6 +17,7 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-02-backend` | Repository layout, `contracts` package, FastAPI app, Alembic baseline with immutability guards and seeded roles |
 | `v2-03-storage` | S3 storage layer: library and work buckets, write-once `put_immutable` with server-side conditional writes, SHA-256 on every object, presigned URLs, per-identity access |
 | `v2-04-jobs` | Jobs in PostgreSQL with Celery on Redis as transport, the Blender engine package and entry point, the worker supervisor (one Blender process per job, progress, cancel, timeout, crash retry, output upload), `blender_smoke` job, job and asset metadata API |
+| `v2-05-auth` | OIDC bearer tokens (JWKS, issuer, audience, expiry), users created on first login with roles synced from the token, permission checks from the database, audit entries, `/me`, dev Keycloak realm |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the
@@ -28,7 +29,7 @@ new phases port pieces of it when they need them.
 contracts/        shared Pydantic contracts (IDs, versions, job envelopes); no other deps
 blender_engine/   cartoon_engine: runs only inside Blender (or the bpy wheel); entrypoint.py runs one job
 workers/          Celery tasks and the supervisor that runs Blender jobs
-infra/            dev service configuration (SeaweedFS identities)
+infra/            dev service configuration (SeaweedFS identities, Keycloak realm)
 backend/          FastAPI app (app/), Alembic migrations, shared test fixtures (studio_testing), tests
 docs/architecture/
 ```

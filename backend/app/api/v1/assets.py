@@ -8,6 +8,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.v1.schemas import AssetFileOut, AssetVersionOut, DownloadOut
+from app.core.auth import Principal, require
 from app.core.database import get_session
 from app.core.errors import ApiError
 from app.core.storage import Storage
@@ -17,7 +18,8 @@ router = APIRouter(prefix="/assets", tags=["assets"])
 
 
 @router.get("/versions/{version_id}", response_model=AssetVersionOut)
-def get_version(version_id: uuid.UUID, session: Session = Depends(get_session)) -> AssetVersionOut:
+def get_version(version_id: uuid.UUID, session: Session = Depends(get_session),
+                _: Principal = Depends(require("asset.read"))) -> AssetVersionOut:
     v = session.get(AssetVersion, version_id)
     if v is None:
         raise ApiError(404, "asset_version_not_found", str(version_id))
@@ -25,7 +27,8 @@ def get_version(version_id: uuid.UUID, session: Session = Depends(get_session)) 
 
 
 @router.get("/files/{file_id}", response_model=AssetFileOut)
-def get_file(file_id: uuid.UUID, session: Session = Depends(get_session)) -> AssetFileOut:
+def get_file(file_id: uuid.UUID, session: Session = Depends(get_session),
+                _: Principal = Depends(require("asset.read"))) -> AssetFileOut:
     f = session.get(AssetFile, file_id)
     if f is None:
         raise ApiError(404, "asset_file_not_found", str(file_id))
@@ -33,7 +36,8 @@ def get_file(file_id: uuid.UUID, session: Session = Depends(get_session)) -> Ass
 
 
 @router.get("/files/{file_id}/download", response_model=DownloadOut, summary="Short-lived presigned URL")
-def download_file(file_id: uuid.UUID, session: Session = Depends(get_session)) -> DownloadOut:
+def download_file(file_id: uuid.UUID, session: Session = Depends(get_session),
+                _: Principal = Depends(require("asset.read"))) -> DownloadOut:
     f = session.get(AssetFile, file_id)
     if f is None:
         raise ApiError(404, "asset_file_not_found", str(file_id))

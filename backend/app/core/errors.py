@@ -16,14 +16,15 @@ PROBLEM = "application/problem+json"
 class ApiError(Exception):
     """Raise from services and routers; ``code`` is stable and documented."""
 
-    def __init__(self, status: int, code: str, detail: str = "", **extra: Any):
+    def __init__(self, status: int, code: str, detail: str = "", headers: dict[str, str] | None = None, **extra: Any):
         self.status = status
         self.code = code
         self.detail = detail
+        self.headers = headers
         self.extra = extra
 
 
-def problem(status: int, code: str, detail: str = "", **extra: Any) -> JSONResponse:
+def problem(status: int, code: str, detail: str = "", headers: dict[str, str] | None = None, **extra: Any) -> JSONResponse:
     body = {
         "type": f"https://errors.studio.local/{code}",
         "title": HTTPStatus(status).phrase,
@@ -32,13 +33,13 @@ def problem(status: int, code: str, detail: str = "", **extra: Any) -> JSONRespo
         "detail": detail,
         **extra,
     }
-    return JSONResponse(body, status_code=status, media_type=PROBLEM)
+    return JSONResponse(body, status_code=status, media_type=PROBLEM, headers=headers)
 
 
 def install_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(ApiError)
     async def _api_error(_: Request, exc: ApiError) -> JSONResponse:
-        return problem(exc.status, exc.code, exc.detail, **exc.extra)
+        return problem(exc.status, exc.code, exc.detail, headers=exc.headers, **exc.extra)
 
     @app.exception_handler(RequestValidationError)
     async def _validation(_: Request, exc: RequestValidationError) -> JSONResponse:

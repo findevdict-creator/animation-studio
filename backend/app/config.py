@@ -46,6 +46,15 @@ class Settings(BaseSettings):
     keep_failed_workspaces: bool = True
     worker_host: str | None = None
 
+    # Authentication (architecture 14): OIDC bearer tokens, Keycloak in the dev stack.
+    auth_issuer: str = "http://localhost:8080/realms/studio"
+    auth_audience: str = "studio-api"
+    auth_jwks_url: str | None = Field(default=None, description="default: <issuer>/protocol/openid-connect/certs")
+    auth_jwks_json: str | None = Field(default=None, description="a static JWKS document instead of fetching one")
+    auth_algorithms: list[str] = Field(default_factory=lambda: ["RS256", "ES256"])
+    auth_leeway_s: int = 30
+    auth_roles_claim: str = Field(default="realm_access.roles", description="dotted path to the role list in the token")
+
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 
 
