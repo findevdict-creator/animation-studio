@@ -81,17 +81,17 @@ class StudioService:
         self,
         runs_dir: Path | str = "runs",
         library: Path | str = "library",
-        agents: str = "claude",
-        allowed_agents: tuple[str, ...] = ("claude", "stub"),
+        agents: str = "llm",
+        allowed_agents: tuple[str, ...] = ("llm", "stub"),
         auto_resume: bool = True,
-        registry_factory: Callable[[str], AgentRegistry] | None = None,
+        registry_factory: Callable[[str, Config], AgentRegistry] | None = None,
     ):
         self.runs_dir = Path(runs_dir).resolve()
         self.runs_dir.mkdir(parents=True, exist_ok=True)
         self.library = Path(library).resolve()
-        self.default_agents = agents
-        self.allowed_agents = tuple(allowed_agents)
-        if agents not in self.allowed_agents:
+        self.default_agents = _agent_set(agents)
+        self.allowed_agents = tuple(dict.fromkeys(_agent_set(a) for a in allowed_agents))
+        if self.default_agents not in self.allowed_agents:
             raise ValueError(f"default agent set '{agents}' is not in allowed {self.allowed_agents}")
         self.auto_resume = auto_resume
         self.registry_factory = registry_factory or _default_registry
@@ -126,9 +126,14 @@ class StudioService:
 
     # ------------------------------------------------------------- info
     def info(self) -> dict[str, Any]:
+        from studio.llm import describe_providers, default_provider_name
         from studio.schemas import Flags, HumanApproval
+        from studio.schemas.config import LLM_AGENTS
 
         return {
+            "llm_providers": describe_providers(),
+            "llm_default_provider": default_provider_name(),
+            "llm_agents": list(LLM_AGENTS[:6]),
             "runs_dir": str(self.runs_dir),
             "library": str(self.library),
             "default_agents": self.default_agents,
@@ -148,6 +153,26 @@ class StudioService:
                 "library_manifest_path": str(self.library / "manifest.json"),
             },
         }
+
+    # ------------------------------------------------------------- llm
+    @staticmethod
+    def _llm_choices(config: Config) -> dict[str, str] | None:
+        from studio.llm import LLMSettings
+
+        try:
+            return LLMSettings.from_flags(config.flags).summary(config.agents_enabled())
+        except Exception:
+            return None
+
+    def llm_summary(self, config: Config) -> str:
+        """'openai:gpt-5' when every agent shares one model, else the distinct choices."""
+        from studio.llm import LLMSettings
+
+        choices = LLMSettings.from_flags(config.flags).summary(config.agents_enabled())
+        distinct = list(dict.fromkeys(choices.values()))
+        if len(distinct) == 1:
+            return distinct[0]
+        return ", ".join(f"{a}={c}" for a, c in choices.items())
 
     # ------------------------------------------------------------- runs
     def list_runs(self) -> list[dict[str, Any]]:
@@ -239,6 +264,7 @@ class StudioService:
             "state": state,
             "config": config.model_dump(mode="json"),
             "agents_used": (json.loads((path / "gui.json").read_text()).get("agents") if (path / "gui.json").exists() else None),
+            "llm": self._llm_choices(config),
             "steps": steps,
             "review": review,
             "approvals": json.loads(store.load_approvals().model_dump_json())["records"],
@@ -256,7 +282,7 @@ class StudioService:
         story = body.get("story_text") or ""
         if not story.strip():
             raise GuiError("the story is empty")
-        agents = body.get("agents") or self.default_agents
+        agents = _agent_set(body.get("agents") or self.default_agents)
         if agents not in self.allowed_agents:
             raise GuiError(f"agent set '{agents}' is not allowed here; allowed: {', '.join(self.allowed_agents)}")
         data = {k: v for k, v in (body.get("config") or {}).items() if v is not None}
@@ -278,7 +304,7 @@ class StudioService:
         path = self.run_path(run_id)
         if agents is None and (path / "gui.json").exists():
             agents = json.loads((path / "gui.json").read_text()).get("agents")
-        agents = agents or self.default_agents
+        agents = _agent_set(agents or self.default_agents)
         if agents not in self.allowed_agents:
             raise GuiError(f"agent set '{agents}' is not allowed here")
         with self._lock:
@@ -288,7 +314,13 @@ class StudioService:
             old_log = list(job.log) if job else []
             job = Job(run_id=run_id, agents=agents)
             job.log.extend(old_log[-LOG_LINES // 2 :])
-            job.log.append(f"--- {'resume' if old_log or (path / 'state.json').exists() else 'start'} with {agents} agents")
+            label = agents
+            if agents == "llm":
+                try:
+                    label = f"llm agents ({self.llm_summary(RunStore(path).load_config())})"
+                except Exception as exc:  # a bad provider choice shows up again when the run starts
+                    label = f"llm agents ({exc})"
+            job.log.append(f"--- {'resume' if old_log or (path / 'state.json').exists() else 'start'} with {label}")
             job.thread = threading.Thread(target=self._run, args=(job, path), name=f"studio-run:{run_id}", daemon=True)
             self.jobs[run_id] = job
             job.thread.start()
@@ -302,7 +334,7 @@ class StudioService:
             store = RunStore(path)
             config = store.load_config()
             manifest = load_manifest(config.library_manifest_path)
-            coordinator = Coordinator(config, manifest, self.registry_factory(job.agents), store, project_id=path.name)
+            coordinator = Coordinator(config, manifest, self.registry_factory(job.agents, config), store, project_id=path.name)
             result = coordinator.run()
             job.outcome = "done"
             log.info("done: %s", result.name)
@@ -442,10 +474,14 @@ class StudioService:
         return self.safe_join(self.library / "preview", rel)
 
 
-def _default_registry(kind: str) -> AgentRegistry:
+def _agent_set(kind: str) -> str:
+    return "llm" if kind == "claude" else kind
+
+
+def _default_registry(kind: str, config: Config | None = None) -> AgentRegistry:
     from studio.cli import build_registry
 
     try:
-        return build_registry(kind)
+        return build_registry(kind, config)
     except SystemExit as exc:  # build_registry exits on an unknown kind; keep the thread alive
         raise ValueError(str(exc)) from None

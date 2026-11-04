@@ -41,13 +41,50 @@ pytest
 # dry run with canned agents, no API key needed
 studio run --story tests/fixtures/lantern_fox/story.txt --run-dir runs/demo --agents stub
 
-# the real agents (needs ANTHROPIC_API_KEY; STUDIO_MODEL overrides the default claude-opus-5-5)
-studio run --story story.txt --run-dir runs/film --duration 90 --agents claude
+# the real agents (Claude by default: needs ANTHROPIC_API_KEY; see "LLM providers" below)
+studio run --story story.txt --run-dir runs/film --duration 90 --agents llm
 studio status runs/film
 studio approve runs/film story_analyst      # or: studio revise runs/film story_analyst "notes"
                                             #     studio edit runs/film story_analyst fixed.json
 # then `studio run ...` again to resume from the gate; human_approval.mode "none" skips the gates
 ```
+
+## LLM providers
+
+Every agent calls its model through a provider adapter (`studio/llm/`). Built in:
+
+| provider | key env var | default model | structured output |
+|---|---|---|---|
+| `anthropic` (alias `claude`) | `ANTHROPIC_API_KEY` | `claude-opus-5-5` | native schema (`messages.parse`) |
+| `openai` | `OPENAI_API_KEY` | `gpt-5` | `response_format` json_schema (non-strict) + schema in prompt |
+| `gemini` (alias `google`) | `GEMINI_API_KEY` or `GOOGLE_API_KEY` | `gemini-2.5-pro` | JSON mode + schema in prompt (`STUDIO_GEMINI_SCHEMA=native` adds `response_json_schema`) |
+| `deepseek` | `DEEPSEEK_API_KEY` | `deepseek-chat` | JSON mode + schema in prompt; no images; output capped at 8192 tokens |
+| `openai_compatible` | `STUDIO_OPENAI_COMPATIBLE_BASE_URL` (+ optional `..._API_KEY`) | none, name one | JSON mode + schema in prompt |
+
+Install the SDKs you need: `pip install -e ".[openai]"`, `".[gemini]"` or `".[all-providers]"`.
+For providers other than Claude, the reply is validated with the agent's Pydantic model; on a
+failure the errors go back to the model for `llm_json_repairs` repair turns (default 1), and
+anything still invalid becomes coordinator feedback for the next attempt, like a Claude schema failure.
+
+Choosing, highest precedence first:
+
+```
+studio run ... --llm-agent director=gemini --llm-agent layout_td=openai:gpt-5   # per agent
+studio run ... --llm-provider openai --llm-model gpt-5                          # run-wide
+STUDIO_LLM_PROVIDER=deepseek   STUDIO_OPENAI_MODEL=gpt-5-mini                     # environment
+studio providers                                                                 # what is set up
+```
+
+The same choices live in the run config as `flags.llm_provider`, `flags.llm_model`,
+`flags.llm_agents` (`{"director": "gemini:gemini-2.5-pro"}`) and `flags.llm_json_repairs`, so a
+resumed run keeps its models, and the GUI's new-run form has a "Language model" section for
+them. `build-props` takes the same `--llm-*` options for the Asset Builder and Render QA.
+`STUDIO_MODEL` still sets the Claude default; `STUDIO_<PROVIDER>_MODEL` sets any provider's.
+
+Adding a provider is one class: subclass `OpenAIProvider` for an OpenAI-compatible API, or
+`JSONTextProvider` and implement `_generate` for anything else, then `register_provider(cls)`.
+The fakes in `tests/fakes.py` (`FakeClient`, `FakeOpenAIClient`, `FakeGeminiClient`) cover
+every built-in provider without keys.
 
 ## GUI
 
@@ -65,7 +102,7 @@ continues on its own after the decision unless `--no-auto-resume` is given. It a
 every agent output and version, the production package with its exports, the ranked and
 routed build queue (with the same `--save` as `studio build-requests`) and the library
 manifest with turntable previews. Flags: `--runs-dir`, `--library`, `--agents`,
-`--allow-agents claude,stub`, `--host`, `--port`, `--no-browser`, `--no-auto-resume`. It
+`--allow-agents llm,stub`, `--host`, `--port`, `--no-browser`, `--no-auto-resume`. It
 binds to 127.0.0.1 and has no login; it uses only the standard library.
 
 Each agent is one structured-output call (`client.messages.parse` with its Pydantic schema); the

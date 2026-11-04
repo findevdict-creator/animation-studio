@@ -4,9 +4,16 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from studio.schemas.common import AgentName, StudioModel
+
+
+# Agents that call an LLM: the six pipeline agents and the three asset build agents.
+LLM_AGENTS = (
+    "story_analyst", "character_designer", "scene_builder", "director", "layout_td",
+    "continuity_checker", "asset_builder", "render_qa", "clip_tagger",
+)
 
 
 class CharacterReference(StudioModel):
@@ -53,6 +60,48 @@ class Flags(StudioModel):
     )
     asset_builder_rounds: int = Field(default=3, ge=0)
     qa_accept_score: float = Field(default=0.8, ge=0, le=1)
+    # LLM provider (module 16). None means STUDIO_LLM_PROVIDER, else anthropic; the model
+    # None means STUDIO_<PROVIDER>_MODEL, else the provider's default. llm_agents maps an
+    # agent name to "provider" or "provider:model" and overrides both for that agent.
+    llm_provider: str | None = None
+    llm_model: str | None = None
+    llm_agents: dict[str, str] = Field(default_factory=dict)
+    llm_json_repairs: int = Field(default=1, ge=0, le=5)
+
+    @field_validator("llm_provider", "llm_model", mode="before")
+    @classmethod
+    def _blank_is_none(cls, v):
+        return v.strip() or None if isinstance(v, str) else v
+
+    @field_validator("llm_provider")
+    @classmethod
+    def _known_provider(cls, v):
+        if v is None:
+            return v
+        from studio.llm.registry import resolve_name
+
+        try:
+            return resolve_name(v)
+        except Exception as exc:
+            raise ValueError(str(exc)) from None
+
+    @field_validator("llm_agents")
+    @classmethod
+    def _known_agent_choices(cls, v):
+        from studio.llm.registry import parse_choice
+
+        out = {}
+        for agent, choice in v.items():
+            if agent not in LLM_AGENTS:
+                raise ValueError(f"llm_agents: unknown agent '{agent}'; known: {', '.join(LLM_AGENTS)}")
+            if not (choice or "").strip():
+                continue
+            try:
+                name, model = parse_choice(choice)
+            except Exception as exc:
+                raise ValueError(f"llm_agents.{agent}: {exc}") from None
+            out[agent] = f"{name}:{model}" if model else name
+        return out
 
     @model_validator(mode="after")
     def _consistent(self) -> "Flags":

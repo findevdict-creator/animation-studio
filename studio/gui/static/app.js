@@ -176,13 +176,16 @@ function newRun(app) {
   setNav("new");
   view = { key: "new" };
   const d = INFO.defaults;
-  const flagsProps = INFO.flags_schema.properties;
+  const flagsProps = Object.fromEntries(Object.entries(INFO.flags_schema.properties).filter(([k]) => !k.startsWith("llm_")));
+  const providers = INFO.llm_providers || [];
+  const provOpt = (p) => h("option", { value: p.name }, `${p.name}${p.configured ? "" : " (needs " + p.setup + ")"}`);
+  const defaultModel = (name) => (providers.find((p) => p.name === name) || {}).default_model || "";
   const stamp = new Date().toISOString().slice(0, 16).replace(/[-:T]/g, "");
   const form = h("form", { class: "panel", onsubmit: submit },
     h("h2", {}, "New run"),
     h("div", { class: "form-grid" },
       h("label", { class: "field" }, "Run name", h("input", { type: "text", name: "name", required: true, value: `run-${stamp}`, pattern: "[A-Za-z0-9][A-Za-z0-9_.\\-]{0,63}" })),
-      h("label", { class: "field" }, "Agents", h("select", { name: "agents" }, INFO.allowed_agents.map((a) => h("option", { value: a, selected: a === INFO.default_agents }, a === "stub" ? "stub (canned fixture, offline)" : a)))),
+      h("label", { class: "field" }, "Agents", h("select", { name: "agents", onchange: syncLlm }, INFO.allowed_agents.map((a) => h("option", { value: a, selected: a === INFO.default_agents }, a === "stub" ? "stub (canned fixture, offline)" : a === "llm" ? "llm (real agents)" : a)))),
       h("label", { class: "field" }, "Target duration (s)", h("input", { type: "number", name: "target_duration_sec", value: d.target_duration_sec, min: 1, step: 1 })),
       h("label", { class: "field" }, "FPS", h("input", { type: "number", name: "fps", value: d.fps, min: 1 })),
       h("label", { class: "field" }, "Aspect ratio", h("input", { type: "text", name: "aspect_ratio", value: d.aspect_ratio })),
@@ -197,6 +200,19 @@ function newRun(app) {
       } })),
     h("h3", {}, "Visual style"),
     h("input", { type: "text", name: "visual_style", value: d.visual_style, style: "width:100%" }),
+    h("h3", {}, "Language model"),
+    h("div", { class: "form-grid", id: "llm-fields" },
+      h("label", { class: "field" }, "Provider", h("select", { name: "llm_provider", onchange: syncLlm },
+        h("option", { value: "" }, `default (${INFO.llm_default_provider})`), providers.map(provOpt))),
+      h("label", { class: "field" }, "Model", h("input", { type: "text", name: "llm_model", placeholder: "" })),
+      h("label", { class: "field" }, "JSON repair turns", h("input", { type: "number", name: "llm_json_repairs", min: 0, max: 5, step: 1, value: d.flags.llm_json_repairs ?? 1 }))),
+    h("details", { style: "margin-top:10px", id: "llm-agents" }, h("summary", {}, "Per-agent provider and model"),
+      h("p", { class: "small muted" }, "Leave an agent on “run default” to use the provider and model above. Claude enforces the JSON schema natively; other providers get prompted JSON that is validated and repaired."),
+      h("div", { class: "form-grid", style: "margin-top:8px" }, (INFO.llm_agents || []).map((a) => h("div", { class: "field" },
+        h("span", { class: "small muted" }, label(a)),
+        h("div", { class: "row" },
+          h("select", { "data-llm-agent": a, onchange: syncLlm }, h("option", { value: "" }, "run default"), providers.map((p) => h("option", { value: p.name }, p.name))),
+          h("input", { type: "text", "data-llm-agent-model": a, placeholder: "model", style: "width:9em" })))))),
     h("h3", {}, "Approval gates"),
     h("div", { class: "row" },
       ["all", "selected", "none"].map((m) => h("label", { class: "check" }, h("input", { type: "radio", name: "gate_mode", value: m, checked: m === d.human_approval.mode, onchange: syncGates }),
@@ -208,6 +224,16 @@ function newRun(app) {
     h("div", { id: "form-error" }),
     h("div", { class: "row", style: "margin-top:18px" }, h("button", { class: "primary", type: "submit" }, "Start run"), h("a", { href: "#/" }, "Cancel")),
   );
+  function syncLlm() {
+    const off = form.agents.value === "stub";
+    form.querySelectorAll("#llm-fields input, #llm-fields select, #llm-agents input, #llm-agents select").forEach((el) => (el.disabled = off));
+    const run = form.llm_provider.value || INFO.llm_default_provider;
+    form.llm_model.placeholder = defaultModel(run) || "model name";
+    form.querySelectorAll("[data-llm-agent]").forEach((sel) => {
+      const m = form.querySelector(`[data-llm-agent-model="${sel.dataset.llmAgent}"]`);
+      m.placeholder = sel.value ? defaultModel(sel.value) || "model" : "model";
+    });
+  }
   function syncGates() {
     const sel = form.querySelector("input[name=gate_mode]:checked").value === "selected";
     form.querySelectorAll("input[name=gate_agent]").forEach((c) => (c.disabled = !sel));
@@ -222,6 +248,16 @@ function newRun(app) {
       (flags[el.dataset.flagList] ||= []);
       if (el.checked) flags[el.dataset.flagList].push(el.value);
     });
+    if (form.agents.value !== "stub") {
+      flags.llm_provider = form.llm_provider.value || null;
+      flags.llm_model = form.llm_model.value.trim() || null;
+      flags.llm_json_repairs = Number(form.llm_json_repairs.value || 1);
+      flags.llm_agents = {};
+      form.querySelectorAll("[data-llm-agent]").forEach((sel) => {
+        const model = form.querySelector(`[data-llm-agent-model="${sel.dataset.llmAgent}"]`).value.trim();
+        if (sel.value) flags.llm_agents[sel.dataset.llmAgent] = model ? `${sel.value}:${model}` : sel.value;
+      });
+    }
     const mode = form.querySelector("input[name=gate_mode]:checked").value;
     const body = {
       name: form.name.value.trim(),
@@ -249,6 +285,7 @@ function newRun(app) {
   }
   put(app, form);
   syncGates();
+  syncLlm();
 }
 
 // ---------------------------------------------------------------- one run
@@ -295,6 +332,8 @@ function renderHead(shell, run) {
     h("div", { class: "row small" }, h("span", { class: "muted" }, run.id), badge(status),
       run.package_status ? badge(run.package_status) : null,
       h("span", { class: "muted" }, `agents: ${run.agents_used || "?"}`),
+      run.agents_used !== "stub" && run.llm ? h("span", { class: "muted", title: Object.entries(run.llm).map(([a, c]) => `${a}: ${c}`).join("\n") },
+        `· ${[...new Set(Object.values(run.llm))].join(", ")}`) : null,
       run.state.needs_review ? h("span", { class: "muted" }, "· continuity errors remain") : null));
   const canResume = !run.active && ["interrupted", "failed", "new"].includes(run.status);
   put(shell.querySelector("#run-actions"), 

@@ -1,13 +1,15 @@
 """Command line: run a story, answer gates, show status.
 
-    studio run --story story.txt --run-dir runs/lantern [--config config.json] [--agents stub]
+    studio run --story story.txt --run-dir runs/lantern [--config config.json] [--agents llm|stub]
+               [--llm-provider openai] [--llm-model gpt-5] [--llm-agent director=gemini:gemini-2.5-pro]
+    studio providers                                                    (LLM providers, default models, key status)
     studio approve runs/lantern story_analyst
     studio edit runs/lantern story_analyst edited.json
     studio revise runs/lantern story_analyst "Mia should be older"
     studio status runs/lantern
     studio build-characters runs/lantern [--library library] [--toon]   (asset build phase 1; needs bpy)
     studio build-environments runs/lantern [--library library]          (asset build phase 3; needs bpy)
-    studio gui [--runs-dir runs] [--library library] [--agents claude|stub] [--port 8765]
+    studio gui [--runs-dir runs] [--library library] [--agents llm|stub] [--port 8765]
 """
 
 from __future__ import annotations
@@ -23,16 +25,75 @@ from studio.coordinator.pipeline import decide, load_manifest
 from studio.schemas import Config
 
 
-def build_registry(kind: str) -> AgentRegistry:
+AGENT_SETS = ("llm", "claude", "stub")  # "claude" is the pre-module-16 name for "llm"
+
+
+def build_registry(kind: str, config: Config | None = None) -> AgentRegistry:
+    """``llm``: the real agents, each on the provider and model ``config.flags`` choose.
+    ``stub``: canned fixture outputs, offline."""
     if kind == "stub":
         from studio.agents.stubs import stub_registry
 
         return stub_registry()
-    if kind == "claude":
-        from studio.agents import claude_registry
+    if kind in ("llm", "claude"):
+        from studio.agents import llm_registry
 
-        return claude_registry()
+        return llm_registry(config)
     raise SystemExit(f"unknown agent set '{kind}'")
+
+
+def parse_llm_agent_args(values: list[str]) -> dict[str, str]:
+    out: dict[str, str] = {}
+    for v in values or []:
+        agent, sep, choice = v.partition("=")
+        if not sep or not agent.strip() or not choice.strip():
+            raise SystemExit(f"--llm-agent wants AGENT=PROVIDER[:MODEL], got '{v}'")
+        out[agent.strip()] = choice.strip()
+    return out
+
+
+def apply_llm_args(config: Config, args: argparse.Namespace) -> Config:
+    """--llm-provider / --llm-model / --llm-agent override the config's llm flags."""
+    updates: dict = {}
+    if getattr(args, "llm_provider", None):
+        updates["llm_provider"] = args.llm_provider
+    if getattr(args, "llm_model", None):
+        updates["llm_model"] = args.llm_model
+    agents = parse_llm_agent_args(getattr(args, "llm_agent", None) or [])
+    if agents:
+        updates["llm_agents"] = {**config.flags.llm_agents, **agents}
+    if not updates:
+        return config
+    flags = config.flags.model_dump(mode="json")
+    flags.update(updates)
+    data = config.model_dump(mode="json")
+    data["flags"] = flags
+    try:
+        return Config.model_validate(data)
+    except ValueError as exc:
+        raise SystemExit(f"bad LLM option: {exc}") from None
+
+
+def add_llm_args(p: argparse.ArgumentParser) -> None:
+    p.add_argument("--llm-provider", help="anthropic (default), openai, gemini, deepseek, openai_compatible, or any registered provider")
+    p.add_argument("--llm-model", help="model for the run-wide provider (default: STUDIO_<PROVIDER>_MODEL or the provider's default)")
+    p.add_argument("--llm-agent", action="append", default=[], metavar="AGENT=PROVIDER[:MODEL]",
+                   help="per-agent provider and model, e.g. director=gemini or layout_td=openai:gpt-5 (repeatable)")
+
+
+def cmd_providers(args: argparse.Namespace) -> int:
+    from studio.llm import describe_providers
+
+    rows = describe_providers()
+    if args.json:
+        print(json.dumps(rows, indent=2))
+        return 0
+    for r in rows:
+        key = "ready" if r["configured"] else f"needs {r['setup']}"
+        alias = f" (alias {', '.join(r['aliases'])})" if r["aliases"] else ""
+        vision = "" if r["supports_images"] else ", no images"
+        print(f"{r['name']}{alias}: default model {r['default_model'] or '(set ' + r['model_env'] + ')'}, {key}{vision}")
+    return 0
 
 
 def cmd_run(args: argparse.Namespace) -> int:
@@ -43,10 +104,11 @@ def cmd_run(args: argparse.Namespace) -> int:
         config = Config.model_validate(data)
     else:
         config = Config(story_text=story, target_duration_sec=args.duration)
+    config = apply_llm_args(config, args)
     run_dir = Path(args.run_dir)
     store = RunStore(run_dir)
     manifest = load_manifest(config.library_manifest_path)
-    coordinator = Coordinator(config, manifest, build_registry(args.agents), store, project_id=run_dir.name)
+    coordinator = Coordinator(config, manifest, build_registry(args.agents, config), store, project_id=run_dir.name)
     try:
         path = coordinator.run()
     except AwaitingApproval as exc:
@@ -147,10 +209,14 @@ def cmd_build_props(args: argparse.Namespace) -> int:
     if args.agents == "stub":
         builder, qa = StubAssetBuilder(), StubRenderQA()
     else:
+        from studio.agents import build_agent
         from studio.agents.asset_builder import AssetBuilder
         from studio.agents.render_qa import RenderQA
+        from studio.llm import LLMSettings
 
-        builder, qa = AssetBuilder(), RenderQA()
+        config = apply_llm_args(config, args)
+        settings = LLMSettings.from_flags(config.flags)
+        builder, qa = build_agent(AssetBuilder, settings), build_agent(RenderQA, settings)
     records, promoted = build_props(library, world, manifest, config, builder, qa, only=args.only or None, time_limit_s=args.time_limit, render=not args.no_render)
     report = write_build_report(store.root, "prop_builds", records)
     version = store.save_output("scene_builder", promoted)
@@ -201,10 +267,13 @@ def cmd_build_requests(args: argparse.Namespace) -> int:
 def cmd_gui(args: argparse.Namespace) -> int:
     from studio.gui import StudioService, serve
 
-    allowed = tuple(a for a in args.allow_agents.split(",") if a) if args.allow_agents else ("claude", "stub")
-    unknown = [a for a in allowed if a not in ("claude", "stub")]
+    allowed = tuple(a for a in args.allow_agents.split(",") if a) if args.allow_agents else ("llm", "stub")
+    allowed = tuple(dict.fromkeys("llm" if a == "claude" else a for a in allowed))
+    unknown = [a for a in allowed if a not in AGENT_SETS]
     if unknown:
         raise SystemExit(f"unknown agent set(s) in --allow-agents: {', '.join(unknown)}")
+    if args.agents == "claude":
+        args.agents = "llm"
     if args.agents not in allowed:
         allowed = (args.agents, *allowed)
     service = StudioService(
@@ -232,7 +301,8 @@ def main(argv: list[str] | None = None) -> int:
     run.add_argument("--run-dir", required=True)
     run.add_argument("--config", help="config.json (story_text is filled from --story)")
     run.add_argument("--duration", type=float, default=120.0, help="target seconds when no config is given")
-    run.add_argument("--agents", default="claude", choices=["claude", "stub"])
+    run.add_argument("--agents", default="llm", choices=AGENT_SETS, help="llm: real agents on the configured providers; stub: offline")
+    add_llm_args(run)
 
     for name in ("approve", "revise", "edit"):
         p = sub.add_parser(name, help=f"{name} an agent's output at an open gate")
@@ -242,6 +312,9 @@ def main(argv: list[str] | None = None) -> int:
             p.add_argument("notes")
         if name == "edit":
             p.add_argument("file", help="corrected JSON payload")
+
+    prov = sub.add_parser("providers", help="list LLM providers, their default models and whether a key is set")
+    prov.add_argument("--json", action="store_true")
 
     status = sub.add_parser("status")
     status.add_argument("run_dir")
@@ -261,7 +334,8 @@ def main(argv: list[str] | None = None) -> int:
     bprop.add_argument("run_dir")
     bprop.add_argument("--library", default="library")
     bprop.add_argument("--only", action="append", default=[])
-    bprop.add_argument("--agents", default="claude", choices=["claude", "stub"])
+    bprop.add_argument("--agents", default="llm", choices=AGENT_SETS)
+    add_llm_args(bprop)
     bprop.add_argument("--time-limit", type=float, default=300.0, help="seconds a script may run")
     bprop.add_argument("--no-render", action="store_true", help="skip the turntable (QA then sees a blank sheet)")
 
@@ -274,8 +348,8 @@ def main(argv: list[str] | None = None) -> int:
     gui = sub.add_parser("gui", help="serve the local web GUI")
     gui.add_argument("--runs-dir", default="runs", help="directory holding one folder per run")
     gui.add_argument("--library", default="library", help="asset library (manifest.json, preview/, generators/)")
-    gui.add_argument("--agents", default="claude", choices=["claude", "stub"], help="agent set preselected for new runs")
-    gui.add_argument("--allow-agents", default="", help="comma list of agent sets the GUI may start (default claude,stub)")
+    gui.add_argument("--agents", default="llm", choices=AGENT_SETS, help="agent set preselected for new runs")
+    gui.add_argument("--allow-agents", default="", help="comma list of agent sets the GUI may start (default llm,stub)")
     gui.add_argument("--host", default="127.0.0.1", help="bind address; anything but loopback exposes the GUI without a login")
     gui.add_argument("--port", type=int, default=8765)
     gui.add_argument("--no-browser", action="store_true", help="do not open a browser tab")
@@ -288,6 +362,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_decide(args, args.cmd)
     if args.cmd == "status":
         return cmd_status(args)
+    if args.cmd == "providers":
+        return cmd_providers(args)
     if args.cmd == "build-characters":
         return cmd_build_characters(args)
     if args.cmd == "build-environments":
