@@ -103,6 +103,45 @@ class GenerateCharacterParams(Model):
         return self
 
 
+class OutfitPreviewSettings(Model):
+    resolution: int = Field(default=384, ge=64, le=2048)
+    samples: int = Field(default=12, ge=1, le=256)
+    pose_tile: int = Field(default=256, ge=64, le=1024)
+    pose_sheet: bool = True
+    glb: bool = True
+
+
+class GenerateOutfitParams(Model):
+    """Blender: a validated OutfitSpecification to outfit geometry built on the reference body
+    of its primary fit profile, fitted back onto that body and put through the fit check."""
+
+    spec: dict[str, Any]
+    previews: OutfitPreviewSettings = Field(default_factory=OutfitPreviewSettings)
+    draft_version_id: UUID | None = Field(
+        default=None, description="the outfit draft the build is for; without one a new outfit is created")
+
+    @model_validator(mode="after")
+    def _spec_is_valid(self) -> "GenerateOutfitParams":
+        from studio_contracts.outfit import OutfitSpecification, validate_outfit
+
+        spec = OutfitSpecification.model_validate(self.spec)
+        errors = [i for i in validate_outfit(spec) if i.severity == "error"]
+        if errors:
+            raise ValueError("; ".join(f"{i.path}: {i.message}" for i in errors))
+        self.spec = spec.model_dump(mode="json")
+        return self
+
+
+class FitOutfitParams(Model):
+    """Blender: fit an outfit version onto a character version and run the fit check (the
+    compatibility registry records the result). The worker supplies the files as inputs:
+    ``inputs/character.blend``, ``inputs/character.json`` and ``inputs/outfit.blend``."""
+
+    outfit_version_id: UUID
+    character_version_id: UUID
+    previews: OutfitPreviewSettings = Field(default_factory=OutfitPreviewSettings)
+
+
 class PublishCharacterParams(Model):
     """Publisher: an approved character version in review to an immutable library version.
 
@@ -119,6 +158,8 @@ class JobType(StrEnum):
     interpret_outfit = "interpret_outfit"
     generate_character = "generate_character"
     publish_character = "publish_character"
+    generate_outfit = "generate_outfit"
+    fit_outfit = "fit_outfit"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -127,21 +168,27 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.interpret_outfit: InterpretOutfitParams,
     JobType.generate_character: GenerateCharacterParams,
     JobType.publish_character: PublishCharacterParams,
+    JobType.generate_outfit: GenerateOutfitParams,
+    JobType.fit_outfit: FitOutfitParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
-                                    JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish}
+                                    JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish,
+                                    JobType.generate_outfit: Queue.blender, JobType.fit_outfit: Queue.blender}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
                                    JobType.generate_character: True,
                                    # resumable: the version number is claimed by a write-once marker
-                                   JobType.publish_character: True}
+                                   JobType.publish_character: True,
+                                   JobType.generate_outfit: True, JobType.fit_outfit: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
                                                    JobType.generate_character: ("asset.create",),
-                                                   JobType.publish_character: ("asset.publish",)}
+                                                   JobType.publish_character: ("asset.publish",),
+                                                   JobType.generate_outfit: ("asset.create",),
+                                                   JobType.fit_outfit: ("asset.create",)}
 
 
 class InputFile(Model):

@@ -212,7 +212,7 @@ FAMILY_CARTOON_CLOTHING = ClothingConventions(
     min_clearance_m=0.002,
     mask_margin_m=0.025,
     fit=FitThresholds(max_clip_share=0.005, max_clip_depth_m=0.004, max_edge_stretch=1.6,
-                      min_edge_stretch=0.45, max_lift_m=0.05),
+                      min_edge_stretch=0.3, max_lift_m=0.05),
     poses=("rest", "t_pose", "arms_up", "arms_forward", "walk", "sit", "crouch", "twist", "head_turn"),
 )
 CLOTHING_CONVENTIONS: dict[str, ClothingConventions] = {FAMILY_CARTOON_CLOTHING.style_profile: FAMILY_CARTOON_CLOTHING}
