@@ -1,0 +1,19 @@
+{
+  "source_rig": "cmu",
+  "target_rig_type": "rigify_human",
+  "root": "Hips",
+  "bones": {
+    "Hips": "root",
+    "Spine": "spine",
+    "Head": "head",
+    "RightArm": "upper_arm.R",
+    "RightHand": "hand.R",
+    "LeftArm": "upper_arm.L",
+    "LeftHand": "hand.L",
+    "RightUpLeg": "thigh.R",
+    "RightFoot": "foot.R",
+    "LeftUpLeg": "thigh.L",
+    "LeftFoot": "foot.L"
+  },
+  "feet": ["foot.R", "foot.L"]
+}

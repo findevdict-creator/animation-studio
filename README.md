@@ -23,6 +23,7 @@ revisited on its branch and merged back into `main`.
 | `09-continuity-checker` | `studio/agents/continuity_checker.py` | Reads the whole package for story and continuity problems; routed to owner agents |
 | `10-build-character` | `tools/build_character.py`, `studio/assets` | Asset build phase 1: parametric bases, wardrobe, hair; sheets become rigged `.blend` files |
 | `11-compose-env` | `tools/compose_env.py`, `studio/assets/environments.py` | Asset build phase 3: kits, seeded terrain and scatter; compositions become environment `.blend` files |
+| `12-clip-pipeline` | `tools/retarget.py`, `tools/tag_clips.py`, `tools/procedural.py`, `studio/assets/clips.py` | Asset build phase 2: mocap retargeting to base rigs, tagging, procedural layers, clip search and transitions |
 
 ## Setup
 
@@ -78,3 +79,18 @@ A location with `asset.status: composed` names a kit, a seed, bounds, a terrain 
 the pieces its anchors depend on and scatter layers. The composer builds the set
 deterministically from the seed, saves `library/envs/lib_env_<slug>.blend` with anchors and
 time-of-day light rigs, and the location then points at that library id.
+
+Phase 2, clips:
+
+```
+python -m tools.retarget --library library --source library/clips/source/mixamo/walk_03.fbx \
+    --base base_human_child --map tools/bone_maps/mixamo_to_rigify_human.json --name clip_walk_03 --licence CC0 --rescan
+```
+
+The retargeter constrains the base rig to the mocap armature through a bone map, bakes one
+Action, scales the root travel to the base's height, measures foot sliding (exit code 2 above
+`--max-slide-cm`), decides looping, tags the clip from its name and motion
+(`tools/tag_clips.py`, vocabulary shared with the Director), and saves it under
+`clips/baked/<rig_type>/`. Breathing, blinks, look-at, head follow and feet-on-ground are
+procedural layers in `tools/procedural.py`, so those never become clip requests;
+`studio.assets.clips.find_clip` resolves a Director `action_tags` set to a clip or a layer.

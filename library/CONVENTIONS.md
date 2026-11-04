@@ -89,3 +89,12 @@ terrain, seeded scatter layers, `anchor_*` empties and one `time_<variant>` ligh
 collection per variant (`day`, `dusk`, `night` outdoors, `interior_warm` indoors). The
 result lands in `envs/lib_env_<slug>.blend` with `studio_composed_from`, `studio_kit` and
 `studio_seed`, and scans like any other environment.
+
+## Clips from mocap
+
+`clips/source/<set>/` holds the source files (FBX or .blend) with `LICENCES.md`; the
+scanner ignores the folder. `tools/retarget.py` bakes a source onto a base rig through a
+bone map (`tools/bone_maps/<set>_to_<rig_type>.json`: source bone to target bone, the root
+bone, the foot bones) and writes `clips/baked/<rig_type>/clip_<slug>.blend` with the rig and
+one Action. Tags come from the fixed vocabulary in `tools/tag_clips.py`; `studio_foot_slide_cm`
+and `studio_retarget_base` record the retarget quality and origin.
