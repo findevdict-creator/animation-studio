@@ -59,6 +59,20 @@ class InterpretCharacterParams(Model):
     provider: str | None = Field(default=None, max_length=120, description="provider[:model]; default from settings")
 
 
+class InterpretOutfitParams(Model):
+    """AI: a description (and optional reference images) to a validated OutfitSpecification.
+    Scope, fit profiles and owner are the caller's, never the model's."""
+
+    description: str = Field(min_length=3, max_length=4000)
+    name: str | None = Field(default=None, max_length=80)
+    style_profile: str = Field(default="family_cartoon@1.0", pattern=r"^[a-z][a-z0-9_]*@\d+\.\d+$")
+    scope: Literal["character", "body_profile", "multi"] = "body_profile"
+    owner_character: str | None = Field(default=None, pattern=r"^CHAR-\d{3,}$")
+    fit_profiles: list[str] = Field(min_length=1, max_length=8)
+    reference_image_keys: list[str] = Field(default_factory=list, max_length=4)
+    provider: str | None = Field(default=None, max_length=120)
+
+
 class PreviewSettings(Model):
     resolution: int = Field(default=512, ge=64, le=2048)
     samples: int = Field(default=16, ge=1, le=256)
@@ -102,6 +116,7 @@ class PublishCharacterParams(Model):
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
+    interpret_outfit = "interpret_outfit"
     generate_character = "generate_character"
     publish_character = "publish_character"
 
@@ -109,18 +124,22 @@ class JobType(StrEnum):
 JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.blender_smoke: BlenderSmokeParams,
     JobType.interpret_character: InterpretCharacterParams,
+    JobType.interpret_outfit: InterpretOutfitParams,
     JobType.generate_character: GenerateCharacterParams,
     JobType.publish_character: PublishCharacterParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
+                                    JobType.interpret_outfit: Queue.ai,
                                     JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
+                                   JobType.interpret_outfit: True,
                                    JobType.generate_character: True,
                                    # resumable: the version number is claimed by a write-once marker
                                    JobType.publish_character: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
+                                                   JobType.interpret_outfit: ("ai.use", "asset.create"),
                                                    JobType.generate_character: ("asset.create",),
                                                    JobType.publish_character: ("asset.publish",)}
 
