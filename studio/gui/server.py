@@ -1,7 +1,7 @@
 """A small local web server for the GUI: a JSON API over ``StudioService`` plus the
 static page. Standard library only (``http.server``), so the GUI adds no dependencies.
 
-    studio gui [--runs-dir runs] [--library library] [--agents claude|stub] [--port 8765]
+    studio gui [--runs-dir runs] [--library library] [--agents llm|stub] [--port 8765]
 
 Routes (all JSON unless noted):
 

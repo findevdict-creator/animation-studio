@@ -4,14 +4,14 @@ against the build request (asset build phase 4). The score decides acceptance th
 
 from __future__ import annotations
 
-import base64
 import json
 from pathlib import Path
 from typing import Any
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 from studio.agents.base import ClaudeAgent
+from studio.llm import ImagePart, LLMConfigError, LLMError
 from studio.schemas import Config
 from studio.schemas.build_requests import BuildRequest
 from studio.schemas.common import StudioModel
@@ -45,28 +45,17 @@ class RenderQA(ClaudeAgent):
     max_tokens = 2000
 
     def review(self, contact_sheet: Path, request: BuildRequest, metrics: dict[str, Any], config: Config) -> QAVerdict:
-        image = base64.standard_b64encode(Path(contact_sheet).read_bytes()).decode("ascii")
         text = (
             f"## Visual style\n{config.visual_style}\n\n## Build request\n```json\n"
             f"{json.dumps(request.model_dump(mode='json', include={'id', 'kind', 'for_id', 'spec', 'bounds_m'}), indent=2)}\n```\n\n"
             f"## Measured\n```json\n{json.dumps(metrics)}\n```\n\n## Task\nScore the prop and list its problems."
         )
-        response = self.client.messages.parse(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            system=[{"type": "text", "text": self.system_prompt, "cache_control": {"type": "ephemeral"}}],
-            output_config={"effort": self.effort},
-            output_format=QAVerdict,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": image}},
-                        {"type": "text", "text": text},
-                    ],
-                }
-            ],
-        )
-        if response.stop_reason == "refusal" or response.parsed_output is None:
+        try:
+            result = self.complete(text, QAVerdict, images=[ImagePart(Path(contact_sheet).read_bytes())])
+        except LLMConfigError:
+            raise
+        except (LLMError, ValidationError) as exc:  # no vision on this provider, or JSON beyond repair
+            return QAVerdict(score=0.0, problems=["QA gave no answer"], notes=str(exc))
+        if result.stop != "ok" or result.parsed is None:
             return QAVerdict(score=0.0, problems=["QA gave no answer"], notes="refused or empty")
-        return response.parsed_output
+        return result.parsed

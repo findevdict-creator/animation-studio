@@ -1,10 +1,12 @@
-"""Base class for agents on the Claude API.
+"""Base class for LLM agents.
 
-One call per agent run: a cached system prompt (role, rules, ID formats), a user
-message with the story, the config, upstream JSON and any feedback, and the
-agent's output schema enforced through structured outputs
-(``client.messages.parse(output_format=Model)``). The coordinator validates the
-result again and runs the hard checks; the agent itself never touches files.
+One call per agent run: a system prompt (role, rules, ID formats), a user message with
+the story, the config, upstream JSON and any feedback, and the agent's output schema. The
+call goes through a provider adapter (``studio.llm``): Claude enforces the schema natively
+(``client.messages.parse(output_format=Model)``, cached system prompt); OpenAI, Gemini,
+DeepSeek and OpenAI-compatible endpoints get prompted JSON validated with Pydantic and
+repaired. The coordinator validates the result again and runs the hard checks; the agent
+itself never touches files.
 """
 
 from __future__ import annotations
@@ -14,24 +16,26 @@ import logging
 import os
 from typing import Any
 
-import anthropic
-
 from studio.coordinator.agents import AgentContext
 from studio.ids import shot_scene
+from studio.llm import ImagePart, LLMProvider, LLMRequest, LLMResult, create_provider
+from studio.llm.providers.anthropic import AnthropicProvider
 from studio.schemas import StudioModel
 from studio.schemas.continuity import Issue
 
 log = logging.getLogger("studio.agents")
 
-DEFAULT_MODEL = os.environ.get("STUDIO_MODEL", "claude-opus-5-5")
+DEFAULT_MODEL = AnthropicProvider.resolve_default_model()
 DEFAULT_EFFORT = os.environ.get("STUDIO_EFFORT", "high")
+#: flags that choose the LLM; kept out of the prompt because they mean nothing to the model
+LLM_FLAG_KEYS = {"llm_provider", "llm_model", "llm_agents", "llm_json_repairs"}
 
 
 class AgentRefused(Exception):
-    """Claude declined the request; the coordinator treats this as a failed attempt."""
+    """The model declined the request; the coordinator treats this as a failed attempt."""
 
 
-class ClaudeAgent:
+class LLMAgent:
     name: str = ""
     output_model: type[StudioModel]
     system_prompt: str = ""
@@ -39,20 +43,30 @@ class ClaudeAgent:
 
     def __init__(
         self,
-        client: anthropic.Anthropic | None = None,
-        model: str = DEFAULT_MODEL,
+        client: Any = None,
+        model: str | None = None,
         effort: str = DEFAULT_EFFORT,
+        provider: LLMProvider | str | None = None,
+        json_repairs: int = 1,
     ):
-        self._client = client
-        self.model = model
+        """``provider`` is an adapter or a provider name (default: STUDIO_LLM_PROVIDER, else
+        anthropic). ``client`` is a pre-built SDK client (or a fake) for that provider."""
+        if isinstance(provider, LLMProvider):
+            self.provider = provider
+        else:
+            self.provider = create_provider(provider, client=client)
+        self.model = model or self.provider.resolve_default_model()
         self.effort = effort
+        self.json_repairs = json_repairs
         self.last_usage: dict[str, int] = {}
 
     @property
-    def client(self) -> anthropic.Anthropic:
-        if self._client is None:
-            self._client = anthropic.Anthropic()
-        return self._client
+    def client(self) -> Any:
+        return self.provider.client
+
+    @property
+    def llm_label(self) -> str:
+        return f"{self.provider.name}:{self.model}"
 
     # ------------------------------------------------------- prompt parts
     def upstream_sections(self, ctx: AgentContext) -> list[tuple[str, Any]]:
@@ -76,7 +90,7 @@ class ClaudeAgent:
                     "aspect_ratio": cfg.aspect_ratio,
                     "audience": cfg.audience,
                     "language": cfg.language,
-                    "flags": cfg.flags.model_dump(mode="json"),
+                    "flags": cfg.flags.model_dump(mode="json", exclude=LLM_FLAG_KEYS),
                 },
                 indent=2,
             )
@@ -98,35 +112,63 @@ class ClaudeAgent:
         return "\n\n".join(parts)
 
     # ------------------------------------------------------------- the call
-    def call(self, user_message: str, output_model: type[StudioModel], system_prompt: str | None = None) -> StudioModel:
+    def complete(
+        self,
+        user_message: str,
+        output_model: type[StudioModel],
+        system_prompt: str | None = None,
+        images: list[ImagePart] | None = None,
+        effort: str | None = None,
+        max_tokens: int | None = None,
+    ) -> LLMResult:
+        """One structured-output call through the provider; returns the raw result (refusals
+        and truncation are reported in ``result.stop``, not raised)."""
+        log.info("%s: calling %s for %s (%d chars)", self.name, self.llm_label, output_model.__name__, len(user_message))
+        result = self.provider.complete(
+            LLMRequest(
+                model=self.model,
+                system=system_prompt or self.system_prompt,
+                user=user_message,
+                output_model=output_model,
+                max_tokens=max_tokens or self.max_tokens,
+                effort=effort or self.effort,
+                images=list(images or []),
+                json_repairs=self.json_repairs,
+            )
+        )
+        for key, value in result.usage.items():
+            self.last_usage[key] = self.last_usage.get(key, 0) + value
+        return result
+
+    def call(
+        self,
+        user_message: str,
+        output_model: type[StudioModel],
+        system_prompt: str | None = None,
+        images: list[ImagePart] | None = None,
+        effort: str | None = None,
+    ) -> StudioModel:
         """One structured-output call. Agents that split their work (the Director works
         per scene) call this several times from ``run``."""
-        log.info("%s: calling %s for %s (%d chars)", self.name, self.model, output_model.__name__, len(user_message))
-        response = self.client.messages.parse(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            system=[{"type": "text", "text": system_prompt or self.system_prompt, "cache_control": {"type": "ephemeral"}}],
-            output_config={"effort": self.effort},
-            output_format=output_model,
-            messages=[{"role": "user", "content": user_message}],
-        )
-        usage = getattr(response, "usage", None)
-        if usage is not None:
-            for key in ("input_tokens", "output_tokens", "cache_read_input_tokens"):
-                self.last_usage[key] = self.last_usage.get(key, 0) + (getattr(usage, key, 0) or 0)
-        if response.stop_reason == "refusal":
-            details = getattr(response, "stop_details", None)
-            raise AgentRefused(f"{self.name}: request declined ({getattr(details, 'category', None)})")
-        if response.stop_reason == "max_tokens":
+        result = self.complete(user_message, output_model, system_prompt, images, effort)
+        if result.stop == "refusal":
+            raise AgentRefused(f"{self.name}: request declined ({result.detail or None})")
+        if result.stop == "max_tokens":
             raise RuntimeError(f"{self.name}: output truncated at {self.max_tokens} tokens; raise max_tokens")
-        parsed = response.parsed_output
-        if parsed is None:
+        if result.parsed is None:
             raise RuntimeError(f"{self.name}: no parsed output in the response")
-        return parsed
+        parsed = result.parsed
+        if isinstance(parsed, output_model):
+            return parsed
+        return output_model.model_validate(parsed.model_dump() if hasattr(parsed, "model_dump") else parsed)
 
     def run(self, ctx: AgentContext) -> StudioModel:
         self.last_usage = {}
         return self.call(self.build_user_message(ctx), self.output_model)
+
+
+#: The name the agents were written against; every agent subclasses this.
+ClaudeAgent = LLMAgent
 
 
 def scene_of_issue(issue: Issue, world) -> str | None:

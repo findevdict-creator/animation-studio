@@ -10,6 +10,9 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8"]
+openai = ["openai>=1.40"]          # OpenAI, DeepSeek and OpenAI-compatible endpoints
+gemini = ["google-genai>=1.20"]
+all-providers = ["openai>=1.40", "google-genai>=1.20"]
 
 [project.scripts]
 studio = "studio.cli:main"

@@ -47,3 +47,90 @@ class FakeClient:
             self.messages = FakeMessages(by_schema["by_schema"])
         else:
             self.messages = FakeMessages(responses)
+
+
+# ---------------------------------------------------------------- other providers
+def _text(reply) -> str:
+    """Replies may be given as text, a dict or a Pydantic model; the fakes return JSON text."""
+    if isinstance(reply, str):
+        return reply
+    if hasattr(reply, "model_dump_json"):
+        return reply.model_dump_json()
+    import json
+
+    return json.dumps(reply)
+
+
+class _Replies:
+    """Replies in order; the last one repeats. A reply is text/dict/model, or a
+    ``(reply, finish_reason)`` tuple."""
+
+    def __init__(self, replies):
+        self.replies = list(replies) or ["{}"]
+        self.calls: list[dict[str, Any]] = []
+
+    def next(self, kwargs):
+        self.calls.append(kwargs)
+        reply = self.replies.pop(0) if len(self.replies) > 1 else self.replies[0]
+        return reply if isinstance(reply, tuple) else (reply, None)
+
+
+class _Obj:
+    """Attribute bag standing in for SDK response objects."""
+
+    def __init__(self, **kw):
+        self.__dict__.update(kw)
+
+
+class FakeOpenAICompletions(_Replies):
+    def create(self, **kwargs):
+        reply, finish = self.next(kwargs)
+        refusal = None
+        if finish == "refusal":
+            refusal, finish, content = _text(reply), "stop", None
+        else:
+            content = _text(reply)
+        message = _Obj(content=content, refusal=refusal)
+        usage = _Obj(prompt_tokens=900, completion_tokens=400, prompt_tokens_details=_Obj(cached_tokens=100))
+        return _Obj(choices=[_Obj(message=message, finish_reason=finish or "stop")], usage=usage)
+
+
+class FakeOpenAIClient:
+    """Stands in for ``openai.OpenAI`` (and DeepSeek / OpenAI-compatible endpoints):
+    ``client.chat.completions.create`` records each request and returns JSON text."""
+
+    def __init__(self, *replies):
+        self.completions = FakeOpenAICompletions(replies)
+        self.chat = _Obj(completions=self.completions)
+
+    @property
+    def calls(self) -> list[dict[str, Any]]:
+        return self.completions.calls
+
+
+class FakeGeminiModels(_Replies):
+    def generate_content(self, **kwargs):
+        reply, finish = self.next(kwargs)
+        usage = _Obj(prompt_token_count=800, candidates_token_count=300, thoughts_token_count=50, cached_content_token_count=0)
+        text = "" if finish == "SAFETY" else _text(reply)
+        return _Obj(text=text, candidates=[_Obj(finish_reason=finish or "STOP")], usage_metadata=usage, prompt_feedback=None)
+
+
+class FakeGeminiClient:
+    """Stands in for ``google.genai.Client``: ``client.models.generate_content``."""
+
+    def __init__(self, *replies):
+        self.models = FakeGeminiModels(replies)
+
+    @property
+    def calls(self) -> list[dict[str, Any]]:
+        return self.models.calls
+
+
+def fake_client_for(provider: str, *replies):
+    """A fake SDK client for ``provider`` that returns ``replies`` (models, dicts or text)."""
+    if provider == "anthropic":
+        return FakeClient(*[r if isinstance(r, FakeResponse) else FakeResponse(r) for r in replies])
+    if provider == "gemini":
+        return FakeGeminiClient(*replies)
+    return FakeOpenAIClient(*replies)

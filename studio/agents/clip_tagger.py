@@ -6,12 +6,12 @@ never introduce a tag the Director and the Layout TD do not know."""
 
 from __future__ import annotations
 
-import base64
 from pathlib import Path
 
-from pydantic import Field
+from pydantic import Field, ValidationError
 
 from studio.agents.base import ClaudeAgent
+from studio.llm import ImagePart, LLMConfigError, LLMError
 from studio.schemas.common import StudioModel
 from tools.tag_clips import ALL_TAGS, VOCABULARY, merge_tags
 
@@ -36,31 +36,20 @@ class ClipTagger(ClaudeAgent):
     max_tokens = 1000
 
     def tag(self, contact_sheet: Path, clip_name: str, known_tags: list[str] | None = None) -> ClipTags:
-        image = base64.standard_b64encode(Path(contact_sheet).read_bytes()).decode("ascii")
         vocab = "\n".join(f"- {group}: {', '.join(tags)}" for group, tags in VOCABULARY.items())
         text = (
             f"Clip: {clip_name}\n\nVocabulary:\n{vocab}\n\n"
             + (f"Tags already known from the file name and root motion: {', '.join(known_tags)}\n\n" if known_tags else "")
             + "Tag this clip."
         )
-        response = self.client.messages.parse(
-            model=self.model,
-            max_tokens=self.max_tokens,
-            system=[{"type": "text", "text": self.system_prompt, "cache_control": {"type": "ephemeral"}}],
-            output_config={"effort": "low"},
-            output_format=ClipTags,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {"type": "image", "source": {"type": "base64", "media_type": "image/png", "data": image}},
-                        {"type": "text", "text": text},
-                    ],
-                }
-            ],
-        )
-        if response.stop_reason == "refusal" or response.parsed_output is None:
+        try:
+            result = self.complete(text, ClipTags, images=[ImagePart(Path(contact_sheet).read_bytes())], effort="low")
+        except LLMConfigError:
+            raise
+        except (LLMError, ValidationError) as exc:  # no vision on this provider, or JSON beyond repair
+            return ClipTags(tags=known_tags or ["idle"], confidence=0.0, notes=f"no answer from the tagger: {exc}")
+        if result.stop != "ok" or result.parsed is None:
             return ClipTags(tags=known_tags or ["idle"], confidence=0.0, notes="no answer from the tagger")
-        result = response.parsed_output
-        clean = merge_tags(known_tags or [], [t for t in result.tags if t in ALL_TAGS])
-        return ClipTags(tags=clean or ["idle"], confidence=result.confidence, notes=result.notes)
+        answer = result.parsed
+        clean = merge_tags(known_tags or [], [t for t in answer.tags if t in ALL_TAGS])
+        return ClipTags(tags=clean or ["idle"], confidence=answer.confidence, notes=answer.notes)
