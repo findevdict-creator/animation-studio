@@ -24,6 +24,7 @@ revisited on its branch and merged back into `main`.
 | `10-build-character` | `tools/build_character.py`, `studio/assets` | Asset build phase 1: parametric bases, wardrobe, hair; sheets become rigged `.blend` files |
 | `11-compose-env` | `tools/compose_env.py`, `studio/assets/environments.py` | Asset build phase 3: kits, seeded terrain and scatter; compositions become environment `.blend` files |
 | `12-clip-pipeline` | `tools/retarget.py`, `tools/tag_clips.py`, `tools/procedural.py`, `studio/assets/clips.py` | Asset build phase 2: mocap retargeting to base rigs, tagging, procedural layers, clip search and transitions |
+| `13-asset-builder` | `tools/asset_builder/`, `studio/agents/asset_builder.py`, `studio/agents/render_qa.py`, `studio/assets/builder.py` | Asset build phase 4: an agent writes bpy scripts for prop requests, a sandbox runs them, Render QA scores the turntable, accepted scripts join the generator library |
 
 ## Setup
 
@@ -94,3 +95,21 @@ Action, scales the root travel to the base's height, measures foot sliding (exit
 `clips/baked/<rig_type>/`. Breathing, blinks, look-at, head follow and feet-on-ground are
 procedural layers in `tools/procedural.py`, so those never become clip requests;
 `studio.assets.clips.find_clip` resolves a Director `action_tags` set to a clip or a layer.
+
+Phase 4, automated one-off props:
+
+```
+studio build-props runs/film --library library [--agents stub] [--only br_prop_lantern_b] [--time-limit 300]
+```
+
+For each open prop build request in world.json the Asset Builder agent writes a Blender
+script that defines `build(params)`. A static check allows only bpy, bmesh, mathutils, math,
+random and colorsys and no file access; the script then runs in a child process with a time
+limit and the runner alone saves `library/props/lib_prop_<slug>.blend`. A turntable renders a
+contact sheet under `library/preview/`, Render QA scores it against the spec, and the loop
+repeats with the notes up to `flags.asset_builder_rounds`. A score at or above
+`flags.qa_accept_score` accepts the request (decision by `qa_agent`), points the prop at the
+new library id and saves the script with its params and tags to
+`library/generators/scripts/index.json` for reuse. Anything else is parked in
+`library/preview/pending/` with every attempt recorded for a human. `--agents stub` runs the
+loop offline with a box builder and a bounds-only QA.

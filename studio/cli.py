@@ -127,6 +127,38 @@ def cmd_build_environments(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_build_props(args: argparse.Namespace) -> int:
+    from studio.assets.builder import StubAssetBuilder, StubRenderQA, build_props, prop_requests
+    from studio.assets.characters import write_build_report
+    from studio.schemas import World
+
+    store = RunStore(Path(args.run_dir))
+    world = store.load_output("scene_builder")
+    if not isinstance(world, World):
+        print("no approved scene_builder output in this run", file=sys.stderr)
+        return 1
+    config = store.load_config()
+    library = Path(args.library).resolve()
+    manifest = load_manifest(library / "manifest.json")
+    if not prop_requests(world, args.only or None):
+        print("no open prop build requests")
+        return 0
+    if args.agents == "stub":
+        builder, qa = StubAssetBuilder(), StubRenderQA()
+    else:
+        from studio.agents.asset_builder import AssetBuilder
+        from studio.agents.render_qa import RenderQA
+
+        builder, qa = AssetBuilder(), RenderQA()
+    records, promoted = build_props(library, world, manifest, config, builder, qa, only=args.only or None, time_limit_s=args.time_limit, render=not args.no_render)
+    report = write_build_report(store.root, "prop_builds", records)
+    version = store.save_output("scene_builder", promoted)
+    for r in records:
+        print(f"{r['request_id']}: {r['status']} (best QA score {r.get('score', 0):.2f}, {len(r['rounds'])} rounds)" + (f" -> {r['file']}" if r.get("file") else ""))
+    print(f"world.json v{version} updated; report: {report}")
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     store = RunStore(Path(args.run_dir))
     state = store.load_state()
@@ -169,6 +201,14 @@ def main(argv: list[str] | None = None) -> int:
     benv.add_argument("--library", default="library")
     benv.add_argument("--only", action="append", default=[])
 
+    bprop = sub.add_parser("build-props", help="run the Asset Builder QA loop on open prop build requests (needs bpy)")
+    bprop.add_argument("run_dir")
+    bprop.add_argument("--library", default="library")
+    bprop.add_argument("--only", action="append", default=[])
+    bprop.add_argument("--agents", default="claude", choices=["claude", "stub"])
+    bprop.add_argument("--time-limit", type=float, default=300.0, help="seconds a script may run")
+    bprop.add_argument("--no-render", action="store_true", help="skip the turntable (QA then sees a blank sheet)")
+
     args = parser.parse_args(argv)
     if args.cmd == "run":
         return cmd_run(args)
@@ -180,6 +220,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_build_characters(args)
     if args.cmd == "build-environments":
         return cmd_build_environments(args)
+    if args.cmd == "build-props":
+        return cmd_build_props(args)
     return 1
 
 

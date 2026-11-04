@@ -98,3 +98,12 @@ bone map (`tools/bone_maps/<set>_to_<rig_type>.json`: source bone to target bone
 bone, the foot bones) and writes `clips/baked/<rig_type>/clip_<slug>.blend` with the rig and
 one Action. Tags come from the fixed vocabulary in `tools/tag_clips.py`; `studio_foot_slide_cm`
 and `studio_retarget_base` record the retarget quality and origin.
+
+## Props built by the Asset Builder
+
+`props/lib_prop_<slug>.blend` files written by the sandbox carry `studio_built_by`
+(`asset_builder`), `studio_build_request` and `studio_params` (the JSON the script read)
+next to the usual prop properties. The script that made an accepted prop lives at
+`generators/scripts/<request>_r<round>.py` and is listed in `generators/scripts/index.json`
+with its tags, params and bounds; builds that QA did not accept wait in `preview/pending/`,
+which the scanner and the lint ignore.
