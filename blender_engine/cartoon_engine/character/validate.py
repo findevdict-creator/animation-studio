@@ -9,6 +9,7 @@ restored afterwards.
 from __future__ import annotations
 
 import math
+import re
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -54,7 +55,8 @@ def find_parts(collection=None) -> Parts:
     import bpy
 
     objs = collection.all_objects if collection is not None else bpy.data.objects
-    by = {o.name: o for o in objs}
+    # in a scene holding several characters Blender suffixes clashing names (body.001)
+    by = {re.sub(r"\.\d{3}$", "", o.name): o for o in objs}
     rig = next(o for o in objs if o.type == "ARMATURE" and "studio_rig_profile" in o)
     return Parts(rig=rig, body=by["body"], head=by["head"], eyes={"L": by["eye.L"], "R": by["eye.R"]},
                  hair=by.get("hair"))

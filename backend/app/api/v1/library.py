@@ -27,6 +27,7 @@ from app.core.errors import ApiError
 from app.core.storage import Storage
 from app.models.assets import AssetVersion
 from app.models.characters import Character, CharacterVersion
+from app.models.jobs import Job
 from studio_contracts.jobs import PreviewSettings
 
 router = APIRouter(prefix="/characters", tags=["character library"])
@@ -69,6 +70,12 @@ class ReviewBody(BaseModel):
     model_config = ConfigDict(extra="forbid")
     decision: Literal["approve", "reject"]
     notes: str = Field(default="", max_length=4000)
+
+
+class PublishBody(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    bump: Literal["minor", "major"] = Field(
+        default="minor", description="major is forced when the template family, rig or fit profile changed")
 
 
 class FileOut(AssetFileOut):
@@ -133,7 +140,7 @@ class CharacterDetail(CharacterOut):
     versions: list[VersionSummary] = []
 
 
-class DraftJobOut(BaseModel):
+class VersionJobOut(BaseModel):
     version: VersionDetail
     job: JobOut
 
@@ -319,6 +326,23 @@ def review(character_id: uuid.UUID, version_id: uuid.UUID, body: ReviewBody, ses
     return _detail(v)
 
 
+@router.post("/{character_id}/versions/{version_id}/publish", status_code=status.HTTP_202_ACCEPTED,
+             response_model=VersionJobOut, summary="Publish an approved version (job on the publisher queue)")
+def publish(character_id: uuid.UUID, version_id: uuid.UUID, response: Response, body: PublishBody | None = None,
+            session: Session = Depends(get_session), idempotency_key: str | None = Header(default=None, max_length=200),
+            who: Principal = Depends(require("asset.publish"))) -> VersionJobOut:
+    v = svc.get_version(session, character_id, version_id, lock=True)
+    params = {"version_id": str(v.id), "bump": (body or PublishBody()).bump}
+    replay = idempotency_key and session.scalar(select(Job.id).where(Job.idempotency_key == idempotency_key))
+    if not replay:  # a replayed request returns its job, even once the version is published
+        svc.check_publishable(v)
+    job, created = submit_and_dispatch(session, who, "publish_character", params, idempotency_key)
+    if not created:
+        response.status_code = status.HTTP_200_OK
+    session.refresh(v)
+    return VersionJobOut(version=_detail(v), job=job_out(job))
+
+
 @router.post("/{character_id}/versions/{version_id}/deprecate", response_model=VersionDetail,
              summary="Hide a published version from pickers; it stays loadable")
 def deprecate(character_id: uuid.UUID, version_id: uuid.UUID, session: Session = Depends(get_session),
@@ -364,10 +388,10 @@ def edit_draft(character_id: uuid.UUID, draft_id: uuid.UUID, body: DraftPatch, r
 
 
 @router.post("/{character_id}/drafts/{draft_id}/generate", status_code=status.HTTP_202_ACCEPTED,
-             response_model=DraftJobOut, summary="Build the draft in Blender (job)")
+             response_model=VersionJobOut, summary="Build the draft in Blender (job)")
 def generate(character_id: uuid.UUID, draft_id: uuid.UUID, response: Response, body: GenerateBody | None = None,
              session: Session = Depends(get_session), idempotency_key: str | None = Header(default=None, max_length=200),
-             who: Principal = Depends(require("asset.create"))) -> DraftJobOut:
+             who: Principal = Depends(require("asset.create"))) -> VersionJobOut:
     v = _draft(session, character_id, draft_id)
     params = {"spec": v.spec, "previews": (body or GenerateBody()).previews.model_dump(),
               "draft_version_id": str(v.id)}
@@ -376,7 +400,7 @@ def generate(character_id: uuid.UUID, draft_id: uuid.UUID, response: Response, b
     if not created:
         response.status_code = status.HTTP_200_OK
     session.refresh(v)
-    return DraftJobOut(version=_detail(v), job=job_out(job))
+    return VersionJobOut(version=_detail(v), job=job_out(job))
 
 
 @router.post("/{character_id}/drafts/{draft_id}/submit", response_model=VersionDetail,

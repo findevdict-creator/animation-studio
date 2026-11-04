@@ -119,6 +119,27 @@ services:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
 
+  # Publishing (publish_character). The only service with the publisher storage identity,
+  # which alone can write the library bucket (and can only read the work bucket). It runs
+  # Blender too: every publish re-validates the exact character.blend in a fresh process.
+  worker-publisher:
+    image: studio-worker:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-publisher
+      STUDIO_S3_SECRET_KEY: dev-publisher-secret
+    command: ["celery", "-A", "studio_workers.tasks", "worker", "-Q", "publish", "--concurrency", "1",
+              "--hostname", "publish@%h"]
+    volumes: [work:/work]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 4g
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
   # AI tasks (interpret_character, …). No Blender runs here; this is the only service that
   # gets provider API keys. Set them in the shell or infra/.env; without one, AI jobs fail
   # with a clear "set ANTHROPIC_API_KEY" error.

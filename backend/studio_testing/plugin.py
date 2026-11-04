@@ -84,11 +84,22 @@ def alembic_config() -> Config:
     return cfg
 
 
+def reset_schema() -> None:
+    """An empty database. Downgrading is not enough once tests have published versions: the
+    immutability guards refuse to delete them, as they would in production."""
+    from sqlalchemy import text
+
+    engine = create_engine(TEST_DB)
+    with engine.begin() as conn:
+        conn.execute(text("DROP SCHEMA public CASCADE"))
+        conn.execute(text("CREATE SCHEMA public"))
+    engine.dispose()
+
+
 @pytest.fixture(scope="session")
 def migrated() -> str:
-    cfg = alembic_config()
-    command.downgrade(cfg, "base")
-    command.upgrade(cfg, "head")
+    reset_schema()
+    command.upgrade(alembic_config(), "head")
     return TEST_DB
 
 

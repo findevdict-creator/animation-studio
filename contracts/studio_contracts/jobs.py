@@ -38,6 +38,7 @@ class Queue(StrEnum):
     blender = "blender"
     render = "render"
     media = "media"
+    publish = "publish"
 
 
 class BlenderSmokeParams(Model):
@@ -88,25 +89,40 @@ class GenerateCharacterParams(Model):
         return self
 
 
+class PublishCharacterParams(Model):
+    """Publisher: an approved character version in review to an immutable library version.
+
+    The worker runs it with the publisher identity, the only one that can write the library
+    bucket; its Blender process re-validates the exact ``character.blend`` being published."""
+
+    version_id: UUID
+    bump: Literal["minor", "major"] = "minor"
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
     generate_character = "generate_character"
+    publish_character = "publish_character"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.blender_smoke: BlenderSmokeParams,
     JobType.interpret_character: InterpretCharacterParams,
     JobType.generate_character: GenerateCharacterParams,
+    JobType.publish_character: PublishCharacterParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
-                                    JobType.generate_character: Queue.blender}
+                                    JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
-                                   JobType.generate_character: True}
+                                   JobType.generate_character: True,
+                                   # resumable: the version number is claimed by a write-once marker
+                                   JobType.publish_character: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
-                                                   JobType.generate_character: ("asset.create",)}
+                                                   JobType.generate_character: ("asset.create",),
+                                                   JobType.publish_character: ("asset.publish",)}
 
 
 class InputFile(Model):

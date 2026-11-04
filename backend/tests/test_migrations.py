@@ -4,7 +4,7 @@ from alembic.runtime.migration import MigrationContext
 from sqlalchemy import create_engine, inspect
 
 from app.models import Base
-from studio_testing.plugin import alembic_config
+from studio_testing.plugin import alembic_config, reset_schema
 
 EXPECTED_TABLES = {
     "users", "roles", "permissions", "user_roles", "role_permissions", "asset_code_counters",
@@ -14,6 +14,8 @@ EXPECTED_TABLES = {
 
 def test_upgrade_downgrade_upgrade(migrated):
     cfg = alembic_config()
+    reset_schema()  # earlier tests may have published versions, which no downgrade may delete
+    command.upgrade(cfg, "head")
     command.downgrade(cfg, "base")
     engine = create_engine(migrated)
     assert not EXPECTED_TABLES & set(inspect(engine).get_table_names())

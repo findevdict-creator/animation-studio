@@ -123,7 +123,7 @@ def new_draft(session: Session, character: Character, *, based_on_version_id: uu
         raw = spec
     else:
         raise ApiError(422, "spec_required", "give based_on_version_id or a spec")
-    clean, rc = checked_spec(raw)
+    clean, rc = checked_spec({"name": character.name, **raw})
     return _new_version(session, character, clean, rc, created_by=created_by, based_on=based_on_version_id)
 
 
@@ -258,3 +258,61 @@ def files_by_name(version: CharacterVersion) -> dict[str, AssetFile]:
 
 def bucket_for(version: CharacterVersion) -> str:
     return "library" if version.status in ("published", "deprecated") else "work"
+
+
+# ---------------------------------------------------------------- publishing (architecture 6.1, 6.3)
+def _family(template_ref: str | None) -> str | None:
+    return template_ref.split("@", 1)[0] if template_ref else None
+
+
+def next_number(session: Session, version: CharacterVersion, bump: str) -> tuple[int, int, list[str]]:
+    """The number this version would get now: 1.0 first; otherwise the latest published
+    number bumped. A changed template family, rig profile version or body-fit profile breaks
+    outfit and animation compatibility, so it forces a major bump; the reasons are returned."""
+    published = [v for v in version.character.versions
+                 if v.status in ("published", "deprecated") and v.id != version.id]
+    if not published:
+        return 1, 0, []
+    latest = max(published, key=lambda v: (v.entry.major, v.entry.minor))
+    reasons = [what for what, a, b in (
+        ("template family", _family(latest.template_ref), _family(version.template_ref)),
+        ("rig profile", latest.rig_profile_ref, version.rig_profile_ref),
+        ("body-fit profile", latest.fit_profile, version.fit_profile)) if a != b]
+    if reasons or bump == "major":
+        return latest.entry.major + 1, 0, reasons
+    return latest.entry.major, latest.entry.minor + 1, []
+
+
+def library_prefix(version: CharacterVersion, major: int, minor: int) -> str:
+    return f"library/characters/{version.character_id}/versions/{major}.{minor}/"
+
+
+def complete_publish(session: Session, version: CharacterVersion, *, major: int, minor: int,
+                     files: list[dict[str, Any]], manifest: dict[str, Any], published_by: uuid.UUID | None,
+                     expected_build: str, job_id: uuid.UUID) -> CharacterVersion:
+    """The one transaction that makes a version published: library file rows replace the
+    draft rows, the manifest and publisher are recorded, then the status flips. Callers hold
+    the character row lock (``get_character(lock=True)``)."""
+    check_publishable(version)
+    if version.built_digest != expected_build:
+        raise ApiError(409, "build_changed", "the version's build changed while it was being published")
+    for f in list(version.entry.files):
+        session.delete(f)
+    session.flush()
+    for f in files:
+        registry.add_file(session, version.entry, role=f["role"], storage_key=f["storage_key"], sha256=f["sha256"],
+                          size_bytes=f["size_bytes"], mime_type=f["mime_type"],
+                          blender_version=f.get("blender_version"), job_id=job_id)
+    version.manifest_key = manifest["storage_key"]
+    version.manifest_sha256 = manifest["sha256"]
+    version.published_by = published_by
+    version.published_at = now()
+    session.flush()  # still in review: the trigger allows the publish record
+    version.entry.major, version.entry.minor, version.entry.status = major, minor, "published"
+    session.flush()
+    character = version.character
+    if character.recommended_version_id is None:
+        character.recommended_version_id = version.id
+        session.flush()
+    session.expire(version.entry, ["files"])
+    return version

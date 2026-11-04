@@ -740,6 +740,50 @@ its `episode_assets` closure; re-rendering it uses only those pins. Script versi
 versioned the same way and AI dialogue is kept in `script_versions`, separate from the
 scene (SRS 14).
 
+### 6.5 Phase 3 implementation (character library)
+
+What was built, and where it differs in detail from 6.1 to 6.3:
+
+- **Tables.** `characters` (identity) and `character_versions`, whose primary key is also the
+  `asset_versions_registry` id. Status and `major.minor` live only on the registry row, so
+  the lifecycle rules of 0002 apply to every kind; `character_versions` holds the spec, the
+  build record (spec and built digests, profile refs, validation report, job) and the review
+  and publish record. Profiles and the template are built-in code in this release, stored as
+  `id@version` refs, not foreign keys (migration 0005).
+- **Database guards (0005).** In `review` only the review, manifest and publish columns of a
+  version may change (the build is frozen for the reviewer). Published and deprecated
+  versions may only gain `deprecated_at` and cannot be deleted. Character codes never change,
+  and `recommended_version_id` must name a published version of the same character.
+- **Submit gate.** A draft can go to review only when its last build was made from its current
+  spec (`built_digest = spec_digest`), passed validation, has the required files, and its
+  `validation.json` names the SHA-256 of that exact `character.blend`. Only the newest
+  generate job requested for a draft is attached; an older one finishing later is ignored.
+- **Publisher.** `publish_character` runs on its own `publish` queue in `worker-publisher`,
+  the only service with the publisher storage identity (writes the library bucket, reads the
+  work bucket, nothing else). It downloads every draft file checking its SHA-256, re-validates
+  `character.blend` in a fresh Blender process with scripts disabled, then writes everything
+  once under `library/characters/{uuid}/versions/{M}.{m}/` with `manifest.json` and
+  `publish_validation.json`, and flips the status in one transaction with the file rows,
+  manifest hash, publisher and audit entry. 6.3 described this as a `blender` queue job; it
+  needs its own queue because no other worker identity may write the library.
+- **Version numbers.** Computed from the latest published version: 1.0 first, otherwise a
+  minor bump, or major when asked or when the template family, rig profile or body-fit profile
+  changed (forced, whatever was asked). The number is claimed by writing
+  `version.claim.json` once into its prefix, not by a database row, so a failed publish
+  leaves nothing published, a resumed publish reuses its own claim, and a number that already
+  holds another version's objects (an abandoned attempt) is skipped rather than reused.
+- **Manifest.** A pure function of the frozen version (files and hashes, dependencies, refs,
+  shape keys, both validations, approver), so a resumed publish writes identical bytes.
+  It records the approver; the publishing user and time are in the database and audit log.
+- **Loading.** `cartoon_engine.character.library.link_character` links a version's
+  `CHAR_*` collection and makes an editable library override; two versions of one character
+  link side by side from their own files and each passes the full validator through its
+  override (`cartoon_engine.tools.load_check`).
+- **Not yet.** Undeprecate (admin), the draft garbage collector, `/usage`, the nightly
+  re-hash and the AI `interpret` route under a draft are not built; the AI job exists on its
+  own (`interpret_character`). The publisher's Blender log is not uploaded (its identity
+  cannot write the work bucket); a failed publish carries the log tail in the job error.
+
 ---
 
 ## 7. Blender asset loading and linking

@@ -2,6 +2,7 @@
 
     celery -A studio_workers.tasks worker -Q blender --concurrency 1
     celery -A studio_workers.tasks worker -Q ai --concurrency 4
+    celery -A studio_workers.tasks worker -Q publish --concurrency 1   # publisher storage identity
     celery -A studio_workers.tasks beat        # runs the outbox sweeper
 """
 
@@ -41,6 +42,10 @@ def run_job(job_id: str) -> str:
         from studio_workers.ai_runner import AIRunner
 
         outcome = AIRunner().run(jid)
+    elif JOB_QUEUES[JobType(job_type)] == Queue.publish:
+        from studio_workers.publisher import PublisherRunner
+
+        outcome = PublisherRunner().run(jid)
     else:
         outcome = Supervisor().run(jid)
     return outcome.status.value if outcome.status else "not_claimed"
