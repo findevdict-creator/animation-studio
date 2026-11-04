@@ -51,7 +51,7 @@ export function FitReport({ report }: { report: unknown }) {
                     `stretch ${e.stretch_lo ?? "-"}–${e.stretch_hi ?? "-"}${e.lift_m !== undefined ? `, lift ${(e.lift_m * 1000).toFixed(0)} mm` : ""}`;
                   return (
                     <td key={p} className={ok ? "ok" : "bad"} title={title}>
-                      {e.clipped ? `${e.clipped} clip` : "✓"}
+                      {e.clipped ? `${e.clipped} clip` : ok ? "✓" : "✗"}
                       <small>{e.stretch_hi !== undefined ? `×${e.stretch_hi}` : ""}</small>
                     </td>
                   );

@@ -1,0 +1,826 @@
+{
+  "outfit": "School day 192145",
+  "spec_digest": "5c8eed59613b998aa358b9ac09f45b949f2831378935f759d376b647ea34bfae",
+  "outfit_blend_sha256": "13fb33720e7749404a309e550cc7b3c7cf73b16d907a4f9de29c56a2d202c9a5",
+  "outfit_version_id": "01a1a802-9d25-7b59-ae17-a6f7f817a437",
+  "wearer": {
+    "kind": "character",
+    "character_version_id": "01a1a801-f24e-738d-9f87-86e74db8a1ce",
+    "name": "Ali",
+    "fit_profile": "child_average",
+    "height_m": 1.28,
+    "character_blend_sha256": "489bb502cb95fcd4a833443860ac0fcbf70d1b6a1aaa76683a04c1253e8a1d4d",
+    "rig_mismatch_m": 0.0
+  },
+  "declared_fit_profiles": [
+    "child_average"
+  ],
+  "fit_profile_declared": true,
+  "rig_profile": "cartoon_humanoid@1.0",
+  "file": {
+    "collections": [
+      "OUTFIT_School_day_192145"
+    ],
+    "objects": [
+      "upper_tshirt",
+      "lower_shorts",
+      "headwear_cap",
+      "footwear_sneakers",
+      "accessory_backpack"
+    ],
+    "armatures": [],
+    "meshes": 5,
+    "materials": 8
+  },
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "garment_armature_modifiers",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "garment_groups_are_deform_bones",
+      "ok": true,
+      "stray": {}
+    },
+    {
+      "name": "garment_skin_weights",
+      "ok": true,
+      "problems": {}
+    },
+    {
+      "name": "rigid_pieces_on_attachment_bones",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "garment_metadata",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "body_mask_modifier",
+      "ok": true,
+      "modifiers": [
+        "rig",
+        "outfit_mask_OUTFIT_School_day_192145"
+      ]
+    },
+    {
+      "name": "garments_parented_to_rig",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "garment_materials",
+      "ok": true,
+      "objects": []
+    },
+    {
+      "name": "no_clipping:footwear_sneakers",
+      "ok": true,
+      "poses": [],
+      "worst_share": 0.0,
+      "worst_depth_m": 0.0
+    },
+    {
+      "name": "deformation:footwear_sneakers",
+      "ok": true,
+      "poses": [],
+      "stretch": [
+        1.0,
+        1.0
+      ],
+      "skin_stretch": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "stays_on_body:footwear_sneakers",
+      "ok": true,
+      "worst_lift_m": 0.0
+    },
+    {
+      "name": "no_clipping:lower_shorts",
+      "ok": true,
+      "poses": [],
+      "worst_share": 0.0,
+      "worst_depth_m": 0.0
+    },
+    {
+      "name": "deformation:lower_shorts",
+      "ok": true,
+      "poses": [],
+      "stretch": [
+        0.392,
+        2.285
+      ],
+      "skin_stretch": [
+        0.549,
+        2.101
+      ]
+    },
+    {
+      "name": "stays_on_body:lower_shorts",
+      "ok": true,
+      "worst_lift_m": 0.0026
+    },
+    {
+      "name": "no_clipping:upper_tshirt",
+      "ok": true,
+      "poses": [],
+      "worst_share": 0.0017,
+      "worst_depth_m": 0.0033
+    },
+    {
+      "name": "deformation:upper_tshirt",
+      "ok": true,
+      "poses": [],
+      "stretch": [
+        0.524,
+        3.349
+      ],
+      "skin_stretch": [
+        0.651,
+        4.058
+      ]
+    },
+    {
+      "name": "stays_on_body:upper_tshirt",
+      "ok": true,
+      "worst_lift_m": 0.0019
+    },
+    {
+      "name": "no_clipping:headwear_cap",
+      "ok": true,
+      "poses": [],
+      "worst_share": 0.0,
+      "worst_depth_m": 0.0
+    },
+    {
+      "name": "deformation:headwear_cap",
+      "ok": true,
+      "poses": [],
+      "stretch": [
+        1.0,
+        1.0
+      ],
+      "skin_stretch": [
+        1.0,
+        1.0
+      ]
+    },
+    {
+      "name": "no_clipping:accessory_backpack",
+      "ok": true,
+      "poses": [],
+      "worst_share": 0.0,
+      "worst_depth_m": 0.0
+    },
+    {
+      "name": "deformation:accessory_backpack",
+      "ok": true,
+      "poses": [],
+      "stretch": [
+        1.0,
+        1.0
+      ],
+      "skin_stretch": [
+        1.0,
+        1.0
+      ]
+    }
+  ],
+  "poses": {
+    "footwear_sneakers": {
+      "rest": {
+        "tested": 90,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "t_pose": {
+        "tested": 100,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "arms_up": {
+        "tested": 97,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "arms_forward": {
+        "tested": 100,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "walk": {
+        "tested": 92,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "sit": {
+        "tested": 87,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "crouch": {
+        "tested": 95,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "twist": {
+        "tested": 92,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "head_turn": {
+        "tested": 90,
+        "hidden_under": 300,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      }
+    },
+    "lower_shorts": {
+      "rest": {
+        "tested": 45,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "t_pose": {
+        "tested": 47,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "arms_up": {
+        "tested": 47,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "arms_forward": {
+        "tested": 47,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "walk": {
+        "tested": 51,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.781,
+        "stretch_hi": 1.28,
+        "skin_stretch_lo": 0.743,
+        "skin_stretch_hi": 1.294,
+        "lift_m": 0.001
+      },
+      "sit": {
+        "tested": 56,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.468,
+        "stretch_hi": 2.051,
+        "skin_stretch_lo": 0.549,
+        "skin_stretch_hi": 1.916,
+        "lift_m": 0.0023
+      },
+      "crouch": {
+        "tested": 55,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.392,
+        "stretch_hi": 2.285,
+        "skin_stretch_lo": 0.555,
+        "skin_stretch_hi": 2.101,
+        "lift_m": 0.0026
+      },
+      "twist": {
+        "tested": 45,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "head_turn": {
+        "tested": 45,
+        "hidden_under": 130,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      }
+    },
+    "upper_tshirt": {
+      "rest": {
+        "tested": 151,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.0,
+        "lift_m": 0.0
+      },
+      "t_pose": {
+        "tested": 161,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.709,
+        "stretch_hi": 1.882,
+        "skin_stretch_lo": 0.714,
+        "skin_stretch_hi": 2.109,
+        "lift_m": 0.0014
+      },
+      "arms_up": {
+        "tested": 160,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.524,
+        "stretch_hi": 3.349,
+        "skin_stretch_lo": 0.656,
+        "skin_stretch_hi": 4.058,
+        "lift_m": 0.0019
+      },
+      "arms_forward": {
+        "tested": 153,
+        "hidden_under": 436,
+        "clipped": 1,
+        "clip_share": 0.0017,
+        "clip_depth_m": 0.0033,
+        "clipped_by": {
+          "body": 1
+        },
+        "stretch_lo": 0.595,
+        "stretch_hi": 2.182,
+        "skin_stretch_lo": 0.651,
+        "skin_stretch_hi": 2.225,
+        "lift_m": 0.0017
+      },
+      "walk": {
+        "tested": 154,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.848,
+        "stretch_hi": 1.187,
+        "skin_stretch_lo": 0.853,
+        "skin_stretch_hi": 1.214,
+        "lift_m": 0.0005
+      },
+      "sit": {
+        "tested": 154,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.949,
+        "stretch_hi": 1.085,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.001,
+        "lift_m": 0.0001
+      },
+      "crouch": {
+        "tested": 151,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.944,
+        "stretch_hi": 1.099,
+        "skin_stretch_lo": 1.0,
+        "skin_stretch_hi": 1.002,
+        "lift_m": 0.0001
+      },
+      "twist": {
+        "tested": 145,
+        "hidden_under": 436,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 0.768,
+        "stretch_hi": 1.313,
+        "skin_stretch_lo": 0.794,
+        "skin_stretch_hi": 1.431,
+        "lift_m": 0.0011
+      },
+      "head_turn": {
+        "tested": 151,
+        "hidden_under": 436,
+        "clipped": 1,
+        "clip_share": 0.0017,
+        "clip_depth_m": 0.0011,
+        "clipped_by": {
+          "body": 1
+        },
+        "stretch_lo": 0.972,
+        "stretch_hi": 1.03,
+        "skin_stretch_lo": 0.996,
+        "skin_stretch_hi": 1.001,
+        "lift_m": 0.0001
+      }
+    },
+    "headwear_cap": {
+      "rest": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "t_pose": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "arms_up": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "arms_forward": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "walk": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "sit": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "crouch": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "twist": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "head_turn": {
+        "tested": 687,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      }
+    },
+    "accessory_backpack": {
+      "rest": {
+        "tested": 252,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "t_pose": {
+        "tested": 234,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "arms_up": {
+        "tested": 226,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "arms_forward": {
+        "tested": 222,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "walk": {
+        "tested": 245,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "sit": {
+        "tested": 252,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "crouch": {
+        "tested": 252,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "twist": {
+        "tested": 233,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      },
+      "head_turn": {
+        "tested": 250,
+        "hidden_under": 0,
+        "clipped": 0,
+        "clip_share": 0.0,
+        "clip_depth_m": 0.0,
+        "clipped_by": {},
+        "stretch_lo": 1.0,
+        "stretch_hi": 1.0
+      }
+    }
+  },
+  "fit": {
+    "body_vertices_hidden": 868,
+    "body_vertices": 6744,
+    "hidden_share_by_region": {
+      "torso": 0.723,
+      "upper_arm": 0.349,
+      "thigh": 0.191,
+      "foot": 0.818
+    },
+    "pieces": {
+      "footwear_sneakers": {
+        "slot": "footwear",
+        "garment": "GARM-SNEAKERS@0.1",
+        "binding": "skinned",
+        "pushed_clear": 0,
+        "max_shift_m": 0.0039
+      },
+      "lower_shorts": {
+        "slot": "lower",
+        "garment": "GARM-SHORTS@0.1",
+        "binding": "skinned",
+        "pushed_clear": 23,
+        "max_shift_m": 0.0173
+      },
+      "upper_tshirt": {
+        "slot": "upper",
+        "garment": "GARM-TSHIRT@0.1",
+        "binding": "skinned",
+        "pushed_clear": 8,
+        "max_shift_m": 0.0203
+      },
+      "headwear_cap": {
+        "slot": "headwear",
+        "garment": "GARM-CAP@0.1",
+        "binding": "rigid",
+        "scaled_up": 1.0,
+        "max_shift_m": 0.0315
+      },
+      "accessory_backpack": {
+        "slot": "accessory",
+        "garment": "GARM-BACKPACK@0.1",
+        "binding": "rigid",
+        "moved_back_m": 0.0026,
+        "max_shift_m": 0.0186
+      }
+    }
+  },
+  "thresholds": {
+    "max_clip_share": 0.005,
+    "max_clip_depth_m": 0.004,
+    "max_edge_stretch": 1.6,
+    "min_edge_stretch": 0.3,
+    "max_lift_m": 0.05
+  },
+  "pose_suite": [
+    "rest",
+    "t_pose",
+    "arms_up",
+    "arms_forward",
+    "walk",
+    "sit",
+    "crouch",
+    "twist",
+    "head_turn"
+  ],
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0",
+  "glb": {
+    "bytes": 1045176,
+    "meshes": [
+      "accessory_backpack",
+      "body",
+      "eye.L",
+      "eye.R",
+      "footwear_sneakers",
+      "hair",
+      "head",
+      "headwear_cap",
+      "lower_shorts",
+      "upper_tshirt"
+    ]
+  }
+}

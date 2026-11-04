@@ -6,7 +6,7 @@ then assembled into scenes and episodes.
 
 The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md);
 the phase demonstrations are in [docs/demos/](docs/demos/) ([Phase 1](docs/demos/phase-1.md),
-[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md)).
+[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md)).
 
 ## Branches
 
@@ -57,6 +57,7 @@ docs/architecture/
 docker compose -f infra/compose.yaml up -d --build
 python scripts/phase1_acceptance.py        # logs in through Keycloak, runs a Blender job, checks the file
 python scripts/phase3_acceptance.py        # character library: publish 1.0, refuse overwrites, publish 2.0, load both
+python scripts/phase4_acceptance.py        # outfits: three outfits for one character, fitted, approved, published, worn in turn
 ```
 
 API docs at http://localhost:8000/api/docs, Keycloak at http://localhost:8080 (admin/admin).

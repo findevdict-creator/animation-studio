@@ -1,0 +1,61 @@
+PASS  character created  (CHAR-004 01a1a801-f242-74cb-b11d-9168204d284f)
+PASS  generate job accepted for the draft  (01a1a801-f4e7-7a1f-acb7-4407ab31c9e7)
+PASS  Blender built and validated the draft  (null)
+PASS  the build is attached to the draft and current  (8 files, built from 6816efcad0ba)
+PASS  draft submitted for review
+PASS  reviewer approved it
+PASS  publish job accepted on the publisher queue  (01a1a802-8bfe-7e1b-9ad8-f85867344185)
+PASS  publisher re-validated, copied and recorded the version  (null)
+PASS  Ali 1.0 published  (library/characters/01a1a801-f242-74cb-b11d-9168204d284f/versions/1.0/manifest.json)
+PASS  school: outfit created (character)  (OUTFIT-001 01a1a802-9d1f-7b39-85da-5451f9b2a25f)
+PASS  school: Blender built the garments and fit-checked them on the reference body  ([])
+PASS  school: outfit.blend holds the outfit alone (no armature, no character)  (OUTFIT_School_day_192145, 5 meshes)
+PASS  school: fit check on Ali requested  (01a1a802-e4a5-71f5-8a29-2f33a4cc1832)
+PASS  school: fit job ran  (null)
+PASS  school: attached to Ali's published character.blend  (rig within 0.00 mm)
+PASS  school: basic deformation holds in every pose (clipping, stretch, lift)  (13 garment checks over 9 poses)
+PASS  school: reviewer approved the fit
+PASS  school: submitted for review
+PASS  school: reviewer approved the outfit
+PASS  school: publisher re-checked outfit.blend in a fresh process and published 1.0  (null)
+PASS  winter: outfit created (body_profile)  (OUTFIT-002 01a1a803-34ae-759e-872f-9a6d45f16530)
+PASS  winter: Blender built the garments and fit-checked them on the reference body  ([])
+PASS  winter: outfit.blend holds the outfit alone (no armature, no character)  (OUTFIT_Winter_walk_192224, 3 meshes)
+PASS  winter: fit check on Ali requested  (01a1a803-7c17-7d8f-b83e-979c7449db95)
+PASS  winter: fit job ran  (null)
+PASS  winter: attached to Ali's published character.blend  (rig within 0.00 mm)
+PASS  winter: basic deformation holds in every pose (clipping, stretch, lift)  (9 garment checks over 9 poses)
+PASS  winter: reviewer approved the fit
+PASS  winter: submitted for review
+PASS  winter: reviewer approved the outfit
+PASS  winter: publisher re-checked outfit.blend in a fresh process and published 1.0  (null)
+PASS  smart: outfit created (body_profile)  (OUTFIT-003 01a1a803-cbac-7275-a1e4-53d824bd51a7)
+PASS  smart: Blender built the garments and fit-checked them on the reference body  ([])
+PASS  smart: outfit.blend holds the outfit alone (no armature, no character)  (OUTFIT_Sunday_best_192303, 3 meshes)
+PASS  smart: fit check on Ali requested  (01a1a804-1303-700b-9102-b65488c79775)
+PASS  smart: fit job ran  (null)
+PASS  smart: attached to Ali's published character.blend  (rig within 0.00 mm)
+PASS  smart: basic deformation holds in every pose (clipping, stretch, lift)  (9 garment checks over 9 poses)
+PASS  smart: reviewer approved the fit
+PASS  smart: submitted for review
+PASS  smart: reviewer approved the outfit
+PASS  smart: publisher re-checked outfit.blend in a fresh process and published 1.0  (null)
+PASS  school: its own library prefix, every SHA-256 matches manifest and registry  (7 files under library/outfits/01a1a802-9d1f-7b39-85da-5451f9b2a25f/versions/1.0/)
+PASS  school: the published files hold no character  (fit_report.json, outfit.blend, outfit.json, poses.png, preview.glb, publish_validation.json, thumbnail.png)
+PASS  school: the manifest names its wearer by reference  (scope character, fits [('CHAR-004', '1.0', 'approved')])
+PASS  winter: its own library prefix, every SHA-256 matches manifest and registry  (7 files under library/outfits/01a1a803-34ae-759e-872f-9a6d45f16530/versions/1.0/)
+PASS  winter: the published files hold no character  (fit_report.json, outfit.blend, outfit.json, poses.png, preview.glb, publish_validation.json, thumbnail.png)
+PASS  winter: the manifest names its wearer by reference  (scope body_profile, fits [('CHAR-004', '1.0', 'approved')])
+PASS  smart: its own library prefix, every SHA-256 matches manifest and registry  (7 files under library/outfits/01a1a803-cbac-7275-a1e4-53d824bd51a7/versions/1.0/)
+PASS  smart: the published files hold no character  (fit_report.json, outfit.blend, outfit.json, poses.png, preview.glb, publish_validation.json, thumbnail.png)
+PASS  smart: the manifest names its wearer by reference  (scope body_profile, fits [('CHAR-004', '1.0', 'approved')])
+PASS  no character was created or copied by the outfits  (3 characters)
+PASS  Ali 1.0 is untouched (files, rows, character.blend bytes)  (489bb502cb95fcd4)
+PASS  Ali's wardrobe lists the three approved outfits  (OUTFIT-001, OUTFIT-002, OUTFIT-003)
+PASS  Ali's library file links into a fresh Blender scene
+PASS  the linked character keeps its geometry in its own file  (/tmp/phase4/phase4/ali/character.blend)
+PASS  school: attached alone to the linked character, every pose passes, detached cleanly  (5 pieces, 21 checks, 868 body vertices masked)
+PASS  winter: attached alone to the linked character, every pose passes, detached cleanly  (3 pieces, 17 checks, 1772 body vertices masked)
+PASS  smart: attached alone to the linked character, every pose passes, detached cleanly  (3 pieces, 17 checks, 1608 body vertices masked)
+
+Phase 4 acceptance: all criteria passed in 166 s. Files in /tmp/phase4/phase4

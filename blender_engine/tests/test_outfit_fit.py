@@ -223,3 +223,14 @@ def test_fit_check_catches_clipping_and_overstretch(files, tmp_path):
     e = per_pose["upper_sweater"]["arms_up"]
     assert e["stretch_hi"] > e["skin_stretch_hi"] * 1.3
     assert not any(m.name.startswith(MASK_PREFIX) for m in parts.body.modifiers[:1])
+
+
+def test_wardrobe_check_tool(files):
+    from cartoon_engine.tools.wardrobe_check import check
+
+    char_blend, char_json = files["ali"]
+    doc = check(char_blend, char_json, [files[n] for n in OUTFITS])
+    assert doc["ok"], doc
+    assert doc["character"]["linked_mesh_data"] and doc["character"]["rig_mismatch_m"] < 1e-3
+    assert [r["outfit"] for r in doc["outfits"]] == list(OUTFITS)
+    assert all(r["character_unchanged_after_detach"] and r["hidden_body_vertices"] > 0 for r in doc["outfits"])

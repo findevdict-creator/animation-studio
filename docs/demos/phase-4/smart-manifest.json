@@ -1,0 +1,128 @@
+{
+  "approved_at": "2026-11-04T19:23:35.992411+00:00",
+  "approved_by": "01a1a6ae-1c91-7dd6-b4b6-e8af1afa9532",
+  "based_on": null,
+  "blender_version": "5.2.3 LTS",
+  "code": "OUTFIT-003",
+  "dependencies": [
+    {
+      "kind": "rig_profile",
+      "ref": "cartoon_humanoid@1.0"
+    },
+    {
+      "kind": "style_profile",
+      "ref": "family_cartoon@1.0"
+    },
+    {
+      "kind": "garment_catalog",
+      "ref": "0.1"
+    }
+  ],
+  "engine_version": "0.4.0",
+  "files": [
+    {
+      "key": "fit_report.json",
+      "mime": "application/json",
+      "role": "report",
+      "sha256": "0e6f1dbce72d21dceb99506000d570f28189c01c494fa87b3b905595cc9e8c69",
+      "size": 13229
+    },
+    {
+      "key": "outfit.blend",
+      "mime": "application/x-blender",
+      "role": "blend",
+      "sha256": "00bac49f399720cb221a0f559338886b74891a24034738311fde7d8e49f50fc6",
+      "size": 633922
+    },
+    {
+      "key": "outfit.json",
+      "mime": "application/json",
+      "role": "spec",
+      "sha256": "4a7466d118d0864e064babd16bc5f5872fa6dbcac622072b9819e666d8f9845d",
+      "size": 3714
+    },
+    {
+      "key": "poses.png",
+      "mime": "image/png",
+      "role": "preview",
+      "sha256": "92d3c5455ae251dac14af403c55ecebec097632f3422b1116a7e0ba4595f18d6",
+      "size": 558434
+    },
+    {
+      "key": "preview.glb",
+      "mime": "model/gltf-binary",
+      "role": "glb",
+      "sha256": "18123e7d09aa01f13712d854ec34b5c0c523b16bfa7ff367919b0dcad27ffffc",
+      "size": 994540
+    },
+    {
+      "key": "publish_validation.json",
+      "mime": "application/json",
+      "role": "report",
+      "sha256": "94853103951c253ca723112edeccd2e854fb0e325b7055b4322e0c993cf731c8",
+      "size": 3708
+    },
+    {
+      "key": "thumbnail.png",
+      "mime": "image/png",
+      "role": "thumbnail",
+      "sha256": "a5477939975e64818f2867c9faf3ad679c1f6287074a960125e7c134e3e827a3",
+      "size": 142867
+    }
+  ],
+  "fit_profiles": [
+    "child_average"
+  ],
+  "kind": "outfit",
+  "manifest_version": "asset_manifest/1",
+  "name": "Sunday best 192303",
+  "outfit_id": "01a1a803-cbac-7275-a1e4-53d824bd51a7",
+  "owner_character": null,
+  "pieces": [
+    {
+      "garment": "GARM-LONGSLEEVE@0.1",
+      "slot": "upper"
+    },
+    {
+      "garment": "GARM-TROUSERS@0.1",
+      "slot": "lower"
+    },
+    {
+      "garment": "GARM-SNEAKERS@0.1",
+      "slot": "footwear"
+    }
+  ],
+  "primary_fit_profile": "child_average",
+  "rig_profile": "cartoon_humanoid@1.0",
+  "scope": "body_profile",
+  "slots": [
+    "footwear",
+    "lower",
+    "upper"
+  ],
+  "spec_digest": "becc369d531282255560651ef9656e52fe97e9a9ec415c7991de4a2213897762",
+  "validation": {
+    "build": {
+      "checks": 17,
+      "ok": true
+    },
+    "publish": {
+      "blender_version": "5.2.3 LTS",
+      "checks": 17,
+      "ok": true
+    }
+  },
+  "verified_fits": [
+    {
+      "character_blend_sha256": "489bb502cb95fcd4a833443860ac0fcbf70d1b6a1aaa76683a04c1253e8a1d4d",
+      "character_id": "01a1a801-f242-74cb-b11d-9168204d284f",
+      "character_version_id": "01a1a801-f24e-738d-9f87-86e74db8a1ce",
+      "code": "CHAR-004",
+      "fit_profile": "child_average",
+      "status": "approved",
+      "version": "1.0"
+    }
+  ],
+  "version": "1.0",
+  "version_id": "01a1a803-cbae-7ea4-aba5-65376a87e70b"
+}

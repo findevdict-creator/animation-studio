@@ -1,0 +1,57 @@
+{
+  "blender_version": "5.2.3 LTS",
+  "character": {
+    "file": "/tmp/phase4/phase4/ali/character.blend",
+    "collection": "CHAR_Ali",
+    "library": "/tmp/phase4/phase4/ali/character.blend",
+    "linked_mesh_data": true,
+    "rig_mismatch_m": 0.0
+  },
+  "outfits": [
+    {
+      "file": "/tmp/phase4/phase4/school/outfit.blend",
+      "outfit": "School day 192145",
+      "pieces": [
+        "accessory_backpack",
+        "footwear_sneakers",
+        "headwear_cap",
+        "lower_shorts",
+        "upper_tshirt"
+      ],
+      "hidden_body_vertices": 868,
+      "ok": true,
+      "failed": [],
+      "checks": 21,
+      "character_unchanged_after_detach": true
+    },
+    {
+      "file": "/tmp/phase4/phase4/winter/outfit.blend",
+      "outfit": "Winter walk 192224",
+      "pieces": [
+        "footwear_boots",
+        "lower_trousers",
+        "upper_sweater"
+      ],
+      "hidden_body_vertices": 1772,
+      "ok": true,
+      "failed": [],
+      "checks": 17,
+      "character_unchanged_after_detach": true
+    },
+    {
+      "file": "/tmp/phase4/phase4/smart/outfit.blend",
+      "outfit": "Sunday best 192303",
+      "pieces": [
+        "footwear_sneakers",
+        "lower_trousers",
+        "upper_longsleeve"
+      ],
+      "hidden_body_vertices": 1608,
+      "ok": true,
+      "failed": [],
+      "checks": 17,
+      "character_unchanged_after_detach": true
+    }
+  ],
+  "ok": true
+}
