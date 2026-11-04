@@ -24,6 +24,7 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-08-character-spec` | Phase 2: `CharacterSpecification`, the `family_cartoon@1.0` style profile, the `cartoon_humanoid@1.0` rig profile, spec validation and resolution, `/characters/spec/validate` and profile endpoints |
 | `v2-09-ai-interpret` | LLM providers ported from `studio/llm` to `app/ai/providers`, the `interpret_character` AI job (closed proposal schema, validation, repair, `ai_generations` log), the `ai` worker queue |
 | `v2-10-character-geometry` | The procedural stand-in template `TPL-HUMANOID-STANDIN@0.1`: skeleton landmarks, skin-modifier body, head with eyes, eyelids, brows and mouth driven by face states, the 43 facial shape keys of the rig profile, four hair styles, style-profile materials |
+| `v2-11-character-rig` | Rigify rig fitted to the template and generated headless, eye bones tracking `eye_target`, `face_ctrl` properties driving all facial shape keys with simple-expression drivers, deterministic skin weights and mask groups, the character validator (structure and motion checks) |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the
