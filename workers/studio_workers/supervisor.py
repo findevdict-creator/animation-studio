@@ -114,6 +114,10 @@ class Supervisor:
             shutil.rmtree(workspace)
         (workspace / "out").mkdir(parents=True)
         (workspace / "tmp").mkdir()
+        try:
+            envelope.inputs = self._stage_inputs(envelope, workspace)
+        except Exception as exc:
+            return self._inputs_failed(job_id, envelope, workspace, exc)
         job_json = workspace / "job.json"
         job_json.write_text(envelope.model_dump_json(indent=2))
 
@@ -132,6 +136,35 @@ class Supervisor:
             if status == JobStatus.succeeded or not self.settings.keep_failed_workspaces:
                 shutil.rmtree(workspace, ignore_errors=True)
         return RunOutcome(status)
+
+    # -------------------------------------------------------------- inputs
+    def _stage_inputs(self, envelope: JobEnvelope, workspace: Path) -> list:
+        from studio_workers import inputs
+
+        if envelope.type.value not in inputs.STAGERS:
+            return []
+        storages = {"work": self.storage}
+        with self.sessions() as s:
+            return inputs.stage(s, envelope.type.value, envelope.params, workspace, self.settings, storages)
+
+    def _inputs_failed(self, job_id: uuid.UUID, envelope: JobEnvelope, workspace: Path, exc: Exception) -> RunOutcome:
+        """A refused input fails the job; a storage hiccup is retried like a crashed process."""
+        from studio_workers.inputs import InputRefused
+
+        error = {"message": f"inputs: {type(exc).__name__}: {exc}"[:2000],
+                 "kind": "refused" if isinstance(exc, InputRefused) else "transient"}
+        retried = False
+        with self.sessions.begin() as s:
+            if not isinstance(exc, InputRefused) and RETRY_SAFE.get(envelope.type, False):
+                retried = service.requeue_for_retry(s, job_id, error)
+            if not retried:
+                service.finish(s, job_id, JobStatus.failed, error=error)
+        if not self.settings.keep_failed_workspaces or retried:
+            shutil.rmtree(workspace, ignore_errors=True)
+        if retried:
+            self.dispatcher.send(job_id, JOB_QUEUES[envelope.type].value, countdown_s=5 * 2 ** (envelope.attempt - 1))
+            return RunOutcome(JobStatus.queued, retried=True)
+        return RunOutcome(JobStatus.failed)
 
     # -------------------------------------------------------------- process
     def _execute(self, job_id: uuid.UUID, workspace: Path, job_json: Path,

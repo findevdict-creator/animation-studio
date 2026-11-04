@@ -42,7 +42,8 @@ class Settings(BaseSettings):
     blender_binary: str = "blender"
     engine_entrypoint: str | None = Field(default=None, description="path to cartoon_engine/entrypoint.py; found automatically")
     job_timeouts_s: dict[str, int] = Field(default_factory=lambda: {"blender_smoke": 300, "generate_character": 1800,
-                                                                              "publish_character": 900})
+                                                                              "publish_character": 900, "generate_outfit": 1800,
+                                                                              "fit_outfit": 900, "publish_outfit": 900})
     default_job_timeout_s: int = 1800
     keep_failed_workspaces: bool = True
     worker_host: str | None = None

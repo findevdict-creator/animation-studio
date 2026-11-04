@@ -63,4 +63,39 @@ def _generate_character(session: Session, job_id: uuid.UUID, uploaded: list[Uplo
             "display_code": version.entry.display_code, **recorded}
 
 
-OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character}
+def _generate_outfit(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                     blender_version: str | None) -> dict[str, Any]:
+    """The build goes onto its outfit draft; without a draft the job creates the outfit."""
+    from app.assets import outfits
+    from app.models.jobs import Job
+    from app.models.outfits import OutfitVersion
+
+    job = session.get(Job, job_id)
+    draft_id = job.params.get("draft_version_id") if job else None
+    if draft_id:
+        version = session.get(OutfitVersion, uuid.UUID(draft_id), with_for_update=True, populate_existing=True)
+        if version is None:
+            return {"attached": False, "reason": "the draft was discarded"}
+    else:
+        spec = job.params["spec"]
+        _, version = outfits.create_outfit(session, name=spec["name"], description=spec.get("description", ""),
+                                           tags=[], spec=spec, created_by=job.requested_by)
+        outfits.begin_generate(version, job_id)
+    recorded = outfits.attach_build(session, version, job_id, uploaded, data, blender_version)
+    return {"outfit_id": str(version.outfit_id), "asset_version_id": str(version.id),
+            "display_code": version.entry.display_code, "fit_ok": bool((data.get("fit") or {}).get("ok")), **recorded}
+
+
+def _fit_outfit(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                blender_version: str | None) -> dict[str, Any]:
+    """The verdict and its evidence onto the compatibility registry."""
+    from app.assets import outfits
+    from app.models.jobs import Job
+
+    params = session.get(Job, job_id).params
+    return outfits.record_fit(session, job_id, uuid.UUID(params["outfit_version_id"]),
+                              uuid.UUID(params["character_version_id"]), uploaded, data)
+
+
+OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character,
+                                "generate_outfit": _generate_outfit, "fit_outfit": _fit_outfit}

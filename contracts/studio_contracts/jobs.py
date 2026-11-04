@@ -152,6 +152,15 @@ class PublishCharacterParams(Model):
     bump: Literal["minor", "major"] = "minor"
 
 
+class PublishOutfitParams(Model):
+    """Publisher: an approved outfit version in review to an immutable library version. Its
+    Blender process re-checks the exact ``outfit.blend`` (file contents, the digest stamp and
+    the fit check on the reference body); the character is never part of an outfit's files."""
+
+    version_id: UUID
+    bump: Literal["minor", "major"] = "minor"
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
@@ -160,6 +169,7 @@ class JobType(StrEnum):
     publish_character = "publish_character"
     generate_outfit = "generate_outfit"
     fit_outfit = "fit_outfit"
+    publish_outfit = "publish_outfit"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -170,25 +180,29 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.publish_character: PublishCharacterParams,
     JobType.generate_outfit: GenerateOutfitParams,
     JobType.fit_outfit: FitOutfitParams,
+    JobType.publish_outfit: PublishOutfitParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
                                     JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish,
-                                    JobType.generate_outfit: Queue.blender, JobType.fit_outfit: Queue.blender}
+                                    JobType.generate_outfit: Queue.blender, JobType.fit_outfit: Queue.blender,
+                                    JobType.publish_outfit: Queue.publish}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
                                    JobType.generate_character: True,
                                    # resumable: the version number is claimed by a write-once marker
                                    JobType.publish_character: True,
-                                   JobType.generate_outfit: True, JobType.fit_outfit: True}
+                                   JobType.generate_outfit: True, JobType.fit_outfit: True,
+                                   JobType.publish_outfit: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
                                                    JobType.generate_character: ("asset.create",),
                                                    JobType.publish_character: ("asset.publish",),
                                                    JobType.generate_outfit: ("asset.create",),
-                                                   JobType.fit_outfit: ("asset.create",)}
+                                                   JobType.fit_outfit: ("asset.create",),
+                                                   JobType.publish_outfit: ("asset.publish",)}
 
 
 class InputFile(Model):

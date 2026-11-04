@@ -157,6 +157,25 @@ def test_fit_outfit_job_on_a_character(tmp_path, files):
     assert result["status"] == "failed" and "does not describe this rig" in result["error"]
 
 
+def test_publish_outfit_rechecks_the_exact_file(tmp_path, files):
+    (tmp_path / "inputs").mkdir()
+    dst = tmp_path / "inputs" / "outfit.blend"
+    dst.write_bytes(files["smart"].read_bytes())
+    inputs = [{"path": "inputs/outfit.blend", "sha256": sha(dst)}]
+    params = {"version_id": str(uuid7()), "spec": spec("smart").model_dump(mode="json")}
+    proc, result = run_job(tmp_path, "publish_outfit", params, inputs)
+    assert result["status"] == "succeeded", proc.stdout[-3000:] + str(result.get("error"))
+    report = result["data"]["report"]
+    assert report["ok"], report["failed"]
+    assert report["outfit_blend_sha256"] == sha(dst) and report["purpose"] == "publish"
+    assert result["data"]["stamps"]["studio_outfit_digest"] == resolve_outfit(spec("smart")).digest()
+    # the same file under another spec is refused: it was not built from it
+    params["spec"] = spec("winter").model_dump(mode="json")
+    _, result = run_job(tmp_path, "publish_outfit", params, inputs)
+    assert result["status"] == "succeeded" and not result["data"]["report"]["ok"]
+    assert "built_from_spec" in result["data"]["report"]["failed"]
+
+
 def test_three_outfits_attach_independently_to_a_linked_character(files):
     char_blend, _ = files["ali"]
     rc = resolve_spec(CharacterSpecification.model_validate(ALI))

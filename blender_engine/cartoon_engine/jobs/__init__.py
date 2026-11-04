@@ -11,8 +11,8 @@ Handler = Callable[[JobContext], dict[str, Any]]
 
 
 def handlers() -> dict[str, Handler]:
-    from cartoon_engine.jobs import blender_smoke, fit_outfit, generate_character, generate_outfit, publish_character
+    from cartoon_engine.jobs import blender_smoke, fit_outfit, generate_character, generate_outfit, publish_character, publish_outfit
 
     return {"blender_smoke": blender_smoke.run, "generate_character": generate_character.run,
             "publish_character": publish_character.run, "generate_outfit": generate_outfit.run,
-            "fit_outfit": fit_outfit.run}
+            "fit_outfit": fit_outfit.run, "publish_outfit": publish_outfit.run}
