@@ -1,0 +1,200 @@
+{
+  "schema_version": "2.0",
+  "locations": [
+    {
+      "id": "loc_forest_clearing",
+      "name": "Forest clearing",
+      "setting_type": "exterior",
+      "description": "",
+      "key_features": [
+        "old stump",
+        "birch ring",
+        "mossy rocks"
+      ],
+      "color_palette": [],
+      "asset": {
+        "status": "composed",
+        "library_id": null,
+        "time_variant": null,
+        "build_request_id": null,
+        "kit_id": "kit_forest",
+        "seed": 4021,
+        "bounds_m": [
+          60.0,
+          60.0,
+          20.0
+        ],
+        "terrain": {
+          "generator_id": "gen_terrain_rolling",
+          "params": {
+            "height_m": 1.5,
+            "roughness": 0.3
+          }
+        },
+        "pieces": [
+          {
+            "piece_id": "kit_forest_stump_a",
+            "position_m": [
+              0.0,
+              0.9,
+              0.0
+            ],
+            "rotation_deg": 20.0,
+            "scale": 1.0,
+            "anchor_id": "anc_stump"
+          },
+          {
+            "piece_id": "kit_forest_rock_a",
+            "position_m": [
+              6.0,
+              4.5,
+              0.0
+            ],
+            "rotation_deg": 0.0,
+            "scale": 1.2,
+            "anchor_id": "anc_fox_spot"
+          }
+        ],
+        "scatter": [
+          {
+            "generator_id": "gen_scatter_grass",
+            "piece_ids": [],
+            "density": 0.4,
+            "exclude_radius_m": 1.5,
+            "ring": null
+          },
+          {
+            "generator_id": "gen_scatter_trees",
+            "piece_ids": [
+              "kit_forest_birch_tall",
+              "kit_forest_birch_short"
+            ],
+            "density": 0.15,
+            "exclude_radius_m": 3.0,
+            "ring": {
+              "inner_m": 9.0,
+              "outer_m": 28.0
+            }
+          }
+        ],
+        "lighting_preset": "dusk"
+      },
+      "anchors": [
+        {
+          "id": "anc_stump",
+          "library_anchor": null,
+          "position_m": [
+            0.0,
+            0.0,
+            0.0
+          ],
+          "facing_deg": 0.0
+        },
+        {
+          "id": "anc_path_entry",
+          "library_anchor": null,
+          "position_m": [
+            -8.0,
+            -12.0,
+            0.0
+          ],
+          "facing_deg": 35.0
+        },
+        {
+          "id": "anc_fox_spot",
+          "library_anchor": null,
+          "position_m": [
+            6.0,
+            4.0,
+            0.0
+          ],
+          "facing_deg": 200.0
+        }
+      ],
+      "set_dressing": [],
+      "inferred_fields": []
+    }
+  ],
+  "props": [
+    {
+      "id": "prop_lantern",
+      "name": "Brass lantern",
+      "description": "",
+      "owner_id": "char_mia",
+      "asset": {
+        "status": "library",
+        "library_id": "lib_prop_lantern",
+        "build_request_id": null
+      },
+      "emits_light": {
+        "color": "#FFB347",
+        "energy_w": 40.0
+      }
+    }
+  ],
+  "scenes": [
+    {
+      "id": "sc_01",
+      "order": 1,
+      "title": "The glow",
+      "beat_ids": [
+        "beat_001"
+      ],
+      "location_id": "loc_forest_clearing",
+      "time_of_day": "dusk",
+      "weather": "",
+      "cast": [
+        {
+          "character_id": "char_mia",
+          "outfit_id": "out_mia_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": "anc_path_entry"
+        },
+        {
+          "character_id": "char_fox",
+          "outfit_id": "out_fox_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": "anc_fox_spot"
+        }
+      ],
+      "prop_ids": [
+        "prop_lantern"
+      ],
+      "summary": "",
+      "dramatic_purpose": "",
+      "mood": "",
+      "estimated_duration_sec": 15.0
+    },
+    {
+      "id": "sc_02",
+      "order": 2,
+      "title": "The wait",
+      "beat_ids": [
+        "beat_002"
+      ],
+      "location_id": "loc_forest_clearing",
+      "time_of_day": "dusk",
+      "weather": "",
+      "cast": [
+        {
+          "character_id": "char_mia",
+          "outfit_id": "out_mia_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": null
+        },
+        {
+          "character_id": "char_fox",
+          "outfit_id": "out_fox_default",
+          "starting_emotion": "neutral",
+          "start_anchor_id": null
+        }
+      ],
+      "prop_ids": [],
+      "summary": "",
+      "dramatic_purpose": "",
+      "mood": "",
+      "estimated_duration_sec": 15.0
+    }
+  ],
+  "build_requests": []
+}

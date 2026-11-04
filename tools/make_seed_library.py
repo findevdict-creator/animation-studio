@@ -7,7 +7,7 @@ assets to work with before any artist touches Blender.
 Creates: one rigged human block figure (lib_char_girl_a), one rigged quadruped
 (lib_char_fox_a), a lantern prop, a forest clearing environment with anchors, four
 clips, three parametric bases (base_human_child, base_human_adult, base_quadruped),
-eight garments and two hair pieces. These are placeholders with correct structure,
+eight garments, two hair pieces, two environment kits and four generators. These are placeholders with correct structure,
 not art: the point is that every tool runs end to end against them.
 """
 
@@ -303,6 +303,41 @@ def make_clip(library: Path, rig_type: str, name: str, frames: int, loop: bool, 
     _save(library / "clips" / "baked" / rig_type / f"{name}.blend")
 
 
+def make_kit_piece(library: Path, kit: str, name: str, size, snap: str, tags: str, color=(0.5, 0.4, 0.3, 1.0)):
+    """A kit piece sits on the ground at the origin; compose_env places copies of it."""
+    scene = _reset()
+    obj = _box(name, size, (0, 0, size[2] / 2))
+    _assign(obj, _material(f"{kit}_{name.split('_')[-2] if name.count('_') > 2 else 'mat'}", color))
+    _props(scene, studio_kind="kit_piece", studio_kit=kit, studio_snap_points=snap, studio_tags=tags)
+    _save(library / "kits" / kit.removeprefix("kit_") / f"{name}.blend")
+
+
+def make_generator(library: Path, name: str, kind: str, params: str, mesh_size=None, color=(0.3, 0.6, 0.2, 1.0)):
+    """A generator file: its parameters as scene properties and, for scatter generators, the
+    mesh it scatters when no kit pieces are named (a grass tuft, a pebble)."""
+    scene = _reset()
+    if mesh_size is not None:
+        _assign(_box(name, mesh_size, (0, 0, mesh_size[2] / 2)), _material(name, color))
+    _props(scene, studio_kind="generator", studio_generator_kind=kind, studio_params=params, studio_tags=kind)
+    _save(library / "generators" / f"{name}.blend")
+
+
+def make_kits(library: Path) -> None:
+    make_kit_piece(library, "kit_forest", "kit_forest_stump_a", (1.2, 1.2, 0.5), "top", "seat,wood")
+    make_kit_piece(library, "kit_forest", "kit_forest_birch_tall", (0.5, 0.5, 9.0), "", "tree,birch", (0.85, 0.85, 0.8, 1.0))
+    make_kit_piece(library, "kit_forest", "kit_forest_birch_short", (0.4, 0.4, 5.0), "", "tree,birch", (0.85, 0.85, 0.8, 1.0))
+    make_kit_piece(library, "kit_forest", "kit_forest_rock_a", (1.5, 1.0, 0.8), "top", "rock", (0.45, 0.45, 0.5, 1.0))
+    make_kit_piece(library, "kit_forest", "kit_forest_log_a", (3.0, 0.6, 0.6), "top", "seat,wood,log")
+    make_kit_piece(library, "kit_interior", "kit_interior_floor_4x4", (4.0, 4.0, 0.1), "n,s,e,w", "floor", (0.6, 0.45, 0.3, 1.0))
+    make_kit_piece(library, "kit_interior", "kit_interior_wall_4m", (4.0, 0.2, 2.8), "left,right", "wall", (0.9, 0.88, 0.8, 1.0))
+    make_kit_piece(library, "kit_interior", "kit_interior_table_a", (1.4, 0.8, 0.75), "top", "table,furniture")
+    make_kit_piece(library, "kit_interior", "kit_interior_chair_a", (0.45, 0.45, 0.9), "seat", "seat,chair,furniture")
+    make_generator(library, "gen_terrain_rolling", "terrain", "height_m:0:10,roughness:0:1")
+    make_generator(library, "gen_scatter_grass", "scatter", "density:0:1,exclude_radius_m:0:10", (0.3, 0.3, 0.25))
+    make_generator(library, "gen_scatter_trees", "scatter", "density:0:1,exclude_radius_m:0:10")
+    make_generator(library, "gen_scatter_pebbles", "scatter", "density:0:1", (0.15, 0.12, 0.08), (0.5, 0.5, 0.5, 1.0))
+
+
 HUMAN_FITS = "base_human_child,base_human_adult"
 
 
@@ -329,6 +364,7 @@ def build(library: Path) -> None:
     make_garment(library, "garm_collar_a", "collar", (0.2, 0.2, 0.04), (0.18, 0, 0.42), "base_quadruped", "collar")
     make_hair(library, "hair_two_braids", HUMAN_FITS)
     make_hair(library, "hair_short_a", HUMAN_FITS)
+    make_kits(library)
     (library / "lighting_presets.json").write_text('["day", "dusk", "night", "interior_warm"]\n')
 
 

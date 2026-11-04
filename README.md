@@ -22,6 +22,7 @@ revisited on its branch and merged back into `main`.
 | `08-layout-td` | `studio/agents/layout_td.py` | Per-scene staging drafts; code owns frames, environment, library ids |
 | `09-continuity-checker` | `studio/agents/continuity_checker.py` | Reads the whole package for story and continuity problems; routed to owner agents |
 | `10-build-character` | `tools/build_character.py`, `studio/assets` | Asset build phase 1: parametric bases, wardrobe, hair; sheets become rigged `.blend` files |
+| `11-compose-env` | `tools/compose_env.py`, `studio/assets/environments.py` | Asset build phase 3: kits, seeded terrain and scatter; compositions become environment `.blend` files |
 
 ## Setup
 
@@ -65,3 +66,15 @@ A sheet with `asset.status: parametric` names a base, proportions (sliders 0.7 t
 bone-length overrides), materials by slot, a hair piece and an outfit of garments. The
 builder opens the base, applies all of it, saves `library/characters/lib_char_<slug>.blend`
 and rescans the manifest; the sheet then points at that library id.
+
+Phase 3, composed environments:
+
+```
+python -m tools.compose_env --library library --world runs/film/current/world.json --rescan
+studio build-environments runs/film
+```
+
+A location with `asset.status: composed` names a kit, a seed, bounds, a terrain generator,
+the pieces its anchors depend on and scatter layers. The composer builds the set
+deterministically from the seed, saves `library/envs/lib_env_<slug>.blend` with anchors and
+time-of-day light rigs, and the location then points at that library id.

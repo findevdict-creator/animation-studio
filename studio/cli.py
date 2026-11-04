@@ -6,6 +6,7 @@
     studio revise runs/lantern story_analyst "Mia should be older"
     studio status runs/lantern
     studio build-characters runs/lantern [--library library] [--toon]   (asset build phase 1; needs bpy)
+    studio build-environments runs/lantern [--library library]          (asset build phase 3; needs bpy)
 """
 
 from __future__ import annotations
@@ -97,6 +98,35 @@ def cmd_build_characters(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_build_environments(args: argparse.Namespace) -> int:
+    from studio.assets.characters import write_build_report
+    from studio.assets.environments import build_environments, plan_environment_builds
+    from studio.schemas import World
+
+    store = RunStore(Path(args.run_dir))
+    world = store.load_output("scene_builder")
+    if not isinstance(world, World):
+        print("no approved scene_builder output in this run", file=sys.stderr)
+        return 1
+    library = Path(args.library).resolve()
+    plan = plan_environment_builds(world, load_manifest(library / "manifest.json"))
+    if not plan:
+        print("no composed locations to build")
+        return 0
+    bad = [p for p in plan if not p["kit_exists"] or p["missing_pieces"] or p["missing_generators"]]
+    for p in bad:
+        print(f"{p['location_id']}: kit {p['kit_id']} exists={p['kit_exists']}, missing pieces {p['missing_pieces']}, missing generators {p['missing_generators']}", file=sys.stderr)
+    if bad:
+        return 1
+    records, promoted = build_environments(library, world, only=args.only or None)
+    report = write_build_report(store.root, "environment_builds", records)
+    version = store.save_output("scene_builder", promoted)
+    for r in records:
+        print(f"composed {r['library_id']} from {r['kit_id']} ({r['pieces']} pieces, scatter {r['scatter']})")
+    print(f"world.json v{version} now points at the built sets; report: {report}")
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     store = RunStore(Path(args.run_dir))
     state = store.load_state()
@@ -134,6 +164,11 @@ def main(argv: list[str] | None = None) -> int:
     build.add_argument("--only", action="append", default=[])
     build.add_argument("--toon", action="store_true")
 
+    benv = sub.add_parser("build-environments", help="compose kit-based locations into library environments (needs bpy)")
+    benv.add_argument("run_dir")
+    benv.add_argument("--library", default="library")
+    benv.add_argument("--only", action="append", default=[])
+
     args = parser.parse_args(argv)
     if args.cmd == "run":
         return cmd_run(args)
@@ -143,6 +178,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_status(args)
     if args.cmd == "build-characters":
         return cmd_build_characters(args)
+    if args.cmd == "build-environments":
+        return cmd_build_environments(args)
     return 1
 
 
