@@ -250,15 +250,15 @@ and recorded in `docs/architecture/versions.md`):
 | Component | Constraint | Note |
 |---|---|---|
 | Python | 3.13 everywhere | `contracts` must import under Blender's bundled Python. Blender 5.1 and 5.2 ship Python 3.13 (the `bpy` 5.x wheels on PyPI are `cp313`), so API, workers and engine share one interpreter version. |
-| Blender | 5.2.x, pinned by exact version and SHA-256 | Phase 1 develops and tests against the `bpy` 5.2.3 wheel; the worker image pins the matching Blender binary. Moving to the next LTS is Q1. Every asset version records the Blender version that wrote it. |
-| FastAPI | current 0.11x line | |
-| SQLAlchemy | 2.0.x (typed ORM, async optional) | |
-| Alembic | 1.13 or later | |
+| Blender | 5.2.3 LTS | Phase 1 runs and tests on the `bpy` 5.2.3 wheel; the worker image can also install the official binary pinned by SHA-256. Every asset version records the Blender version that wrote it. |
+| FastAPI | 0.115 or later (Phase 1 runs 0.162) | |
+| SQLAlchemy | 2.0.30 or later (Phase 1 runs 2.1) | sync sessions on psycopg 3 |
+| Alembic | 1.13 or later (Phase 1 runs 1.20) | |
 | PostgreSQL | 16 or 17 | |
-| Celery | 5.4 or 5.5 | |
+| Celery | 5.4 or later (Phase 1 runs 5.6) | |
 | Redis | 7.x | |
-| Object store | any S3 API; the local server is chosen in Phase 1 | MinIO stopped publishing its community Docker images in 2025, so the dev stack uses another S3-compatible server. Conditional writes needed, see 10.4 |
-| Keycloak | 26.x | |
+| Object store | any S3 API; SeaweedFS 4.50 in the dev stack | MinIO stopped publishing community Docker images in 2025. Garage was tried and ignores `If-None-Match`; SeaweedFS honours it on PutObject and CompleteMultipartUpload and supports per-bucket identity permissions (10.4) |
+| Keycloak | 26.4 | |
 | Node | 22 LTS | |
 | React / TS | React 18 or 19, TypeScript 5.x | R3F major must match React major (v8 for 18, v9 for 19) |
 | FFmpeg | 6 or 7 | |
@@ -718,7 +718,7 @@ stateDiagram-v2
 |---|---|
 | Service | `AssetRegistry.update_draft()` refuses unless `status = 'draft'`; publish runs in one transaction with `SELECT … FOR UPDATE` on the identity row. |
 | Database | `BEFORE UPDATE` trigger on every `*_versions` table: if `OLD.status IN ('review','published','deprecated')`, only `status`, `published_*` and `deprecated_*` columns may change, and only along allowed transitions; `BEFORE DELETE` refuses for published/deprecated. `asset_files` rows for a published version cannot be updated or deleted. Unique `(asset_id, major, minor)`. |
-| Storage | Published keys are written once with a conditional put (`If-None-Match: *`) by the publisher identity only. The bucket policy denies `PutObject` and `DeleteObject` on `library/**/versions/**` for every other identity. Object Lock (governance mode) on the bucket where the store supports it. |
+| Storage | Published files live in their own **library bucket**. Only the publisher identity can write it, and it writes each key once with a conditional put (`If-None-Match: *`), so a second write is refused by the server even in a race. Every other identity (API, workers) has read-only access to it. Object Lock (governance mode) on the bucket where the store supports it. |
 | Verification | Every load of a published file checks its SHA-256 against `asset_files` (the worker cache keys by hash). A nightly job re-hashes a sample and alarms on mismatch. |
 | Tests | The SRS 28.3 end-to-end test, plus negative tests that try each layer directly (SQL update, storage put with a worker credential). |
 
@@ -800,11 +800,22 @@ Everything scene-specific lives in overrides inside `scene.blend` and in the man
 cannot flow back into the library because the library files are read-only on disk, linked
 not appended, hash-verified, and the worker identity has no write access to published keys.
 
-### 7.3 Fallback: append with provenance
+### 7.3 Phase 1 result, and the fallback
 
-Library overrides are the riskiest Blender feature in this design (R4). If the Phase 1
-spike shows that override of an armature-modifier target or a Mask modifier is unreliable
-in the pinned Blender release, the fallback is: append the collection into the scene,
+The Phase 1 spike (`blender_engine/spikes/link_override.py`, report in
+`spikes/phase1-spikes.md`) showed link plus overrides working on Blender 5.2.3. The outfit's
+Armature modifier was retargeted to the character's overridden rig, the garment deformed
+with it, a body Mask modifier was added, a pose and a scene-local Action were kept, the
+library paths stayed relative, and the scene reopened after its workspace was moved to
+another directory. The source files' hashes did not change. Two rules came out of it:
+
+- Never change a pose bone's `rotation_mode` in a scene. On reload the mode override can be
+  applied after the rotation value and convert it away. The rig profile fixes rotation modes
+  in the published character.
+- New custom properties on an override are dropped on save. Instance metadata lives in the
+  scene manifest (D5), not on Blender objects.
+
+The fallback is kept in case a later Blender release regresses. It is: append the collection into the scene,
 stamp every appended datablock with `studio_source = CHAR-001@1.0#sha256`, and keep the
 same hash post-condition on the source. Pinning still holds (the manifest pins the
 version); only the scene file gets larger and the "used in" link becomes metadata instead
@@ -840,7 +851,12 @@ animation is compatible with a profile only if it passes the validator.
   the `DEF-*` bones only.
 - Root at origin, Z up, Y forward (existing CONVENTIONS.md), metres, 24 fps, scale 1.
 - The SRS says "evaluate Rigify vs custom". The proposal is Rigify for v1 because it is
-  maintained, well understood by animators, and headless-generatable. A custom rig is the
+  maintained, well understood by animators, and headless-generatable. The Phase 1 spike
+  generated the stock human metarig headless in about 7 s (706 bones, 160 deform bones, all
+  `DEF-` prefixed, IK/FK switches and finger controls present) after moving landmark bones.
+  The call must not pin `active_object` with `temp_override`, because the generator makes
+  the new rig active and asserts it. The stock metarig includes a face rig; the profile
+  will drop it in favour of shape keys (8.2). A custom rig is the
   fallback if R5 (headless Rigify generation) fails, and would keep the same `DEF-*` and
   control names so the contract does not change.
 
@@ -938,19 +954,24 @@ was a heuristic version of this; it is replaced by measured verification.
 
 ### 10.1 Buckets and prefixes
 
-One private bucket per environment (`studio-dev`, `studio-prod`), prefixes as in SRS 19.1
-with drafts and uploads added:
+Two private buckets per environment. Splitting by bucket, not by prefix, means write-once can
+be enforced with plain per-bucket credentials on any S3 store, including ones without
+prefix-scoped policies (decided in Phase 1, see 10.4):
 
 ```
-library/{kind}/{asset_uuid}/versions/{major}.{minor}/...   immutable, publisher-only write
-drafts/{kind}/{asset_uuid}/{draft_uuid}/...                 mutable, worker write, GC'd
-uploads/quarantine/{upload_uuid}                            browser presigned PUT, scanned, then moved
-uploads/accepted/{upload_uuid}                              immutable after acceptance
-series/{series_uuid}/episodes/{episode_uuid}/
-    scripts/, storyboard/, scenes/{scene_uuid}/versions/{n}/scene.blend, audio/
-renders/{render_job_uuid}/frames/{shot}/####.png            per job, immutable after job success
-exports/{episode_uuid}/{episode_version}/{export_uuid}.mp4
-cache/                                                      derived previews, regenerable, lifecycle-expired
+studio-library   (publisher writes once; API and workers read)
+  library/{kind}/{asset_uuid}/versions/{major}.{minor}/...  immutable published versions
+  uploads/accepted/{upload_uuid}                             immutable after acceptance
+  exports/{episode_uuid}/{episode_version}/{export_uuid}.mp4
+
+studio-work      (API and workers write; publisher reads)
+  drafts/{kind}/{asset_uuid}/{draft_uuid}/...                mutable, GC'd
+  jobs/{job_id}/attempt-{n}/out/...                          raw job outputs and logs
+  uploads/quarantine/{upload_uuid}                           browser presigned PUT, scanned, then promoted
+  series/{series_uuid}/episodes/{episode_uuid}/
+      scripts/, storyboard/, scenes/{scene_uuid}/versions/{n}/scene.blend, audio/
+  renders/{render_job_uuid}/frames/{shot}/####.png
+  cache/                                                     derived previews, regenerable, lifecycle-expired
 ```
 
 UUIDs in keys (not display codes) so a renamed code or a series move never moves objects;
@@ -979,10 +1000,14 @@ character used in 40 scenes downloads once per host. Every cache fill verifies t
 
 ### 10.4 Conditional writes
 
-Write-once relies on `If-None-Match: *` on `PutObject` / multipart complete, which AWS S3
-and several S3-compatible servers support. Phase 1 tests it against the chosen store; if a store lacks it,
-the publisher uses Object Lock or a DB-side lock plus `HEAD`-then-put under the identity
-row lock (weaker; documented if used).
+Write-once relies on `If-None-Match: *` on `PutObject` and `CompleteMultipartUpload`. AWS
+S3 supports it; in Phase 1 SeaweedFS 4.50 refused both second writes with
+`PreconditionFailed` (tested in `backend/tests/test_storage.py`), while Garage 2.1 accepted
+them, which ruled Garage out. `Storage.put_immutable` also checks with `HEAD` first, treats an
+identical re-write as success (so an interrupted publish can resume), and raises
+`ObjectExists` for different content. For a store without conditional writes,
+`STUDIO_S3_CONDITIONAL_WRITES=false` falls back to `HEAD`-then-put, which is safe only
+because publishing holds the identity row lock (weaker; avoid in production).
 
 ---
 
@@ -1199,7 +1224,7 @@ galleries.
 | Separation of duties | `asset.publish` requires an approved review by someone other than the draft's creator unless the series setting allows self-approval (small team). |
 | AI cannot publish | AI tasks run with a service identity that has no `asset.publish`, `asset.review` or storage publish rights (SRS 24). |
 | Uploads | Presigned PUT to quarantine only, with size cap and content-type condition. `inspect_upload` job checks magic bytes, re-encodes images with Pillow (strips metadata and payloads), rejects SVG/HTML. User-supplied `.blend`, FBX and GLB files open only in a Blender worker with `--disable-autoexec`, no network, and no credentials. |
-| Storage access | Bucket private. Three identities: API (presign only, scoped prefixes), workers (read library, write drafts/renders), publisher (only identity that can write `library/**/versions/**`, conditional puts only). No public URLs; presigned GETs are short-lived and issued after a permission check. |
+| Storage access | Both buckets private. Three identities: API (read both, write work for presigned uploads), workers (read library, write work), publisher (the only identity that can write the library bucket, conditional puts only; read-only on work). Phase 1 tests each refusal against SeaweedFS. No public URLs; presigned GETs are short-lived and issued after a permission check. |
 | Worker isolation | Blender runs as an unprivileged user in a container with a read-only root FS, its workspace as the only writable mount, cgroup CPU/RAM limits and no outbound network for `blender` and `render` queues. LLM-written bpy (the existing Asset Builder, PR #13) runs only in that sandbox with its existing static allow-list as a second layer. |
 | Secrets | Env vars from the deployment secret store; nothing in the repo. LLM provider keys set through the admin UI are stored encrypted (envelope encryption, key from the secret store) and only the `ai` worker can decrypt them. |
 | Input validation | Pydantic on every request; specs validated against contracts and the style profile vocabulary; IDs referenced in scripts/manifests checked to exist and be visible to the caller. |
@@ -1276,8 +1301,8 @@ has been generated".
 | R1 | **Character quality.** Procedural generation alone will not reach "professional-quality stylized" characters; the SRS's quality bar depends on the template mesh more than on code. | High / high | D11: commission or author one excellent child template (clean quad topology, face loops for expressions, UVs, sculpted expression and viseme shapes, painted weights) before Phase 2; parametric code varies it within ranges that stay on-model. Budget this as an art task, not a coding task. |
 | R2 | **Variety from one template.** Sliders on one mesh produce siblings, not a cast. | High / medium | Several head/face blend shapes per template, swappable hair/ear/nose parts with defined seams, a second template (adult) in Phase 2b. |
 | R3 | **Garment fit across bodies.** Surface Deform fitting can stretch, and clipping in extreme poses is common. | High / high | Fit profiles keep the range narrow; body masks hide what is under clothing; the pose-suite report makes failures visible; character-specific outfits as the escape hatch. |
-| R4 | **Library overrides** are complex and have had regressions between Blender releases (pointer overrides on modifiers, re-sync after library changes). | Medium / high | Phase 1 spike on the pinned release; immutable library files mean overrides never need resyncing to a changed source; append-with-provenance fallback (7.3). |
-| R5 | **Headless Rigify generation** uses operators that expect a UI context. | Medium / medium | Spike in Phase 1 using `context.temp_override`; fallback is generating the rig once per template offline and adjusting bone positions through the metarig-to-rig mapping, or a custom rig with the same names. |
+| R4 | **Library overrides** are complex and have had regressions between Blender releases (pointer overrides on modifiers, re-sync after library changes). | Medium / high | **Phase 1 spike passed on 5.2.3** (7.3), and it runs as a regression test on every Blender upgrade. Immutable library files mean overrides never need resyncing to a changed source. Append-with-provenance stays as the fallback. |
+| R5 | **Headless Rigify generation** uses operators that expect a UI context. | Medium / medium | **Phase 1 spike passed on 5.2.3** (8.1), and it runs as a regression test. The fallback is still a rig generated once per template offline, or a custom rig with the same names. |
 | R6 | **Blender version drift.** `.blend` files are forward compatible only in practice, and Python API changes break the engine. | Medium / high | One pinned LTS; Blender version recorded per asset version and per job; upgrade is a planned migration with a re-validation job across the library; never mix versions in one render. |
 | R7 | **Reproducibility is not bit-exactness.** GPU, driver and Cycles sampling differences change pixels. | Certain / low | Define reproducible as "same pinned inputs, same Blender and engine version, same settings, fixed seeds"; record all of them; compare re-renders by perceptual difference, not hashes. |
 | R8 | **Celery + Redis redelivery** of long tasks after `visibility_timeout`. | High if ignored / medium | Chunked renders, raised timeout, compare-and-set on job status (11.2). |
@@ -1300,7 +1325,7 @@ Phase 1 starts.
 
 | # | Question | Proposed default |
 |---|---|---|
-| Q1 ★ | Which Blender release do we pin? | The current Blender LTS at Phase 1 start, verified by the spikes. Every later upgrade is a planned migration. |
+| Q1 | Which Blender release do we pin? | **Decided in Phase 1:** 5.2.3 LTS, the current LTS, which the spikes verified. Every later upgrade is a planned migration that reruns the spike tests. |
 | Q2 ★ | Who authors the first character template and the first garment templates (R1)? | A commissioned or in-house 3D artist delivers one child template and three garments to the rig standard in section 8 before Phase 2; the engine work starts in parallel on a simplified stand-in. |
 | Q3 | Do we merge the existing 16-PR stack into `main` first? | **Answered by M:** no. The new platform starts from `main` on its own numbered branches; the stack stays unmerged as a reference, and code is ported from it when a phase needs it. |
 | Q4 ★ | Will artists hand-edit scene or character files in desktop Blender? | Not in the MVP. Character edits go through draft specs; scene edits through the scene manifest. A desktop check-in workflow is a later phase. |
