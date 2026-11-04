@@ -1325,7 +1325,7 @@ Phase 1 starts.
 
 ### 18.1 What exists
 
-Sixteen stacked, unmerged PRs (#1 to #16; about 12,000 lines of Python, 114 tests passing,
+Sixteen stacked, unmerged PRs (#1 to #16; about 12,000 lines of Python, 113 tests passing,
 1 failing, 9 skipped because the `bpy` wheel is absent in CI). The system they build is a
 **story-first** pipeline: a story goes in, six agents produce story bible, character
 sheets, world, direction and layout, gated by human approvals, and deterministic Blender
