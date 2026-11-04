@@ -48,7 +48,9 @@ def test_seed_scan_lint_round_trip(tmp_path):
     assert walk.frames == 32 and walk.loop and abs(walk.root_motion_m[1] - 1.1) < 1e-3
     assert manifest.clip_by_id()["clip_raise_arm_r"].loop is False
     base = manifest.base_by_id()["base_human_child"]
-    assert base.proportion_sliders == ["head_scale", "limb_length"]
+    assert base.proportion_sliders == ["head_scale", "limb_length", "torso_width", "belly", "age"]
+    assert {b.id for b in manifest.bases} == {"base_human_child", "base_human_adult", "base_quadruped"}
+    assert {g.slot for g in manifest.garments} >= {"top", "bottom", "shoes", "coat", "hat", "accessory", "collar"}
     assert "head_scale" not in base.shape_keys
     assert manifest.lighting_presets == ["day", "dusk", "night", "interior_warm"]
 

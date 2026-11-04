@@ -21,6 +21,7 @@ revisited on its branch and merged back into `main`.
 | `07-director` | `studio/agents/director.py` | Style guide, then a shot list per scene (parallel, partial retries) |
 | `08-layout-td` | `studio/agents/layout_td.py` | Per-scene staging drafts; code owns frames, environment, library ids |
 | `09-continuity-checker` | `studio/agents/continuity_checker.py` | Reads the whole package for story and continuity problems; routed to owner agents |
+| `10-build-character` | `tools/build_character.py`, `studio/assets` | Asset build phase 1: parametric bases, wardrobe, hair; sheets become rigged `.blend` files |
 
 ## Setup
 
@@ -47,3 +48,20 @@ Each agent is one structured-output call (`client.messages.parse` with its Pydan
 Director and the Layout TD make one call per scene and only redo the scenes that fail a check.
 
 Design docs: "Animation Studio: Stage 1 Agent Design" and "Asset Build Implementation Plan".
+
+## Asset build
+
+Stage 1 agents emit asset specs; deterministic Blender code turns them into library files,
+so a human modeller only sees what the automated paths cannot do (see the Asset Build
+Implementation Plan). Phase 1, parametric characters:
+
+```
+python -m tools.make_seed_library --library library      # placeholder bases, garments, hair
+python -m tools.build_character --library library --characters runs/film/current/characters.json --rescan
+studio build-characters runs/film                         # same, from a run; promotes the sheets to library assets
+```
+
+A sheet with `asset.status: parametric` names a base, proportions (sliders 0.7 to 1.3 and
+bone-length overrides), materials by slot, a hair piece and an outfit of garments. The
+builder opens the base, applies all of it, saves `library/characters/lib_char_<slug>.blend`
+and rescans the manifest; the sheet then points at that library id.

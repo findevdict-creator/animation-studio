@@ -5,9 +5,10 @@ assets to work with before any artist touches Blender.
     python -m tools.make_seed_library --library library
 
 Creates: one rigged human block figure (lib_char_girl_a), one rigged quadruped
-(lib_char_fox_a), a lantern prop, a forest clearing environment with anchors, three
-clips, and a parametric base (base_human_child). These are placeholders with correct
-structure, not art.
+(lib_char_fox_a), a lantern prop, a forest clearing environment with anchors, four
+clips, three parametric bases (base_human_child, base_human_adult, base_quadruped),
+eight garments and two hair pieces. These are placeholders with correct structure,
+not art: the point is that every tool runs end to end against them.
 """
 
 from __future__ import annotations
@@ -85,37 +86,141 @@ def _props(scene, **props):
         scene[k] = v
 
 
-def make_human(library: Path, height: float, file: Path, as_base: bool = False):
+FACE_KEYS = ["smile", "frown", "brow_up", "mouth_open", "blink_l", "blink_r", "vis_aa", "vis_ee", "vis_oh", "vis_mm"]
+PROPORTION_SLIDERS = ["head_scale", "limb_length", "torso_width", "belly", "age"]
+OUTFIT_SLOTS = "top,bottom,shoes,coat,hat,accessory"
+
+
+def _material(name: str, rgba=(0.8, 0.8, 0.8, 1.0)):
+    import bpy
+
+    mat = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+    mat.use_nodes = True
+    bsdf = mat.node_tree.nodes.get("Principled BSDF")
+    if bsdf is not None:
+        bsdf.inputs["Base Color"].default_value = rgba
+    return mat
+
+
+def _assign(obj, mat) -> None:
+    obj.data.materials.clear()
+    obj.data.materials.append(mat)
+
+
+def make_human(library: Path, height: float, file: Path, as_base: bool = False, tags: str | None = None):
     import bpy
 
     scene = _reset()
     h = height
     body = _box("body", (0.25 * h, 0.12 * h, 0.4 * h), (0, 0, 0.55 * h))
     head = _box("head", (0.16 * h, 0.16 * h, 0.16 * h), (0, 0, 0.9 * h))
-    _box("leg_l", (0.08 * h, 0.1 * h, 0.35 * h), (-0.07 * h, 0, 0.175 * h))
-    _box("leg_r", (0.08 * h, 0.1 * h, 0.35 * h), (0.07 * h, 0, 0.175 * h))
-    _add_shape_keys(head, ["smile", "frown", "brow_up", "mouth_open", "blink_l", "blink_r"] + (["head_scale", "limb_length"] if as_base else []))
+    leg_l = _box("leg_l", (0.08 * h, 0.1 * h, 0.35 * h), (-0.07 * h, 0, 0.175 * h))
+    leg_r = _box("leg_r", (0.08 * h, 0.1 * h, 0.35 * h), (0.07 * h, 0, 0.175 * h))
+    eyes = _box("eyes", (0.1 * h, 0.02 * h, 0.02 * h), (0, -0.08 * h, 0.92 * h))
+    hair = _box("hair_cap", (0.17 * h, 0.17 * h, 0.04 * h), (0, 0, 0.99 * h))
+    skin = _material("skin", (0.78, 0.55, 0.42, 1.0))
+    for obj in (body, head, leg_l, leg_r):
+        _assign(obj, skin)
+    _assign(eyes, _material("eyes", (0.2, 0.12, 0.08, 1.0)))
+    _assign(hair, _material("hair", (0.15, 0.1, 0.08, 1.0)))
+    # Face shape keys on the head; proportion sliders are shape keys too (neutral at 0, -1..1).
+    _add_shape_keys(head, FACE_KEYS)
+    if as_base:
+        for name in PROPORTION_SLIDERS:
+            for obj in (head, body):
+                if not obj.data.shape_keys:
+                    obj.shape_key_add(name="Basis", from_mix=False)
+                kb = obj.shape_key_add(name=name, from_mix=False)
+                kb.slider_min = -1.0
+                for v in kb.data:
+                    v.co.z += 0.02 * h  # a token deformation
     rig = _rig(
         [
             ("root", (0, 0, 0), (0, 0.2, 0), None),
             ("spine", (0, 0, 0.35 * h), (0, 0, 0.75 * h), "root"),
             ("head", (0, 0, 0.75 * h), (0, 0, 0.98 * h), "spine"),
-            ("hand.R", (0.2 * h, 0, 0.5 * h), (0.25 * h, 0, 0.45 * h), "spine"),
-            ("hand.L", (-0.2 * h, 0, 0.5 * h), (-0.25 * h, 0, 0.45 * h), "spine"),
+            ("upper_arm.R", (0.14 * h, 0, 0.72 * h), (0.2 * h, 0, 0.55 * h), "spine"),
+            ("hand.R", (0.2 * h, 0, 0.55 * h), (0.25 * h, 0, 0.45 * h), "upper_arm.R"),
+            ("upper_arm.L", (-0.14 * h, 0, 0.72 * h), (-0.2 * h, 0, 0.55 * h), "spine"),
+            ("hand.L", (-0.2 * h, 0, 0.55 * h), (-0.25 * h, 0, 0.45 * h), "upper_arm.L"),
+            ("thigh.R", (0.07 * h, 0, 0.35 * h), (0.07 * h, 0, 0.18 * h), "root"),
+            ("foot.R", (0.07 * h, 0, 0.18 * h), (0.07 * h, 0.1 * h, 0.0), "thigh.R"),
+            ("thigh.L", (-0.07 * h, 0, 0.35 * h), (-0.07 * h, 0, 0.18 * h), "root"),
+            ("foot.L", (-0.07 * h, 0, 0.18 * h), (-0.07 * h, 0.1 * h, 0.0), "thigh.L"),
         ]
     )
-    for obj in (body, head):
+    for obj in (body, head, leg_l, leg_r, eyes, hair):
         obj.parent = rig
     _props(
         scene,
         studio_kind="base" if as_base else "character",
         studio_rig_type="rigify_human",
-        studio_outfit_slots="top,bottom,shoes,coat,hat,accessory",
-        studio_tags="human,child" if h < 1.5 else "human,adult",
+        studio_outfit_slots=OUTFIT_SLOTS,
+        studio_tags=tags or ("human,child" if h < 1.5 else "human,adult"),
     )
     if as_base:
-        _props(scene, studio_proportion_sliders="head_scale,limb_length", studio_material_slots="skin,hair,eyes")
+        _props(scene, studio_proportion_sliders=",".join(PROPORTION_SLIDERS), studio_material_slots="skin,hair,eyes")
     _save(file)
+
+
+def make_quadruped_base(library: Path):
+    """base_quadruped: the fox's shape with sliders, so animal characters are parametric too."""
+    scene = _reset()
+    body = _box("body", (0.45, 0.2, 0.2), (0, 0, 0.3))
+    head = _box("head", (0.18, 0.15, 0.15), (0.3, 0, 0.42))
+    for name, x, y in (("leg_fl", 0.15, 0.06), ("leg_fr", 0.15, -0.06), ("leg_bl", -0.15, 0.06), ("leg_br", -0.15, -0.06)):
+        _assign(_box(name, (0.06, 0.06, 0.2), (x, y, 0.1)), _material("fur", (0.8, 0.45, 0.2, 1.0)))
+    tail = _box("tail", (0.3, 0.08, 0.08), (-0.35, 0, 0.35))
+    eyes = _box("eyes", (0.02, 0.08, 0.02), (0.39, 0, 0.46))
+    fur = _material("fur", (0.8, 0.45, 0.2, 1.0))
+    for obj in (body, head, tail):
+        _assign(obj, fur)
+    _assign(eyes, _material("eyes", (0.1, 0.1, 0.1, 1.0)))
+    _add_shape_keys(head, ["smile", "ears_back", "mouth_open", "blink_l", "blink_r"])
+    for name in ("head_scale", "limb_length", "torso_width", "belly", "age"):
+        kb = body.shape_key_add(name=name, from_mix=False) if body.data.shape_keys else (body.shape_key_add(name="Basis", from_mix=False), body.shape_key_add(name=name, from_mix=False))[1]
+        kb.slider_min = -1.0
+        for v in kb.data:
+            v.co.z += 0.01
+    rig = _rig(
+        [
+            ("root", (0, 0, 0), (0.2, 0, 0), None),
+            ("spine", (-0.2, 0, 0.3), (0.2, 0, 0.3), "root"),
+            ("head", (0.2, 0, 0.35), (0.4, 0, 0.45), "spine"),
+            ("tail", (-0.2, 0, 0.3), (-0.5, 0, 0.4), "spine"),
+        ]
+    )
+    for obj in (body, head, tail, eyes):
+        obj.parent = rig
+    _props(scene, studio_kind="base", studio_rig_type="rigify_quadruped", studio_outfit_slots="collar,accessory",
+           studio_proportion_sliders="head_scale,limb_length,torso_width,belly,age", studio_material_slots="fur,eyes",
+           studio_tags="quadruped,animal")
+    _save(library / "bases" / "base_quadruped.blend")
+
+
+def make_garment(library: Path, name: str, slot: str, size, location, fits: str, tags: str):
+    """Garments are authored for a 1.0 m tall base and scaled to the target base's height."""
+    scene = _reset()
+    obj = _box(name, size, location)
+    _assign(obj, _material(slot, (0.6, 0.6, 0.6, 1.0)))
+    _props(scene, studio_kind="garment", studio_slot=slot, studio_fits=fits, studio_tags=tags, studio_ref_height_m=1.0)
+    _save(library / "garments" / f"{name}.blend")
+
+
+def make_hair(library: Path, name: str, fits: str):
+    scene = _reset()
+    obj = _box(name, (0.18, 0.18, 0.06), (0, 0, 1.0))
+    _assign(obj, _material("hair", (0.15, 0.1, 0.08, 1.0)))
+    for side in (-1, 1):
+        _assign(_box(f"{name}_braid_{'l' if side < 0 else 'r'}", (0.04, 0.04, 0.25), (side * 0.1, 0.02, 0.8)), bpy_mat("hair"))
+    _props(scene, studio_kind="hair", studio_fits=fits, studio_ref_height_m=1.0, studio_tags="hair")
+    _save(library / "hair" / f"{name}.blend")
+
+
+def bpy_mat(name: str):
+    import bpy
+
+    return bpy.data.materials[name]
 
 
 def make_fox(library: Path):
@@ -198,9 +303,14 @@ def make_clip(library: Path, rig_type: str, name: str, frames: int, loop: bool, 
     _save(library / "clips" / "baked" / rig_type / f"{name}.blend")
 
 
+HUMAN_FITS = "base_human_child,base_human_adult"
+
+
 def build(library: Path) -> None:
     make_human(library, 1.2, library / "characters" / "lib_char_girl_a.blend")
     make_human(library, 1.2, library / "bases" / "base_human_child.blend", as_base=True)
+    make_human(library, 1.75, library / "bases" / "base_human_adult.blend", as_base=True)
+    make_quadruped_base(library)
     make_fox(library)
     make_lantern(library)
     make_forest(library)
@@ -208,6 +318,17 @@ def build(library: Path) -> None:
     make_clip(library, "rigify_human", "clip_raise_arm_r", 18, False, 0.0, "gesture")
     make_clip(library, "rigify_human", "clip_idle_breath", 48, True, 0.0, "idle")
     make_clip(library, "rigify_quadruped", "clip_fox_sit", 24, True, 0.0, "idle")
+    # Wardrobe, authored at 1.0 m and scaled per base.
+    make_garment(library, "garm_tee_a", "top", (0.27, 0.14, 0.2), (0, 0, 0.62), HUMAN_FITS, "casual")
+    make_garment(library, "garm_shorts_a", "bottom", (0.26, 0.13, 0.12), (0, 0, 0.42), HUMAN_FITS, "casual")
+    make_garment(library, "garm_trousers_a", "bottom", (0.26, 0.13, 0.36), (0, 0, 0.19), HUMAN_FITS, "casual")
+    make_garment(library, "garm_boots_a", "shoes", (0.24, 0.16, 0.08), (0, 0.02, 0.04), HUMAN_FITS, "boots,rain")
+    make_garment(library, "garm_raincoat_a", "coat", (0.3, 0.16, 0.4), (0, 0, 0.56), HUMAN_FITS, "outerwear,rain")
+    make_garment(library, "garm_cap_a", "hat", (0.18, 0.18, 0.05), (0, 0, 1.02), HUMAN_FITS, "cap")
+    make_garment(library, "garm_scarf_a", "accessory", (0.2, 0.2, 0.05), (0, 0, 0.74), HUMAN_FITS, "scarf,winter")
+    make_garment(library, "garm_collar_a", "collar", (0.2, 0.2, 0.04), (0.18, 0, 0.42), "base_quadruped", "collar")
+    make_hair(library, "hair_two_braids", HUMAN_FITS)
+    make_hair(library, "hair_short_a", HUMAN_FITS)
     (library / "lighting_presets.json").write_text('["day", "dusk", "night", "interior_warm"]\n')
 
 

@@ -79,7 +79,7 @@ def scan_file(library: Path, file: Path) -> tuple[str, dict] | None:
             "rig_type": scene_prop("studio_rig_type", "custom" if rig else "custom"),
             "height_m": bounds[2],
             "outfit_slots": split_csv(scene_prop("studio_outfit_slots")),
-            "shape_keys": shape_key_names(),
+            "shape_keys": [k for k in shape_key_names() if k not in split_csv(scene_prop("studio_hidden_shape_keys"))],
             "tags": tags,
         }
     if kind == "prop":
