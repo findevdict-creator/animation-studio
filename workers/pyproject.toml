@@ -1,0 +1,13 @@
+[project]
+name = "studio-workers"
+version = "0.1.0"
+description = "Celery workers: job supervision, Blender process management, result upload."
+requires-python = ">=3.13"
+dependencies = ["studio-backend", "studio-contracts", "celery[redis]>=5.4"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["studio_workers*"]

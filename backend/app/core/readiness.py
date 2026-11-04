@@ -43,3 +43,12 @@ def _storage() -> None:
 
     Storage.for_bucket("work").ping()
     Storage.for_bucket("library").ping()
+
+
+@register("broker")
+def _broker() -> None:
+    import redis
+
+    from app.config import get_settings
+
+    redis.Redis.from_url(get_settings().redis_url, socket_connect_timeout=2).ping()

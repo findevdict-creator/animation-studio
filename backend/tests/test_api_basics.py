@@ -12,10 +12,10 @@ def test_health():
     assert r.status_code == 200 and r.json() == {"status": "ok"}
 
 
-def test_ready_checks_database_and_storage(migrated, s3_buckets):
+def test_ready_checks_every_dependency(migrated, s3_buckets):
     r = client().get("/api/v1/ready")
     assert r.status_code == 200, r.text
-    assert r.json()["checks"] == {"database": "ok", "storage": "ok"}
+    assert r.json()["checks"] == {"database": "ok", "storage": "ok", "broker": "ok"}
 
 
 def test_unknown_route_is_problem_json():

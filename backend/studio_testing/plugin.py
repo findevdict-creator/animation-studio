@@ -1,4 +1,4 @@
-"""Tests run against a real PostgreSQL database (``STUDIO_TEST_DATABASE_URL``), migrated
+"""Shared fixtures. Tests run against a real PostgreSQL database (``STUDIO_TEST_DATABASE_URL``), migrated
 with Alembic once per session. Each test runs inside a transaction that is rolled back."""
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ DEV_KEYS = {
     "publisher": ("dev-publisher", "dev-publisher-secret"),
 }
 
-BACKEND = Path(__file__).resolve().parents[1]
+BACKEND = Path(__file__).resolve().parents[1]  # backend/
 
 
 def alembic_config() -> Config:
@@ -99,3 +99,40 @@ def key_prefix() -> str:
     from studio_contracts.ids import uuid7
 
     return f"_test/{uuid7()}"
+
+
+class RecordingDispatcher:
+    def __init__(self) -> None:
+        self.sent: list[tuple[str, str, float]] = []
+
+    def send(self, job_id, queue: str, countdown_s: float = 0) -> None:
+        self.sent.append((str(job_id), queue, countdown_s))
+
+
+@pytest.fixture
+def dispatcher() -> Iterator[RecordingDispatcher]:
+    from app.jobs.queue import set_dispatcher
+
+    d = RecordingDispatcher()
+    set_dispatcher(d)
+    yield d
+    set_dispatcher(None)
+
+
+@pytest.fixture
+def db(migrated):
+    """A sessionmaker whose sessions really commit (for code that manages its own
+    transactions, such as API routes and the worker supervisor)."""
+    from app.core.database import get_sessionmaker
+
+    return get_sessionmaker()
+
+
+@pytest.fixture
+def api(migrated, s3_buckets, dispatcher):
+    from fastapi.testclient import TestClient
+
+    from app.main import create_app
+
+    with TestClient(create_app()) as client:
+        yield client

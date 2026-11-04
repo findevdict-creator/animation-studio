@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     database_echo: bool = False
 
     redis_url: str = "redis://localhost:6379/0"
+    job_visibility_timeout_s: int = Field(default=6 * 3600, description="above the longest job timeout")
 
     # Object storage (any S3 API). Each process gets its own identity; see infra/seaweedfs.
     s3_endpoint_url: str | None = "http://localhost:8333"
@@ -34,6 +35,16 @@ class Settings(BaseSettings):
         default=True, description="the store honours If-None-Match: * on PutObject and CompleteMultipartUpload"
     )
     s3_presign_expiry_s: int = Field(default=900, ge=60, le=3600)
+
+    # Workers (architecture 11). The Blender process gets none of the credentials above.
+    work_root: str = "/tmp/studio-work"
+    blender_mode: str = Field(default="binary", description="binary: the Blender executable; wheel: the bpy module in this Python")
+    blender_binary: str = "blender"
+    engine_entrypoint: str | None = Field(default=None, description="path to cartoon_engine/entrypoint.py; found automatically")
+    job_timeouts_s: dict[str, int] = Field(default_factory=lambda: {"blender_smoke": 300})
+    default_job_timeout_s: int = 1800
+    keep_failed_workspaces: bool = True
+    worker_host: str | None = None
 
     cors_origins: list[str] = Field(default_factory=lambda: ["http://localhost:5173"])
 

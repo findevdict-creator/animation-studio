@@ -4,7 +4,7 @@ from alembic.runtime.migration import MigrationContext
 from sqlalchemy import create_engine, inspect
 
 from app.models import Base
-from tests.conftest import alembic_config
+from studio_testing.plugin import alembic_config
 
 EXPECTED_TABLES = {
     "users", "roles", "permissions", "user_roles", "role_permissions", "asset_code_counters",

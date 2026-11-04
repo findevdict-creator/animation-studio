@@ -1,0 +1,15 @@
+[project]
+name = "cartoon-engine"
+version = "0.1.0"
+description = "Deterministic Blender production code. Runs only inside Blender's Python (or the bpy wheel)."
+requires-python = ">=3.13"
+dependencies = ["studio-contracts"]
+# bpy is provided by Blender itself; for tests outside Blender install the matching wheel:
+#   pip install bpy==5.2.3
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["cartoon_engine*"]
