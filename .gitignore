@@ -12,3 +12,4 @@ library/preview/
 node_modules/
 /work/
 *.blend@
+dump.rdb
