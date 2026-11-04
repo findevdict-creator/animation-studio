@@ -184,8 +184,18 @@ def build_prop(
     record: dict[str, Any] = {"request_id": request.id, "library_id": library_id, "rounds": []}
     start_round = max((a.round for a in attempts), default=0)
     accepted = False
+    reuse = None
+    if request.route == "generator" and not attempts:
+        from studio.assets.queue import request_tags
+
+        reuse = generators.match(request_tags(request, manifest), kind=request.kind)
     for rnd in range(start_round + 1, start_round + 1 + config.flags.asset_builder_rounds):
-        bs = builder.write_script(request, manifest, config, previous=attempts, scripts=scripts)
+        if reuse is not None and rnd == start_round + 1:
+            # The generator route: an accepted script with the new request's dimensions.
+            bs = BuildScript(script=generators.script_text(reuse), params={k: float(v) for k, v in reuse["params"].items() if isinstance(v, (int, float))}, tags=list(reuse["tags"]), summary=f"reused {reuse['id']}")
+            bs.params.update({k: v for k, v in default_params(request).items() if k != "seed"})
+        else:
+            bs = builder.write_script(request, manifest, config, previous=attempts, scripts=scripts)
         script_rel = str(SCRIPTS_DIR / f"{request.id}_r{rnd}.py")
         (library / script_rel).write_text(bs.script)
         scripts[script_rel] = bs.script
@@ -222,7 +232,8 @@ def build_prop(
             sheet.write_bytes(b"\x89PNG\r\n\x1a\n")
             sheet_rel = str(sheet.relative_to(library))
         verdict = qa.review(sheet, request, metrics, config)
-        attempts.append(BuildAttempt(route="asset_builder", round=rnd, script=script_rel, turntable=sheet_rel, qa_score=verdict.score, qa_notes=verdict.summary()))
+        route = "generator" if reuse is not None and rnd == start_round + 1 else "asset_builder"
+        attempts.append(BuildAttempt(route=route, round=rnd, script=script_rel, turntable=sheet_rel, qa_score=verdict.score, qa_notes=verdict.summary()))
         record["rounds"].append({"round": rnd, "outcome": "scored", "score": verdict.score, "metrics": metrics, "notes": verdict.summary()})
         if verdict.score >= config.flags.qa_accept_score:
             generators.add(request, script_rel, params, bs.tags, library_id, verdict.score)
@@ -232,7 +243,7 @@ def build_prop(
     if accepted:
         updated = request.model_copy(
             update={
-                "route": "asset_builder", "status": "accepted", "attempts": attempts, "result_library_id": library_id,
+                "route": attempts[-1].route, "status": "accepted", "attempts": attempts, "result_library_id": library_id,
                 "decision": BuildDecision(by="qa_agent", at=_now(), note=f"accepted at QA score {attempts[-1].qa_score:.2f} in round {attempts[-1].round}"),
             }
         )

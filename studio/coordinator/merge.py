@@ -82,6 +82,10 @@ def build_package(
     build_requests = list(characters.build_requests) + list(world.build_requests)
     if layout:
         build_requests += list(layout.build_requests)
+    # Rank by screen time and pick a route for open requests (asset build phase 5).
+    from studio.assets.queue import plan_queue
+
+    build_requests, _ = plan_queue(build_requests, layout, world, manifest, config)
     open_ids = open_build_requests(characters, world, layout) if layout else open_build_requests(characters, world)
 
     if open_ids:

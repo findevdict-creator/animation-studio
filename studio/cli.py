@@ -159,6 +159,44 @@ def cmd_build_props(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_build_requests(args: argparse.Namespace) -> int:
+    from studio.assets.builder import GeneratorLibrary
+    from studio.assets.characters import write_build_report
+    from studio.assets.queue import apply_queue, metrics, metrics_markdown, plan_queue, queue_table
+    from studio.schemas import Characters, Layout, World
+
+    store = RunStore(Path(args.run_dir))
+    outputs = store.load_all_outputs()
+    chars, world, layout = outputs.get("character_designer"), outputs.get("scene_builder"), outputs.get("layout_td")
+    if not isinstance(chars, Characters) or not isinstance(world, World):
+        print("this run has no character_designer and scene_builder outputs yet", file=sys.stderr)
+        return 1
+    layout = layout if isinstance(layout, Layout) else None
+    config = store.load_config()
+    library = Path(args.library).resolve()
+    manifest = load_manifest(library / "manifest.json")
+    generators = GeneratorLibrary(library) if (library / "generators").exists() else None
+    requests = list(chars.build_requests) + list(world.build_requests) + (list(layout.build_requests) if layout else [])
+    planned, records = plan_queue(requests, layout, world, manifest, config, generators)
+    m = metrics(planned)
+    write_build_report(store.root, "build_queue", records)
+    (store.root / "assets" / "metrics.json").write_text(json.dumps(m, indent=2) + "\n")
+    (store.root / "assets" / "metrics.md").write_text(metrics_markdown(m, store.root.name))
+    if args.save:
+        c2, w2, l2 = apply_queue(chars, world, layout, planned)
+        store.save_output("character_designer", c2)
+        store.save_output("scene_builder", w2)
+        if l2 is not None:
+            store.save_output("layout_td", l2)
+    if args.json:
+        print(json.dumps({"queue": records, "metrics": m}, indent=2))
+    else:
+        print(queue_table(records) if records else "no build requests")
+        print()
+        print(metrics_markdown(m, store.root.name))
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     store = RunStore(Path(args.run_dir))
     state = store.load_state()
@@ -209,6 +247,12 @@ def main(argv: list[str] | None = None) -> int:
     bprop.add_argument("--time-limit", type=float, default=300.0, help="seconds a script may run")
     bprop.add_argument("--no-render", action="store_true", help="skip the turntable (QA then sees a blank sheet)")
 
+    breq = sub.add_parser("build-requests", help="rank and route a run's build requests; print the queue and metrics")
+    breq.add_argument("run_dir")
+    breq.add_argument("--library", default="library")
+    breq.add_argument("--save", action="store_true", help="write screen time and routes back into the run's outputs")
+    breq.add_argument("--json", action="store_true")
+
     args = parser.parse_args(argv)
     if args.cmd == "run":
         return cmd_run(args)
@@ -222,6 +266,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_build_environments(args)
     if args.cmd == "build-props":
         return cmd_build_props(args)
+    if args.cmd == "build-requests":
+        return cmd_build_requests(args)
     return 1
 
 
