@@ -9,7 +9,9 @@ import pytest
 from app.config import get_settings
 from app.core.storage import sha256_file
 from app.jobs import service
+from app.assets import characters
 from app.models.assets import AssetVersion
+from app.models.characters import Character, CharacterVersion
 from app.models.jobs import Job
 from studio_contracts.jobs import JobStatus
 from studio_workers.supervisor import Supervisor
@@ -51,9 +53,17 @@ def test_generate_character_end_to_end(db, storage_as, dispatcher, tmp_path):
         assert data["glb"]["head_morph_targets"] == 43 and data["turntable_frames"] == 4
         version = s.get(AssetVersion, job.result["asset_version_id"])
         assert version.kind == "character" and version.display_code.startswith("CHAR-") and version.status == "draft"
+        # without a draft the job creates the character identity and its first draft
+        character = s.get(Character, job.result["character_id"])
+        draft = s.get(CharacterVersion, version.id)
+        assert job.result["attached"] and character.code == version.display_code and character.name == "Ali"
+        assert draft.built_digest == draft.spec_digest == data["resolved_digest"]
+        assert draft.validation_report["ok"] and draft.validation_report["blend_sha256"] == data["blend_sha256"]
+        assert characters.readiness(draft) == []
         roles = sorted(f.role for f in version.files)
         assert roles == ["blend", "glb", "preview", "preview", "report", "spec", "thumbnail", "turntable"]
         files = {f.storage_key.rsplit("/", 1)[-1]: f for f in version.files}
+        assert files["character.blend"].sha256 == data["blend_sha256"]
 
     for name, f in files.items():  # every object is in storage with the recorded checksum
         local = tmp_path / name

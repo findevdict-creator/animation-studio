@@ -39,22 +39,34 @@ def submit_job(
     idempotency_key: str | None = Header(default=None, max_length=200),
     who: Principal = Depends(require("job.submit")),
 ) -> JobOut:
-    for permission in service.extra_permissions(body.type):
+    job, created = submit_and_dispatch(session, who, body.type, body.params, idempotency_key)
+    if not created:
+        response.status_code = status.HTTP_200_OK
+    return _out(job)
+
+
+def submit_and_dispatch(session: Session, who: Principal, job_type: str, params: dict, idempotency_key: str | None,
+                        before_commit=None) -> tuple[Job, bool]:
+    """Check the type's extra permissions, insert the job, commit, then hand it to the broker.
+
+    ``before_commit(job)`` runs in the same transaction as the insert, for callers that link
+    the job to something (a character draft, …)."""
+    for permission in service.extra_permissions(job_type):
         if not who.can(permission):
-            raise ApiError(403, "forbidden", f"{body.type} jobs need {permission}", required=permission)
-    job, created = service.submit(session, body.type, body.params, idempotency_key=idempotency_key,
+            raise ApiError(403, "forbidden", f"{job_type} jobs need {permission}", required=permission)
+    job, created = service.submit(session, job_type, params, idempotency_key=idempotency_key,
                                   requested_by=who.user_id)
     if created:
         audit(session, who, "job.submitted", "job", job.id, type=job.type)
+        if before_commit is not None:
+            before_commit(job)
     session.commit()  # the row exists before anything can pick the id up (outbox, 11.2)
     if created:
         get_dispatcher().send(job.id, job.queue)
         service.mark_enqueued(session, job.id)
         session.commit()
-    else:
-        response.status_code = status.HTTP_200_OK
     session.refresh(job)
-    return _out(job)
+    return job, created
 
 
 @router.get("", response_model=Page[JobOut], summary="List jobs, newest first")

@@ -8,6 +8,7 @@ A character that fails validation fails the job (its log carries the report).
 
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 import time
@@ -84,7 +85,10 @@ def run(ctx: JobContext) -> dict[str, Any]:
 
     ctx.progress(0.3, "validating")
     report = validate(parts, rc.height_m, CARTOON_HUMANOID_V1)
-    report_doc = {"character": rc.name, "spec_digest": digest, "rig_profile": CARTOON_HUMANOID_V1.ref,
+    # the report names the exact file it describes, so a publisher can tell it belongs to the blend
+    blend_sha = hashlib.sha256(blend.read_bytes()).hexdigest()
+    report_doc = {"character": rc.name, "spec_digest": digest, "blend_sha256": blend_sha,
+                  "rig_profile": CARTOON_HUMANOID_V1.ref,
                   "blender_version": blend_io.blender_version(), "engine_version": cartoon_engine.__version__,
                   **report.as_dict()}
     write_json(out / "validation.json", report_doc)
@@ -136,7 +140,8 @@ def run(ctx: JobContext) -> dict[str, Any]:
     return {
         "name": rc.name, "resolved_digest": digest, "template": rc.template, "style_profile": rc.style_profile,
         "rig_profile": rc.rig_profile, "fit_profile": rc.fit_profile, "height_m": rc.height_m,
-        "validation": {"ok": report.ok, "checks": len(report.checks)}, "rig": rig_stats, "vertices": counts,
+        "validation": {"ok": report.ok, "checks": len(report.checks)}, "report": report_doc,
+        "blend_sha256": blend_sha, "rig": rig_stats, "vertices": counts,
         "render": {"engine": "CYCLES", "device": "CPU", "resolution": opts.resolution, "samples": opts.samples},
         "timings_s": timings, **data,
     }

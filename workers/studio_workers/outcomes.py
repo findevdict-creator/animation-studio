@@ -34,13 +34,6 @@ def _draft_with_files(session: Session, kind: AssetKind, job_id: uuid.UUID, uplo
     return {"asset_version_id": str(version.id), "display_code": version.display_code, "asset_file_ids": files}
 
 
-def _requester(session: Session, job_id: uuid.UUID) -> uuid.UUID | None:
-    from app.models.jobs import Job
-
-    job = session.get(Job, job_id)
-    return job.requested_by if job else None
-
-
 def _blender_smoke(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
                    blender_version: str | None) -> dict[str, Any]:
     return _draft_with_files(session, AssetKind.test_asset, job_id, uploaded, blender_version)
@@ -48,10 +41,26 @@ def _blender_smoke(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded]
 
 def _generate_character(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
                         blender_version: str | None) -> dict[str, Any]:
-    """A new character draft (CHAR-NNN) holding the build. Character identity and version
-    tables, review and publishing arrive with the library (Phase 3)."""
-    return _draft_with_files(session, AssetKind.character, job_id, uploaded, blender_version,
-                             created_by=_requester(session, job_id))
+    """The build goes onto its character draft. A job submitted without a draft (the Phase 2
+    path) creates the character identity and its first draft from the job's spec."""
+    from app.assets import characters
+    from app.models.characters import CharacterVersion
+    from app.models.jobs import Job
+
+    job = session.get(Job, job_id)
+    draft_id = job.params.get("draft_version_id") if job else None
+    if draft_id:
+        version = session.get(CharacterVersion, uuid.UUID(draft_id), with_for_update=True, populate_existing=True)
+        if version is None:
+            return {"attached": False, "reason": "the draft was discarded"}
+    else:
+        spec = job.params["spec"]
+        _, version = characters.create_character(session, name=spec["name"], description=spec.get("description", ""),
+                                                 tags=[], spec=spec, created_by=job.requested_by)
+        characters.begin_generate(version, job_id)
+    recorded = characters.attach_build(session, version, job_id, uploaded, data, blender_version)
+    return {"character_id": str(version.character_id), "asset_version_id": str(version.id),
+            "display_code": version.entry.display_code, **recorded}
 
 
 OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character}

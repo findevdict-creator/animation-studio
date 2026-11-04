@@ -73,6 +73,8 @@ class GenerateCharacterParams(Model):
 
     spec: dict[str, Any]
     previews: PreviewSettings = Field(default_factory=PreviewSettings)
+    draft_version_id: UUID | None = Field(
+        default=None, description="the character draft the build is for; without one a new character is created")
 
     @model_validator(mode="after")
     def _spec_is_valid(self) -> "GenerateCharacterParams":

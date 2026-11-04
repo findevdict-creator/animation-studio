@@ -26,6 +26,7 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-10-character-geometry` | The procedural stand-in template `TPL-HUMANOID-STANDIN@0.1`: skeleton landmarks, skin-modifier body, head with eyes, eyelids, brows and mouth driven by face states, the 43 facial shape keys of the rig profile, four hair styles, style-profile materials |
 | `v2-11-character-rig` | Rigify rig fitted to the template and generated headless, eye bones tracking `eye_target`, `face_ctrl` properties driving all facial shape keys with simple-expression drivers, deterministic skin weights and mask groups, the character validator (structure and motion checks) |
 | `v2-12-character-previews` | The `generate_character` Blender job (build, rig, save, reopen, validate, turntable MP4, labelled expression sheet, GLB), the CHAR draft outcome, the Phase 2 acceptance script and demonstration record |
+| `v2-13-character-library` | Character identity and version tables (migration 0005) with database guards that freeze a build in review and a published version for good, the library service (create, drafts based on any version, spec edits with `If-Match`, generate linked to its draft, submit gated on a current validated build, review approve/reject, deprecate, discard) and the `/characters` API with gallery search and presigned file links |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the
