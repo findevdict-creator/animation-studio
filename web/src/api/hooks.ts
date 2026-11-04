@@ -1,5 +1,8 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { api, CharacterDetail, CharacterOut, JobOut, Me, VersionDetail, VersionJobOut } from "./client";
+import {
+  api, CharacterDetail, CharacterOut, Conventions, FitDetail, FitOut, Garment, JobOut, Me, OutfitDetail, OutfitOut,
+  OutfitVersionDetail, VersionDetail, VersionJobOut,
+} from "./client";
 
 export const useMe = () => useQuery({ queryKey: ["me"], queryFn: () => api<Me>("/me"), staleTime: 60_000 });
 
@@ -49,6 +52,68 @@ export function useCharacterAction<TBody, TOut = VersionDetail | VersionJobOut>(
       qc.invalidateQueries({ queryKey: ["character", cid] });
       qc.invalidateQueries({ queryKey: ["version", cid] });
       qc.invalidateQueries({ queryKey: ["characters"] });
+    },
+  });
+}
+
+// ---------------------------------------------------------------- outfits
+export interface OutfitFilter { q?: string; slot?: string; scope?: string; status?: string; owner_character_id?: string }
+
+export const useOutfits = (f: OutfitFilter) =>
+  useQuery({
+    queryKey: ["outfits", f],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      for (const [k, v] of Object.entries(f)) if (v) p.set(k, v);
+      return api<{ items: OutfitOut[]; next_cursor: string | null }>(`/outfits?${p}`);
+    },
+  });
+
+export const useOutfit = (id: string) =>
+  useQuery({ queryKey: ["outfit", id], queryFn: () => api<OutfitDetail>(`/outfits/${id}`) });
+
+export const useOutfitVersion = (oid: string, vid: string | undefined) =>
+  useQuery({
+    queryKey: ["outfit-version", oid, vid],
+    queryFn: () => api<OutfitVersionDetail>(`/outfits/${oid}/versions/${vid}`),
+    enabled: !!vid,
+  });
+
+export const useFits = (oid: string, vid: string | undefined) =>
+  useQuery({
+    queryKey: ["fits", oid, vid],
+    queryFn: () => api<FitOut[]>(`/outfits/${oid}/versions/${vid}/fits`),
+    enabled: !!vid,
+  });
+
+export const useFit = (oid: string, vid: string | undefined, cvid: string | undefined) =>
+  useQuery({
+    queryKey: ["fit", oid, vid, cvid],
+    queryFn: () => api<FitDetail>(`/outfits/${oid}/versions/${vid}/fits/${cvid}`),
+    enabled: !!vid && !!cvid,
+  });
+
+export const useWardrobe = (cid: string, cvid: string | undefined) =>
+  useQuery({
+    queryKey: ["wardrobe", cid, cvid],
+    queryFn: () => api<FitOut[]>(`/characters/${cid}/versions/${cvid}/outfits`),
+    enabled: !!cvid,
+  });
+
+export const useGarments = () =>
+  useQuery({ queryKey: ["garments"], queryFn: () => api<Garment[]>("/garments"), staleTime: Infinity });
+
+export const useClothing = (ref = "family_cartoon@1.0") =>
+  useQuery({ queryKey: ["clothing", ref], queryFn: () => api<Conventions>(`/style-profiles/${ref}/clothing`), staleTime: Infinity });
+
+/** Every mutation on an outfit refreshes its detail, versions, fits and the gallery. */
+export function useOutfitAction<TBody, TOut = unknown>(oid: string, run: (body: TBody) => Promise<TOut>) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      for (const key of [["outfit", oid], ["outfit-version", oid], ["outfits"], ["fits", oid], ["fit", oid], ["wardrobe"]])
+        qc.invalidateQueries({ queryKey: key });
     },
   });
 }

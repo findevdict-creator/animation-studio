@@ -504,6 +504,336 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/outfits/spec/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate an outfit specification against the garment catalog and its style
+         * @description Always 200: an invalid spec is a normal answer here, listing every issue.
+         */
+        post: operations["validate_api_v1_outfits_spec_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/garments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The garment catalog (procedural stand-ins) */
+        get: operations["list_garments_api_v1_garments_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/style-profiles/{ref}/clothing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Colours, fabrics, fit thresholds and fit profiles of a style */
+        get: operations["get_clothing_api_v1_style_profiles__ref__clothing_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gallery: search and filter outfits */
+        get: operations["gallery_api_v1_outfits_get"];
+        put?: never;
+        /** Create an outfit and its first draft from a specification */
+        post: operations["create_api_v1_outfits_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail */
+        get: operations["detail_api_v1_outfits__outfit_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Name, description, tags, recommended version */
+        patch: operations["patch_identity_api_v1_outfits__outfit_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version history, newest first */
+        get: operations["history_api_v1_outfits__outfit_id__versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version Detail */
+        get: operations["version_detail_api_v1_outfits__outfit_id__versions__version_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/files/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A version file: 302 to a presigned URL */
+        get: operations["version_file_api_v1_outfits__outfit_id__versions__version_id__files__name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve, or reject back to draft with notes */
+        post: operations["review_api_v1_outfits__outfit_id__versions__version_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish an approved version (job on the publisher queue) */
+        post: operations["publish_api_v1_outfits__outfit_id__versions__version_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/deprecate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide a published version from pickers; it stays loadable */
+        post: operations["deprecate_api_v1_outfits__outfit_id__versions__version_id__deprecate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** New draft, optionally copying the spec of an existing (e.g. published) version */
+        post: operations["create_draft_api_v1_outfits__outfit_id__drafts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/drafts/{draft_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Discard a draft */
+        delete: operations["discard_api_v1_outfits__outfit_id__drafts__draft_id__delete"];
+        options?: never;
+        head?: never;
+        /** Edit a draft's spec */
+        patch: operations["edit_draft_api_v1_outfits__outfit_id__drafts__draft_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/drafts/{draft_id}/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Build the draft in Blender and fit-check it (job) */
+        post: operations["generate_api_v1_outfits__outfit_id__drafts__draft_id__generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/drafts/{draft_id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a built draft whose fit check passed to review */
+        post: operations["submit_api_v1_outfits__outfit_id__drafts__draft_id__submit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/fits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Compatibility records of this outfit version */
+        get: operations["list_fits_api_v1_outfits__outfit_id__versions__version_id__fits_get"];
+        put?: never;
+        /** Fit-check this outfit version on a published character version (job) */
+        post: operations["request_fit_api_v1_outfits__outfit_id__versions__version_id__fits_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/fits/{character_version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One compatibility record with its full fit report */
+        get: operations["fit_detail_api_v1_outfits__outfit_id__versions__version_id__fits__character_version_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/outfits/{outfit_id}/versions/{version_id}/fits/{character_version_id}/decision": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a verified fit for production, or revoke a fit */
+        post: operations["decide_fit_api_v1_outfits__outfit_id__versions__version_id__fits__character_version_id__decision_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/characters/{character_id}/versions/{character_version_id}/outfits": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Wardrobe: every outfit version checked on this character version */
+        get: operations["wardrobe_api_v1_characters__character_id__versions__character_version_id__outfits_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -709,6 +1039,33 @@ export interface components {
             /** Recommended Version Id */
             recommended_version_id?: string | null;
         };
+        /** ConventionsOut */
+        ConventionsOut: {
+            /** Style Profile */
+            style_profile: string;
+            /** Colors */
+            colors: {
+                [key: string]: string;
+            };
+            /** Fabrics */
+            fabrics: {
+                [key: string]: components["schemas"]["Fabric"];
+            };
+            /** Clearance M */
+            clearance_m: [
+                number,
+                number
+            ];
+            /** Min Clearance M */
+            min_clearance_m: number;
+            /** Mask Margin M */
+            mask_margin_m: number;
+            fit: components["schemas"]["FitThresholds"];
+            /** Poses */
+            poses: string[];
+            /** Fit Profiles */
+            fit_profiles: string[];
+        };
         /** DownloadOut */
         DownloadOut: {
             /** Url */
@@ -731,6 +1088,20 @@ export interface components {
             spec: {
                 [key: string]: unknown;
             };
+        };
+        /** Fabric */
+        Fabric: {
+            /** Roughness */
+            roughness: number;
+            /** Specular */
+            specular: number;
+            /**
+             * Sheen
+             * @default 0
+             */
+            sheen: number;
+            /** Thickness */
+            thickness: number;
         };
         /** FileOut */
         FileOut: {
@@ -768,6 +1139,217 @@ export interface components {
              * @default
              */
             name: string;
+        };
+        /** FitDetail */
+        FitDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Outfit Version Id
+             * Format: uuid
+             */
+            outfit_version_id: string;
+            /**
+             * Character Version Id
+             * Format: uuid
+             */
+            character_version_id: string;
+            /** Status */
+            status: string;
+            /** Fit Job Id */
+            fit_job_id: string | null;
+            /** Fit Profile */
+            fit_profile: string | null;
+            /** Fit Profile Declared */
+            fit_profile_declared: boolean | null;
+            /** Outfit Blend Sha256 */
+            outfit_blend_sha256: string | null;
+            /** Character Blend Sha256 */
+            character_blend_sha256: string | null;
+            /** Checked At */
+            checked_at: string | null;
+            /** Decided By */
+            decided_by: string | null;
+            /** Decided At */
+            decided_at: string | null;
+            /** Notes */
+            notes: string;
+            /** Failed */
+            failed: string[];
+            /**
+             * Current
+             * @description the record describes the outfit version's current outfit.blend
+             */
+            current: boolean;
+            character: components["schemas"]["FitParty"];
+            outfit: components["schemas"]["FitParty"];
+            /**
+             * Files
+             * @description report, thumbnail, pose sheet and try-on GLB, with presigned URLs
+             */
+            files: components["schemas"]["FitFile"][];
+            /** Report */
+            report?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** FitFile */
+        FitFile: {
+            /** Name */
+            name: string;
+            /** Role */
+            role: string;
+            /** Sha256 */
+            sha256: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Url */
+            url: string;
+        };
+        /** FitJobOut */
+        FitJobOut: {
+            fit: components["schemas"]["FitOut"];
+            job: components["schemas"]["JobOut"];
+        };
+        /** FitOut */
+        FitOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Outfit Version Id
+             * Format: uuid
+             */
+            outfit_version_id: string;
+            /**
+             * Character Version Id
+             * Format: uuid
+             */
+            character_version_id: string;
+            /** Status */
+            status: string;
+            /** Fit Job Id */
+            fit_job_id: string | null;
+            /** Fit Profile */
+            fit_profile: string | null;
+            /** Fit Profile Declared */
+            fit_profile_declared: boolean | null;
+            /** Outfit Blend Sha256 */
+            outfit_blend_sha256: string | null;
+            /** Character Blend Sha256 */
+            character_blend_sha256: string | null;
+            /** Checked At */
+            checked_at: string | null;
+            /** Decided By */
+            decided_by: string | null;
+            /** Decided At */
+            decided_at: string | null;
+            /** Notes */
+            notes: string;
+            /** Failed */
+            failed: string[];
+            /**
+             * Current
+             * @description the record describes the outfit version's current outfit.blend
+             */
+            current: boolean;
+            character: components["schemas"]["FitParty"];
+            outfit: components["schemas"]["FitParty"];
+            /**
+             * Files
+             * @description report, thumbnail, pose sheet and try-on GLB, with presigned URLs
+             */
+            files: components["schemas"]["FitFile"][];
+        };
+        /**
+         * FitParty
+         * @description One side of a compatibility record: the character or the outfit, at its version.
+         */
+        FitParty: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string | null;
+            /**
+             * Version Id
+             * Format: uuid
+             */
+            version_id: string;
+            /** Version */
+            version: string | null;
+            /** Status */
+            status: string;
+        };
+        /**
+         * FitThresholds
+         * @description What the fit check accepts (architecture 9.3). A garment fails a pose when more than
+         *     ``max_clip_share`` of the body points it covers poke through, or any by more than
+         *     ``max_clip_depth_m``.
+         */
+        FitThresholds: {
+            /** Max Clip Share */
+            max_clip_share: number;
+            /** Max Clip Depth M */
+            max_clip_depth_m: number;
+            /** Max Edge Stretch */
+            max_edge_stretch: number;
+            /** Min Edge Stretch */
+            min_edge_stretch: number;
+            /** Max Lift M */
+            max_lift_m: number;
+        };
+        /** GarmentDef */
+        GarmentDef: {
+            /** Id */
+            id: string;
+            /** Version */
+            version: string;
+            /** Key */
+            key: string;
+            /** Slot */
+            slot: string;
+            /** Label */
+            label: string;
+            /**
+             * Binding
+             * @enum {string}
+             */
+            binding: "skinned" | "rigid";
+            /** Attachment */
+            attachment?: string | null;
+            /** Params */
+            params?: {
+                [key: string]: components["schemas"]["ParamDef"];
+            };
+            /** Fabrics */
+            fabrics: string[];
+            /** Default Fabric */
+            default_fabric: string;
+            /** Default Color */
+            default_color: string;
+            /**
+             * Trim
+             * @description has cuffs/hems that can take a second colour
+             * @default false
+             */
+            trim: boolean;
+            /** Covers */
+            covers: string[];
+            /**
+             * Hides
+             * @default []
+             */
+            hides: string[];
         };
         /** GenerateBody */
         GenerateBody: {
@@ -890,6 +1472,363 @@ export interface components {
             /** Permissions */
             permissions: string[];
         };
+        /** OutfitCreate */
+        OutfitCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Tags */
+            tags?: string[];
+            /**
+             * Spec
+             * @description OutfitSpecification; its name defaults to the outfit's
+             */
+            spec: {
+                [key: string]: unknown;
+            };
+        };
+        /** OutfitDetail */
+        OutfitDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Scope */
+            scope: string;
+            /** Owner Character Id */
+            owner_character_id: string | null;
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+            /**
+             * Versions
+             * @default []
+             */
+            versions: components["schemas"]["OutfitVersionSummary"][];
+        };
+        /** OutfitDraftCreate */
+        OutfitDraftCreate: {
+            /** Based On Version Id */
+            based_on_version_id?: string | null;
+            /** Spec */
+            spec?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** OutfitDraftPatch */
+        OutfitDraftPatch: {
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+        };
+        /** OutfitFitBody */
+        OutfitFitBody: {
+            /**
+             * Character Version Id
+             * Format: uuid
+             */
+            character_version_id: string;
+            previews?: components["schemas"]["OutfitPreviewSettings"];
+        };
+        /** OutfitFitDecision */
+        OutfitFitDecision: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "revoke";
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
+        /** OutfitGenerateBody */
+        OutfitGenerateBody: {
+            previews?: components["schemas"]["OutfitPreviewSettings"];
+        };
+        /** OutfitOut */
+        OutfitOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Scope */
+            scope: string;
+            /** Owner Character Id */
+            owner_character_id: string | null;
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+        };
+        /** OutfitPatch */
+        OutfitPatch: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Recommended Version Id */
+            recommended_version_id?: string | null;
+        };
+        /** OutfitPreviewSettings */
+        OutfitPreviewSettings: {
+            /**
+             * Resolution
+             * @default 384
+             */
+            resolution: number;
+            /**
+             * Samples
+             * @default 12
+             */
+            samples: number;
+            /**
+             * Pose Tile
+             * @default 256
+             */
+            pose_tile: number;
+            /**
+             * Pose Sheet
+             * @default true
+             */
+            pose_sheet: boolean;
+            /**
+             * Glb
+             * @default true
+             */
+            glb: boolean;
+        };
+        /** OutfitPublishBody */
+        OutfitPublishBody: {
+            /**
+             * Bump
+             * @description major is forced when the rig or style changed, or a fit profile was dropped
+             * @default minor
+             * @enum {string}
+             */
+            bump: "minor" | "major";
+        };
+        /** OutfitReviewBody */
+        OutfitReviewBody: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "reject";
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
+        /** OutfitValidationOut */
+        OutfitValidationOut: {
+            /** Valid */
+            valid: boolean;
+            /** Issues */
+            issues: components["schemas"]["Issue"][];
+            resolved?: components["schemas"]["ResolvedOutfit"] | null;
+            /** Digest */
+            digest?: string | null;
+        };
+        /** OutfitVersionDetail */
+        OutfitVersionDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Outfit Id
+             * Format: uuid
+             */
+            outfit_id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Fit Profiles */
+            fit_profiles: string[];
+            /** Primary Fit Profile */
+            primary_fit_profile: string | null;
+            /** Slots */
+            slots: string[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Fit Ok */
+            fit_ok?: boolean | null;
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+            /** Style Profile Ref */
+            style_profile_ref: string | null;
+            /** Rig Profile Ref */
+            rig_profile_ref: string | null;
+            /** Catalog Ref */
+            catalog_ref: string | null;
+            /** Blender Version */
+            blender_version: string | null;
+            /** Fit Report */
+            fit_report: {
+                [key: string]: unknown;
+            } | null;
+            /** Generate Job Id */
+            generate_job_id: string | null;
+            /** Review Notes */
+            review_notes: string;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Manifest Key */
+            manifest_key: string | null;
+            /** Manifest Sha256 */
+            manifest_sha256: string | null;
+            /** Published By */
+            published_by: string | null;
+            /**
+             * Files
+             * @default []
+             */
+            files: components["schemas"]["FileOut"][];
+            /**
+             * Ready For Review
+             * @description what blocks submit; empty when ready
+             */
+            ready_for_review?: string[];
+        };
+        /** OutfitVersionJobOut */
+        OutfitVersionJobOut: {
+            version: components["schemas"]["OutfitVersionDetail"];
+            job: components["schemas"]["JobOut"];
+        };
+        /** OutfitVersionSummary */
+        OutfitVersionSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Outfit Id
+             * Format: uuid
+             */
+            outfit_id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Fit Profiles */
+            fit_profiles: string[];
+            /** Primary Fit Profile */
+            primary_fit_profile: string | null;
+            /** Slots */
+            slots: string[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Fit Ok */
+            fit_ok?: boolean | null;
+        };
         /** Page[CharacterOut] */
         Page_CharacterOut_: {
             /** Items */
@@ -903,6 +1842,24 @@ export interface components {
             items: components["schemas"]["JobOut"][];
             /** Next Cursor */
             next_cursor?: string | null;
+        };
+        /** Page[OutfitOut] */
+        Page_OutfitOut_: {
+            /** Items */
+            items: components["schemas"]["OutfitOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** ParamDef */
+        ParamDef: {
+            /** Min */
+            min: number;
+            /** Max */
+            max: number;
+            /** Default */
+            default: number;
+            /** Description */
+            description: string;
         };
         /** PreviewSettings */
         PreviewSettings: {
@@ -1052,6 +2009,75 @@ export interface components {
             eye_roughness: number;
             /** Seed */
             seed: number;
+        };
+        /** ResolvedOutfit */
+        ResolvedOutfit: {
+            /** Name */
+            name: string;
+            /** Style Profile */
+            style_profile: string;
+            /** Rig Profile */
+            rig_profile: string;
+            /** Catalog */
+            catalog: string;
+            /** Primary Fit Profile */
+            primary_fit_profile: string;
+            /** Fit Profiles */
+            fit_profiles: string[];
+            /** Scope */
+            scope: string;
+            /** Owner Character */
+            owner_character: string | null;
+            /** Pieces */
+            pieces: components["schemas"]["ResolvedPiece"][];
+            /** Min Clearance */
+            min_clearance: number;
+            /** Mask Margin */
+            mask_margin: number;
+            /** Seed */
+            seed: number;
+        };
+        /** ResolvedPiece */
+        ResolvedPiece: {
+            /** Slot */
+            slot: string;
+            /** Garment */
+            garment: string;
+            /** Key */
+            key: string;
+            /**
+             * Binding
+             * @enum {string}
+             */
+            binding: "skinned" | "rigid";
+            /** Attachment */
+            attachment: string | null;
+            /** Attach Bone */
+            attach_bone: string | null;
+            /** Params */
+            params: {
+                [key: string]: number;
+            };
+            /** Fabric */
+            fabric: string;
+            /** Color */
+            color: string;
+            /** Trim Color */
+            trim_color: string | null;
+            /** Roughness */
+            roughness: number;
+            /** Specular */
+            specular: number;
+            /** Sheen */
+            sheen: number;
+            /** Thickness */
+            thickness: number;
+            /** Clearance */
+            clearance: number;
+            /** Covers */
+            covers: string[];
+            /** Hides */
+            hides: string[];
         };
         /** ReviewBody */
         ReviewBody: {
@@ -2359,6 +3385,788 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["VersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_api_v1_outfits_spec_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitValidationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_garments_api_v1_garments_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GarmentDef"][];
+                };
+            };
+        };
+    };
+    get_clothing_api_v1_style_profiles__ref__clothing_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConventionsOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    gallery_api_v1_outfits_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                tag?: string[];
+                scope?: string | null;
+                owner_character_id?: string | null;
+                status?: string | null;
+                fit_profile?: string | null;
+                slot?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_OutfitOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_api_v1_outfits_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    detail_api_v1_outfits__outfit_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_identity_api_v1_outfits__outfit_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    history_api_v1_outfits__outfit_id__versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    version_detail_api_v1_outfits__outfit_id__versions__version_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    version_file_api_v1_outfits__outfit_id__versions__version_id__files__name__get: {
+        parameters: {
+            query?: {
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect to the object */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_api_v1_outfits__outfit_id__versions__version_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitReviewBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_api_v1_outfits__outfit_id__versions__version_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                outfit_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OutfitPublishBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deprecate_api_v1_outfits__outfit_id__versions__version_id__deprecate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_draft_api_v1_outfits__outfit_id__drafts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitDraftCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_api_v1_outfits__outfit_id__drafts__draft_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_draft_api_v1_outfits__outfit_id__drafts__draft_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                outfit_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitDraftPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_api_v1_outfits__outfit_id__drafts__draft_id__generate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                outfit_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["OutfitGenerateBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_api_v1_outfits__outfit_id__drafts__draft_id__submit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OutfitVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_fits_api_v1_outfits__outfit_id__versions__version_id__fits_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    request_fit_api_v1_outfits__outfit_id__versions__version_id__fits_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                outfit_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitFitBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    fit_detail_api_v1_outfits__outfit_id__versions__version_id__fits__character_version_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+                character_version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    decide_fit_api_v1_outfits__outfit_id__versions__version_id__fits__character_version_id__decision_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                outfit_id: string;
+                version_id: string;
+                character_version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["OutfitFitDecision"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    wardrobe_api_v1_characters__character_id__versions__character_version_id__outfits_get: {
+        parameters: {
+            query?: {
+                status?: string[];
+            };
+            header?: never;
+            path: {
+                character_id: string;
+                character_version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FitOut"][];
                 };
             };
             /** @description Validation Error */

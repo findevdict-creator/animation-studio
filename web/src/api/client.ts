@@ -12,6 +12,16 @@ export type FileOut = S["FileOut"];
 export type JobOut = S["JobOut"];
 export type VersionJobOut = S["VersionJobOut"];
 export type Me = S["MeOut"];
+export type OutfitOut = S["OutfitOut"];
+export type OutfitDetail = S["OutfitDetail"];
+export type OutfitVersionSummary = S["OutfitVersionSummary"];
+export type OutfitVersionDetail = S["OutfitVersionDetail"];
+export type OutfitVersionJobOut = S["OutfitVersionJobOut"];
+export type FitOut = S["FitOut"];
+export type FitDetail = S["FitDetail"];
+export type FitJobOut = S["FitJobOut"];
+export type Garment = S["GarmentDef"];
+export type Conventions = S["ConventionsOut"];
 
 export const API = "/api/v1";
 
@@ -35,5 +45,10 @@ export async function api<T>(path: string, init: RequestInit & { json?: unknown;
 
 export async function fileUrl(characterId: string, versionId: string, name: string): Promise<string> {
   const r = await api<{ url: string }>(`/characters/${characterId}/versions/${versionId}/files/${name}?redirect=false`);
+  return r.url;
+}
+
+export async function outfitFileUrl(outfitId: string, versionId: string, name: string): Promise<string> {
+  const r = await api<{ url: string }>(`/outfits/${outfitId}/versions/${versionId}/files/${name}?redirect=false`);
   return r.url;
 }

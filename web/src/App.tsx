@@ -5,6 +5,9 @@ import { currentUser, userManager } from "./auth";
 import { CharacterPage } from "./pages/CharacterPage";
 import { GalleryPage } from "./pages/GalleryPage";
 import { NewCharacterPage } from "./pages/NewCharacterPage";
+import { NewOutfitPage } from "./pages/NewOutfitPage";
+import { OutfitGalleryPage } from "./pages/OutfitGalleryPage";
+import { OutfitPage } from "./pages/OutfitPage";
 
 let redirecting = false;
 let callback: ReturnType<typeof userManager.signinRedirectCallback> | undefined; // the code is single-use
@@ -25,6 +28,7 @@ function Shell({ children }: { children: React.ReactNode }) {
       <nav className="top">
         <Link to="/characters" className="brand">Studio</Link>
         <Link to="/characters">Characters</Link>
+        <Link to="/outfits">Outfits</Link>
         <span className="spacer" />
         {me.data && <span className="who">{me.data.name} · {me.data.roles.join(", ")}</span>}
         <button onClick={() => userManager.signoutRedirect()}>Sign out</button>
@@ -54,6 +58,9 @@ export function App() {
       <Route path="/characters" element={<Shell><GalleryPage /></Shell>} />
       <Route path="/characters/new" element={<Shell><NewCharacterPage /></Shell>} />
       <Route path="/characters/:id" element={<Shell><CharacterPage /></Shell>} />
+      <Route path="/outfits" element={<Shell><OutfitGalleryPage /></Shell>} />
+      <Route path="/outfits/new" element={<Shell><NewOutfitPage /></Shell>} />
+      <Route path="/outfits/:id" element={<Shell><OutfitPage /></Shell>} />
     </Routes>
   );
 }

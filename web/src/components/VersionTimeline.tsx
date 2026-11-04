@@ -1,9 +1,14 @@
-import type { VersionSummary } from "../api/client";
 import { StatusChip, when } from "./bits";
+
+/** What the timeline needs from a character or outfit version. */
+export interface TimelineVersion {
+  id: string; version_label?: string | null; status: string; review_decision?: string | null;
+  based_on_version_id?: string | null; published_at?: string | null; created_at?: string | null;
+}
 
 /** Version history, newest first, with the "based on" link of each draft. */
 export function VersionTimeline({ versions, selected, recommended, onSelect }: {
-  versions: VersionSummary[]; selected?: string; recommended?: string | null; onSelect: (id: string) => void;
+  versions: TimelineVersion[]; selected?: string; recommended?: string | null; onSelect: (id: string) => void;
 }) {
   const label = (id?: string | null) => {
     const v = versions.find((x) => x.id === id);
