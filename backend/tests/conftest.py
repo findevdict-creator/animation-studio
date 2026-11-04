@@ -19,6 +19,19 @@ TEST_DB = os.environ.get(
 os.environ["STUDIO_DATABASE_URL"] = TEST_DB
 os.environ.setdefault("STUDIO_LOG_JSON", "false")
 
+# Object storage: a real S3-compatible server (infra/seaweedfs in compose). The API identity
+# is the process default; tests that need another identity build their own Storage.
+S3_ENDPOINT = os.environ.get("STUDIO_TEST_S3_ENDPOINT", "http://localhost:8333")
+os.environ["STUDIO_S3_ENDPOINT_URL"] = S3_ENDPOINT
+os.environ.setdefault("STUDIO_S3_ACCESS_KEY", "dev-api")
+os.environ.setdefault("STUDIO_S3_SECRET_KEY", "dev-api-secret")
+DEV_KEYS = {
+    "admin": ("dev-admin", "dev-admin-secret"),
+    "api": ("dev-api", "dev-api-secret"),
+    "worker": ("dev-worker", "dev-worker-secret"),
+    "publisher": ("dev-publisher", "dev-publisher-secret"),
+}
+
 BACKEND = Path(__file__).resolve().parents[1]
 
 
@@ -53,3 +66,36 @@ def connection(migrated: str) -> Iterator[Connection]:
 def session(connection: Connection) -> Iterator[Session]:
     with Session(bind=connection, join_transaction_mode="create_savepoint") as s:
         yield s
+
+
+@pytest.fixture(scope="session")
+def s3_buckets() -> None:
+    from app.config import get_settings
+    from app.core.storage import ensure_buckets, make_client
+
+    s = get_settings()
+    admin = make_client(s, access_key=DEV_KEYS["admin"][0], secret_key=DEV_KEYS["admin"][1])
+    try:
+        ensure_buckets(admin, [s.s3_library_bucket, s.s3_work_bucket])
+    except Exception as exc:  # pragma: no cover - environment problem, make it obvious
+        pytest.fail(f"no S3 server at {S3_ENDPOINT} ({exc}); start infra/compose.yaml or set STUDIO_TEST_S3_ENDPOINT")
+
+
+@pytest.fixture
+def storage_as(s3_buckets):
+    """storage_as("worker", "work") -> a Storage for that identity and bucket."""
+    from app.config import get_settings
+    from app.core.storage import Storage
+
+    def make(identity: str, bucket: str) -> Storage:
+        key, secret = DEV_KEYS[identity]
+        return Storage.for_bucket(bucket, get_settings(), access_key=key, secret_key=secret)
+
+    return make
+
+
+@pytest.fixture
+def key_prefix() -> str:
+    from studio_contracts.ids import uuid7
+
+    return f"_test/{uuid7()}"

@@ -35,3 +35,11 @@ def run_checks() -> dict[str, str]:
         except Exception as exc:  # report, never raise: this is a status endpoint
             results[name] = f"error: {type(exc).__name__}: {exc}"[:300]
     return results
+
+
+@register("storage")
+def _storage() -> None:
+    from app.core.storage import Storage
+
+    Storage.for_bucket("work").ping()
+    Storage.for_bucket("library").ping()

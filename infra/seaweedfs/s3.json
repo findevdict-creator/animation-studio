@@ -1,0 +1,25 @@
+{
+  "_comment": "Development identities only. Each process gets the narrowest key it needs (architecture 10, 14). Production keys come from the secret store.",
+  "identities": [
+    {
+      "name": "admin",
+      "credentials": [{ "accessKey": "dev-admin", "secretKey": "dev-admin-secret" }],
+      "actions": ["Admin", "Read", "Write", "List", "Tagging"]
+    },
+    {
+      "name": "api",
+      "credentials": [{ "accessKey": "dev-api", "secretKey": "dev-api-secret" }],
+      "actions": ["Read:studio-library", "List:studio-library", "Read:studio-work", "List:studio-work", "Write:studio-work"]
+    },
+    {
+      "name": "worker",
+      "credentials": [{ "accessKey": "dev-worker", "secretKey": "dev-worker-secret" }],
+      "actions": ["Read:studio-library", "List:studio-library", "Read:studio-work", "List:studio-work", "Write:studio-work"]
+    },
+    {
+      "name": "publisher",
+      "credentials": [{ "accessKey": "dev-publisher", "secretKey": "dev-publisher-secret" }],
+      "actions": ["Read:studio-library", "List:studio-library", "Write:studio-library", "Read:studio-work", "List:studio-work"]
+    }
+  ]
+}
