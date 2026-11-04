@@ -1,0 +1,163 @@
+{
+  "schema_version": "2.0",
+  "characters": [
+    {
+      "id": "char_mia",
+      "name": "Mia",
+      "role": "protagonist",
+      "species": "human",
+      "age": "",
+      "gender": "",
+      "personality": [],
+      "goal": "",
+      "arc": "",
+      "appearance": {
+        "height_class": "",
+        "build": "",
+        "skin": "",
+        "hair": "",
+        "eyes": "",
+        "distinguishing_features": []
+      },
+      "color_palette": [],
+      "default_outfit_id": "out_mia_default",
+      "outfits": [
+        {
+          "id": "out_mia_default",
+          "description": "red raincoat",
+          "slots": {
+            "coat": {
+              "garment_id": "garm_raincoat_a",
+              "base_color": "#C0392B",
+              "roughness": 0.5
+            },
+            "shoes": {
+              "garment_id": "garm_boots_a",
+              "base_color": "#F4D03F",
+              "roughness": 0.4
+            },
+            "bottom": {
+              "garment_id": null,
+              "base_color": "#2C3E50",
+              "roughness": 0.6
+            }
+          }
+        }
+      ],
+      "expressions": {
+        "neutral": {},
+        "curious": {
+          "brow_up": 0.7
+        }
+      },
+      "asset": {
+        "status": "parametric",
+        "library_id": null,
+        "base_id": "base_human_child",
+        "rig_type": "rigify_human",
+        "height_m": 1.2,
+        "proportions": {
+          "head_scale": 1.15,
+          "limb_length": 0.95,
+          "age": 0.8
+        },
+        "proportion_overrides": {
+          "upper_arm.R": 1.05,
+          "upper_arm.L": 1.05
+        },
+        "materials": {
+          "skin": {
+            "base_color": "#C68642",
+            "roughness": 0.5
+          },
+          "hair": {
+            "base_color": "#1C1C1C",
+            "roughness": 0.7
+          },
+          "eyes": {
+            "base_color": "#3B2412",
+            "roughness": 0.3
+          }
+        },
+        "hair_id": "hair_two_braids",
+        "build_request_id": null
+      },
+      "signature_prop_ids": [
+        "prop_lantern"
+      ],
+      "relationships": [],
+      "voice_notes": "",
+      "reference_images": [],
+      "design_brief": "",
+      "source_evidence": [],
+      "inferred_fields": []
+    },
+    {
+      "id": "char_fox",
+      "name": "The fox",
+      "role": "supporting",
+      "species": "fox",
+      "age": "",
+      "gender": "",
+      "personality": [],
+      "goal": "",
+      "arc": "",
+      "appearance": {
+        "height_class": "",
+        "build": "",
+        "skin": "",
+        "hair": "",
+        "eyes": "",
+        "distinguishing_features": []
+      },
+      "color_palette": [],
+      "default_outfit_id": "out_fox_default",
+      "outfits": [
+        {
+          "id": "out_fox_default",
+          "description": "",
+          "slots": {
+            "collar": {
+              "garment_id": "garm_collar_a",
+              "base_color": "#8E44AD",
+              "roughness": 0.5
+            }
+          }
+        }
+      ],
+      "expressions": {
+        "neutral": {},
+        "alert": {
+          "ears_back": 0.5
+        }
+      },
+      "asset": {
+        "status": "parametric",
+        "library_id": null,
+        "base_id": "base_quadruped",
+        "rig_type": "rigify_quadruped",
+        "height_m": 0.5,
+        "proportions": {
+          "torso_width": 0.9
+        },
+        "proportion_overrides": {},
+        "materials": {
+          "fur": {
+            "base_color": "#D35400",
+            "roughness": 0.8
+          }
+        },
+        "hair_id": null,
+        "build_request_id": null
+      },
+      "signature_prop_ids": [],
+      "relationships": [],
+      "voice_notes": "",
+      "reference_images": [],
+      "design_brief": "",
+      "source_evidence": [],
+      "inferred_fields": []
+    }
+  ],
+  "build_requests": []
+}

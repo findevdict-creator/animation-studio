@@ -5,6 +5,7 @@
     studio edit runs/lantern story_analyst edited.json
     studio revise runs/lantern story_analyst "Mia should be older"
     studio status runs/lantern
+    studio build-characters runs/lantern [--library library] [--toon]   (asset build phase 1; needs bpy)
 """
 
 from __future__ import annotations
@@ -67,6 +68,35 @@ def cmd_decide(args: argparse.Namespace, decision: str) -> int:
     return 0
 
 
+def cmd_build_characters(args: argparse.Namespace) -> int:
+    from studio.assets.characters import build_characters, plan_character_builds, write_build_report
+    from studio.schemas import Characters
+
+    store = RunStore(Path(args.run_dir))
+    characters = store.load_output("character_designer")
+    if not isinstance(characters, Characters):
+        print("no approved character_designer output in this run", file=sys.stderr)
+        return 1
+    library = Path(args.library).resolve()
+    manifest = load_manifest(library / "manifest.json")
+    plan = plan_character_builds(characters, manifest)
+    if not plan:
+        print("no parametric characters to build")
+        return 0
+    missing = [p for p in plan if not p["base_exists"]]
+    for p in missing:
+        print(f"{p['character_id']}: base {p['base_id']} is not in the library", file=sys.stderr)
+    if missing:
+        return 1
+    records, promoted = build_characters(library, characters, only=args.only or None, toon=args.toon)
+    report = write_build_report(store.root, "character_builds", records)
+    version = store.save_output("character_designer", promoted)
+    for r in records:
+        print(f"built {r['library_id']} from {r['base_id']} ({len(r['garments'])} garments, {len(r['warnings'])} warnings)")
+    print(f"characters.json v{version} now points at the built assets; report: {report}")
+    return 0
+
+
 def cmd_status(args: argparse.Namespace) -> int:
     store = RunStore(Path(args.run_dir))
     state = store.load_state()
@@ -98,6 +128,12 @@ def main(argv: list[str] | None = None) -> int:
     status = sub.add_parser("status")
     status.add_argument("run_dir")
 
+    build = sub.add_parser("build-characters", help="build parametric characters into library assets (needs bpy)")
+    build.add_argument("run_dir")
+    build.add_argument("--library", default="library")
+    build.add_argument("--only", action="append", default=[])
+    build.add_argument("--toon", action="store_true")
+
     args = parser.parse_args(argv)
     if args.cmd == "run":
         return cmd_run(args)
@@ -105,6 +141,8 @@ def main(argv: list[str] | None = None) -> int:
         return cmd_decide(args, args.cmd)
     if args.cmd == "status":
         return cmd_status(args)
+    if args.cmd == "build-characters":
+        return cmd_build_characters(args)
     return 1
 
 

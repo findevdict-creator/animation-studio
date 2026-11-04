@@ -1,5 +1,5 @@
 {
-  "library_version": "d2b7c80",
+  "library_version": "4da2c06-dirty",
   "units": "metres",
   "characters": [
     {
@@ -23,7 +23,7 @@
       "id": "lib_char_girl_a",
       "file": "characters/lib_char_girl_a.blend",
       "rig_type": "rigify_human",
-      "height_m": 1.176,
+      "height_m": 1.212,
       "outfit_slots": [
         "top",
         "bottom",
@@ -38,7 +38,11 @@
         "brow_up",
         "mouth_open",
         "blink_l",
-        "blink_r"
+        "blink_r",
+        "vis_aa",
+        "vis_ee",
+        "vis_oh",
+        "vis_mm"
       ],
       "tags": [
         "human",
@@ -161,11 +165,14 @@
   ],
   "bases": [
     {
-      "id": "base_human_child",
+      "id": "base_human_adult",
       "rig_type": "rigify_human",
       "proportion_sliders": [
         "head_scale",
-        "limb_length"
+        "limb_length",
+        "torso_width",
+        "belly",
+        "age"
       ],
       "material_slots": [
         "skin",
@@ -186,12 +193,184 @@
         "brow_up",
         "mouth_open",
         "blink_l",
+        "blink_r",
+        "vis_aa",
+        "vis_ee",
+        "vis_oh",
+        "vis_mm"
+      ]
+    },
+    {
+      "id": "base_human_child",
+      "rig_type": "rigify_human",
+      "proportion_sliders": [
+        "head_scale",
+        "limb_length",
+        "torso_width",
+        "belly",
+        "age"
+      ],
+      "material_slots": [
+        "skin",
+        "hair",
+        "eyes"
+      ],
+      "outfit_slots": [
+        "top",
+        "bottom",
+        "shoes",
+        "coat",
+        "hat",
+        "accessory"
+      ],
+      "shape_keys": [
+        "smile",
+        "frown",
+        "brow_up",
+        "mouth_open",
+        "blink_l",
+        "blink_r",
+        "vis_aa",
+        "vis_ee",
+        "vis_oh",
+        "vis_mm"
+      ]
+    },
+    {
+      "id": "base_quadruped",
+      "rig_type": "rigify_quadruped",
+      "proportion_sliders": [
+        "head_scale",
+        "limb_length",
+        "torso_width",
+        "belly",
+        "age"
+      ],
+      "material_slots": [
+        "fur",
+        "eyes"
+      ],
+      "outfit_slots": [
+        "collar",
+        "accessory"
+      ],
+      "shape_keys": [
+        "smile",
+        "ears_back",
+        "mouth_open",
+        "blink_l",
         "blink_r"
       ]
     }
   ],
-  "garments": [],
-  "hair": [],
+  "garments": [
+    {
+      "id": "garm_boots_a",
+      "slot": "shoes",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "boots",
+        "rain"
+      ]
+    },
+    {
+      "id": "garm_cap_a",
+      "slot": "hat",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "cap"
+      ]
+    },
+    {
+      "id": "garm_collar_a",
+      "slot": "collar",
+      "fits": [
+        "base_quadruped"
+      ],
+      "tags": [
+        "collar"
+      ]
+    },
+    {
+      "id": "garm_raincoat_a",
+      "slot": "coat",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "outerwear",
+        "rain"
+      ]
+    },
+    {
+      "id": "garm_scarf_a",
+      "slot": "accessory",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "scarf",
+        "winter"
+      ]
+    },
+    {
+      "id": "garm_shorts_a",
+      "slot": "bottom",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "casual"
+      ]
+    },
+    {
+      "id": "garm_tee_a",
+      "slot": "top",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "casual"
+      ]
+    },
+    {
+      "id": "garm_trousers_a",
+      "slot": "bottom",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ],
+      "tags": [
+        "casual"
+      ]
+    }
+  ],
+  "hair": [
+    {
+      "id": "hair_short_a",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ]
+    },
+    {
+      "id": "hair_two_braids",
+      "fits": [
+        "base_human_child",
+        "base_human_adult"
+      ]
+    }
+  ],
   "kits": [],
   "generators": [],
   "lighting_presets": [

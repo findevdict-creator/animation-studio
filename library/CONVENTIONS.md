@@ -45,8 +45,9 @@ warns.
 | environment | `studio_time_variants` | comma-separated variant names (a collection per variant, `time_<variant>`) |
 | clip | `studio_loop` | `1` if the action loops |
 | clip | `studio_source`, `studio_licence` | provenance |
-| garment | `studio_slot`, `studio_fits` | slot name; comma-separated base ids it is weighted to |
-| hair | `studio_fits` | comma-separated base ids |
+| garment | `studio_slot`, `studio_fits`, `studio_ref_height_m` | slot name; comma-separated base ids it is weighted to; the base height it was authored at (default 1.0) |
+| hair | `studio_fits`, `studio_ref_height_m` | comma-separated base ids; authored height |
+| built character | `studio_built_from`, `studio_character_id`, `studio_outfit_id`, `studio_hidden_shape_keys` | written by `tools/build_character.py`: the base, the sheet it came from, the outfit baked in, and the slider keys the scanner must not list as expressions |
 | kit_piece | `studio_kit`, `studio_snap_points` | kit id; comma-separated snap point names |
 | generator | `studio_generator_kind`, `studio_params` | `terrain`/`scatter`/`prop`; `name:min:max,...` |
 
@@ -63,3 +64,15 @@ warns.
 
 `bounds_m` = the axis-aligned size of all mesh geometry in the file at frame 1.
 `height_m` of a character = bounds z.
+
+## Parametric bases and built characters
+
+A base (`bases/base_<slug>.blend`) is a rigged figure whose proportion sliders are shape
+keys named in `studio_proportion_sliders`, neutral at 0 and running -1..1 (a sheet
+proportion of 1.0 maps to 0, 0.7 to -1, 1.3 to 1). Its material slots are materials named
+in `studio_material_slots` (`skin`, `hair`, `eyes`; `fur` for animals). Garment and hair
+files hold plain meshes authored for `studio_ref_height_m`; `build_character.py` scales
+them to the base's height, parents them to the rig and gives them a vertex group named
+after the carrying bone (`spine`, `head`), so a weighted garment and a placeholder box go
+through the same path. A built character lands in `characters/lib_char_<slug>.blend` and
+scans like any other character.
