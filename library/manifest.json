@@ -1,5 +1,5 @@
 {
-  "library_version": "4da2c06-dirty",
+  "library_version": "3d81bd6-dirty",
   "units": "metres",
   "characters": [
     {
@@ -371,8 +371,197 @@
       ]
     }
   ],
-  "kits": [],
-  "generators": [],
+  "kits": [
+    {
+      "id": "kit_forest",
+      "pieces": [
+        {
+          "id": "kit_forest_birch_short",
+          "footprint_m": [
+            0.4,
+            0.4
+          ],
+          "snap_points": [],
+          "tags": [
+            "tree",
+            "birch"
+          ]
+        },
+        {
+          "id": "kit_forest_birch_tall",
+          "footprint_m": [
+            0.5,
+            0.5
+          ],
+          "snap_points": [],
+          "tags": [
+            "tree",
+            "birch"
+          ]
+        },
+        {
+          "id": "kit_forest_log_a",
+          "footprint_m": [
+            3.0,
+            0.6
+          ],
+          "snap_points": [
+            "top"
+          ],
+          "tags": [
+            "seat",
+            "wood",
+            "log"
+          ]
+        },
+        {
+          "id": "kit_forest_rock_a",
+          "footprint_m": [
+            1.5,
+            1.0
+          ],
+          "snap_points": [
+            "top"
+          ],
+          "tags": [
+            "rock"
+          ]
+        },
+        {
+          "id": "kit_forest_stump_a",
+          "footprint_m": [
+            1.2,
+            1.2
+          ],
+          "snap_points": [
+            "top"
+          ],
+          "tags": [
+            "seat",
+            "wood"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "kit_interior",
+      "pieces": [
+        {
+          "id": "kit_interior_chair_a",
+          "footprint_m": [
+            0.45,
+            0.45
+          ],
+          "snap_points": [
+            "seat"
+          ],
+          "tags": [
+            "seat",
+            "chair",
+            "furniture"
+          ]
+        },
+        {
+          "id": "kit_interior_floor_4x4",
+          "footprint_m": [
+            4.0,
+            4.0
+          ],
+          "snap_points": [
+            "n",
+            "s",
+            "e",
+            "w"
+          ],
+          "tags": [
+            "floor"
+          ]
+        },
+        {
+          "id": "kit_interior_table_a",
+          "footprint_m": [
+            1.4,
+            0.8
+          ],
+          "snap_points": [
+            "top"
+          ],
+          "tags": [
+            "table",
+            "furniture"
+          ]
+        },
+        {
+          "id": "kit_interior_wall_4m",
+          "footprint_m": [
+            4.0,
+            0.2
+          ],
+          "snap_points": [
+            "left",
+            "right"
+          ],
+          "tags": [
+            "wall"
+          ]
+        }
+      ]
+    }
+  ],
+  "generators": [
+    {
+      "id": "gen_scatter_grass",
+      "kind": "scatter",
+      "params": {
+        "density": [
+          0.0,
+          1.0
+        ],
+        "exclude_radius_m": [
+          0.0,
+          10.0
+        ]
+      }
+    },
+    {
+      "id": "gen_scatter_pebbles",
+      "kind": "scatter",
+      "params": {
+        "density": [
+          0.0,
+          1.0
+        ]
+      }
+    },
+    {
+      "id": "gen_scatter_trees",
+      "kind": "scatter",
+      "params": {
+        "density": [
+          0.0,
+          1.0
+        ],
+        "exclude_radius_m": [
+          0.0,
+          10.0
+        ]
+      }
+    },
+    {
+      "id": "gen_terrain_rolling",
+      "kind": "terrain",
+      "params": {
+        "height_m": [
+          0.0,
+          10.0
+        ],
+        "roughness": [
+          0.0,
+          1.0
+        ]
+      }
+    }
+  ],
   "lighting_presets": [
     "day",
     "dusk",

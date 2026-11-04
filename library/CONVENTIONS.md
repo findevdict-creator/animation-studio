@@ -76,3 +76,16 @@ them to the base's height, parents them to the rig and gives them a vertex group
 after the carrying bone (`spine`, `head`), so a weighted garment and a placeholder box go
 through the same path. A built character lands in `characters/lib_char_<slug>.blend` and
 scans like any other character.
+
+## Kits, generators and composed environments
+
+A kit piece (`kits/<kit>/kit_<kit>_<piece>.blend`) is one mesh sitting on the ground at the
+origin, with `studio_kit` and optional `studio_snap_points`; the scanner records its
+footprint. A generator (`generators/gen_<slug>.blend`) declares `studio_generator_kind`
+(`terrain`, `scatter`, `prop`) and `studio_params` ranges; a scatter generator may carry
+the mesh it scatters when a composition names no kit pieces for it. `compose_env.py`
+builds a location from a kit composition: seeded terrain, placed pieces snapped to the
+terrain, seeded scatter layers, `anchor_*` empties and one `time_<variant>` light
+collection per variant (`day`, `dusk`, `night` outdoors, `interior_warm` indoors). The
+result lands in `envs/lib_env_<slug>.blend` with `studio_composed_from`, `studio_kit` and
+`studio_seed`, and scans like any other environment.
