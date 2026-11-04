@@ -25,6 +25,7 @@ revisited on its branch and merged back into `main`.
 | `11-compose-env` | `tools/compose_env.py`, `studio/assets/environments.py` | Asset build phase 3: kits, seeded terrain and scatter; compositions become environment `.blend` files |
 | `12-clip-pipeline` | `tools/retarget.py`, `tools/tag_clips.py`, `tools/procedural.py`, `studio/assets/clips.py` | Asset build phase 2: mocap retargeting to base rigs, tagging, procedural layers, clip search and transitions |
 | `13-asset-builder` | `tools/asset_builder/`, `studio/agents/asset_builder.py`, `studio/agents/render_qa.py`, `studio/assets/builder.py` | Asset build phase 4: an agent writes bpy scripts for prop requests, a sandbox runs them, Render QA scores the turntable, accepted scripts join the generator library |
+| `14-build-queue` | `studio/assets/queue.py` | Asset build phase 5: build requests ranked by screen time, routed variant → generator → asset_builder → image_to_3d → human, deduplicated, with per-story metrics |
 
 ## Setup
 
@@ -113,3 +114,20 @@ new library id and saves the script with its params and tags to
 `library/generators/scripts/index.json` for reuse. Anything else is parked in
 `library/preview/pending/` with every attempt recorded for a human. `--agents stub` runs the
 loop offline with a box builder and a bounds-only QA.
+
+Phase 5, the queue:
+
+```
+studio build-requests runs/film --library library [--save] [--json]
+```
+
+Every package already carries its build requests ranked by frames on screen (from
+layout.json) with a route chosen in the order `variant` (the nearest library asset fits:
+same rig type for characters, bounds within forty percent for props and sets), `generator`
+(an accepted script matches the request's tags), `asset_builder` (props), `image_to_3d`
+(props with reference images, only when the flag lists it), otherwise `human`. Characters
+and clips never go to the automated modelling routes. Near-duplicate requests are routed as
+variants of the first one. The command prints the queue with the reason for each route and
+writes `assets/build_queue.json`, `assets/metrics.json` and `assets/metrics.md` (requests
+opened, closed by code, closed by a human, open, in review, automated share, rounds);
+`--save` writes the screen time and routes back into the run's outputs.
