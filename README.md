@@ -5,7 +5,8 @@ outfits and assets built by deterministic Blender code from AI-interpreted speci
 then assembled into scenes and episodes.
 
 The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md);
-the Phase 1 demonstration is in [docs/demos/phase-1.md](docs/demos/phase-1.md).
+the phase demonstrations are in [docs/demos/](docs/demos/) ([Phase 1](docs/demos/phase-1.md),
+[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md)).
 
 ## Branches
 
@@ -28,6 +29,7 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-12-character-previews` | The `generate_character` Blender job (build, rig, save, reopen, validate, turntable MP4, labelled expression sheet, GLB), the CHAR draft outcome, the Phase 2 acceptance script and demonstration record |
 | `v2-13-character-library` | Character identity and version tables (migration 0005) with database guards that freeze a build in review and a published version for good, the library service (create, drafts based on any version, spec edits with `If-Match`, generate linked to its draft, submit gated on a current validated build, review approve/reject, deprecate, discard) and the `/characters` API with gallery search and presigned file links |
 | `v2-14-character-publisher` | The `publish_character` job on its own `publish` queue and `worker-publisher` service (publisher storage identity): SHA-256 check of every draft file, fresh-process Blender re-validation of the exact `character.blend`, version number claimed by a write-once marker, write-once library copy with `manifest.json`, one-transaction status flip; major bump forced on template/rig/fit changes; linking two published versions into one scene with library overrides (`load_check`); the Phase 3 acceptance script |
+| `v2-15-library-web` | The web app (`web/`, Vite + React + TypeScript + TanStack Query + React Three Fiber, Keycloak login with PKCE): character gallery with search and filters, character page with the GLB viewer (orbit, front/side/back, expression, viseme and eye morph sliders), version history, draft spec form generated from the style profile, generate/submit/review/publish/deprecate/duplicate actions by permission; the Phase 3 demonstration record |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the
@@ -38,7 +40,8 @@ new phases port pieces of it when they need them.
 ```
 contracts/        shared Pydantic contracts (IDs, versions, job envelopes); no other deps
 blender_engine/   cartoon_engine: runs only inside Blender (or the bpy wheel); entrypoint.py runs one job
-workers/          Celery tasks and the supervisor that runs Blender jobs
+workers/          Celery tasks, the supervisor that runs Blender jobs, the AI runner and the publisher
+web/              the browser app (Vite, React, TypeScript)
 infra/            dev service configuration (SeaweedFS identities, Keycloak realm)
 backend/          FastAPI app (app/), Alembic migrations, shared test fixtures (studio_testing), tests
 docs/architecture/
@@ -49,9 +52,12 @@ docs/architecture/
 ```
 docker compose -f infra/compose.yaml up -d --build
 python scripts/phase1_acceptance.py        # logs in through Keycloak, runs a Blender job, checks the file
+python scripts/phase3_acceptance.py        # character library: publish 1.0, refuse overwrites, publish 2.0, load both
 ```
 
 API docs at http://localhost:8000/api/docs, Keycloak at http://localhost:8080 (admin/admin).
+The web app runs from source with Node 22: `cd web && npm ci && npm run dev`, then
+http://localhost:5173 (it proxies `/api` to the API).
 Dev users `admin`, `creator`, `director`, `reviewer`, each with password `dev-<name>`. The
 worker image installs Blender as the `bpy` 5.2.3 wheel by default; build with
 `--build-arg BLENDER_SOURCE=binary --build-arg BLENDER_SHA256=<sha>` for the official

@@ -1,7 +1,7 @@
 # Developer entry points. Python 3.13; a venv is assumed to be active.
 PY ?= python
 
-.PHONY: install install-bpy test migrate api worker
+.PHONY: install install-bpy test test-web migrate api worker web
 
 install:
 	$(PY) -m pip install -e contracts -e "backend[dev]" -e blender_engine -e workers
@@ -12,6 +12,12 @@ install-bpy:
 
 test:
 	$(PY) -m pytest -q backend/tests blender_engine/tests workers/tests
+
+test-web:
+	cd web && npm ci && npm run typecheck && npm test
+
+web:
+	cd web && npm run dev
 
 migrate:
 	cd backend && alembic upgrade head

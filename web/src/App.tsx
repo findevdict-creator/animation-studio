@@ -1,0 +1,59 @@
+import { useEffect, useState } from "react";
+import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
+import { useMe } from "./api/hooks";
+import { currentUser, userManager } from "./auth";
+import { CharacterPage } from "./pages/CharacterPage";
+import { GalleryPage } from "./pages/GalleryPage";
+import { NewCharacterPage } from "./pages/NewCharacterPage";
+
+let redirecting = false;
+let callback: ReturnType<typeof userManager.signinRedirectCallback> | undefined; // the code is single-use
+
+function Callback() {
+  const navigate = useNavigate();
+  useEffect(() => {
+    callback ??= userManager.signinRedirectCallback();
+    callback.then((u) => navigate((u.state as string) || "/characters", { replace: true }));
+  }, [navigate]);
+  return <main>signing in…</main>;
+}
+
+function Shell({ children }: { children: React.ReactNode }) {
+  const me = useMe();
+  return (
+    <>
+      <nav className="top">
+        <Link to="/characters" className="brand">Studio</Link>
+        <Link to="/characters">Characters</Link>
+        <span className="spacer" />
+        {me.data && <span className="who">{me.data.name} · {me.data.roles.join(", ")}</span>}
+        <button onClick={() => userManager.signoutRedirect()}>Sign out</button>
+      </nav>
+      {children}
+    </>
+  );
+}
+
+export function App() {
+  const [ready, setReady] = useState(window.location.pathname === "/callback");
+  useEffect(() => {
+    if (ready) return;
+    currentUser().then((u) => {
+      if (u) setReady(true);
+      else if (!redirecting) {
+        redirecting = true; // StrictMode runs effects twice in development
+        userManager.signinRedirect({ state: window.location.pathname + window.location.search });
+      }
+    });
+  }, [ready]);
+  if (!ready) return <main>signing in…</main>;
+  return (
+    <Routes>
+      <Route path="/callback" element={<Callback />} />
+      <Route path="/" element={<Navigate to="/characters" replace />} />
+      <Route path="/characters" element={<Shell><GalleryPage /></Shell>} />
+      <Route path="/characters/new" element={<Shell><NewCharacterPage /></Shell>} />
+      <Route path="/characters/:id" element={<Shell><CharacterPage /></Shell>} />
+    </Routes>
+  );
+}

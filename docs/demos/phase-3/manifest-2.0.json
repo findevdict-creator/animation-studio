@@ -1,0 +1,162 @@
+{
+  "approved_at": "2026-11-04T16:31:48.235922+00:00",
+  "approved_by": "01a1a6ae-1c91-7dd6-b4b6-e8af1afa9532",
+  "based_on": {
+    "version": "1.0",
+    "version_id": "01a1a765-45aa-77b6-a73d-5ed0327ab8f9"
+  },
+  "blender_version": "5.2.3 LTS",
+  "body_fit_profile": "child_average",
+  "character_id": "01a1a765-45a1-7225-9696-d4ff8dcc3f35",
+  "code": "CHAR-002",
+  "dependencies": [
+    {
+      "kind": "template",
+      "ref": "TPL-HUMANOID-STANDIN@0.1"
+    },
+    {
+      "kind": "rig_profile",
+      "ref": "cartoon_humanoid@1.0"
+    },
+    {
+      "kind": "style_profile",
+      "ref": "family_cartoon@1.0"
+    }
+  ],
+  "engine_version": "0.3.0",
+  "files": [
+    {
+      "key": "character.blend",
+      "mime": "application/x-blender",
+      "role": "blend",
+      "sha256": "6a7ea115d3ca34e33c2e57aca9c5f388a95562901b580cd2d9cc8385cb6803c8",
+      "size": 6022063
+    },
+    {
+      "key": "character.json",
+      "mime": "application/json",
+      "role": "spec",
+      "sha256": "094606b77f34514c00a680654870837e7230b4619ea41d980501d69425a17aed",
+      "size": 2382
+    },
+    {
+      "key": "expressions.png",
+      "mime": "image/png",
+      "role": "preview",
+      "sha256": "3e4be349a188e3805945cf6dae0c94fc965f94864510813274e19f28a6b95a52",
+      "size": 980730
+    },
+    {
+      "key": "preview.glb",
+      "mime": "model/gltf-binary",
+      "role": "glb",
+      "sha256": "be01ff95e972481bf5acaae26d239f86dd3fafff639ca96c6c7880920c8fef75",
+      "size": 872180
+    },
+    {
+      "key": "publish_validation.json",
+      "mime": "application/json",
+      "role": "report",
+      "sha256": "936a4bb24da64d29c9f846ae372d7843ff588ef5bf9ddf59e461908144a1dce8",
+      "size": 2366
+    },
+    {
+      "key": "thumbnail.png",
+      "mime": "image/png",
+      "role": "thumbnail",
+      "sha256": "84b71b38bc0f1b0176b6d48444f26250a042f6c96371e7b69377f571616dac69",
+      "size": 144638
+    },
+    {
+      "key": "turntable.mp4",
+      "mime": "video/mp4",
+      "role": "turntable",
+      "sha256": "6a1a321ff7659f8b0d3c435e39213c746459100814759308a2970855344de01d",
+      "size": 24035
+    },
+    {
+      "key": "turntable_sheet.png",
+      "mime": "image/png",
+      "role": "preview",
+      "sha256": "ebdc18f58c3bb7c3f1ba8cb8e110d38b9b677609cea7387e848e2b02e9b4b495",
+      "size": 1160226
+    },
+    {
+      "key": "validation.json",
+      "mime": "application/json",
+      "role": "report",
+      "sha256": "b4e6db9a4eb138452911591b480fcfecabb23063cc55d222bad9505ba570ad12",
+      "size": 2342
+    }
+  ],
+  "height_m": 1.31,
+  "kind": "character",
+  "manifest_version": "asset_manifest/1",
+  "name": "Ali",
+  "rig_profile": "cartoon_humanoid@1.0",
+  "shape_keys": {
+    "expressions": [
+      "expr_happy_brow",
+      "expr_happy_eyes",
+      "expr_happy_mouth",
+      "expr_sad_brow",
+      "expr_sad_eyes",
+      "expr_sad_mouth",
+      "expr_angry_brow",
+      "expr_angry_eyes",
+      "expr_angry_mouth",
+      "expr_surprised_brow",
+      "expr_surprised_eyes",
+      "expr_surprised_mouth",
+      "expr_fearful_brow",
+      "expr_fearful_eyes",
+      "expr_fearful_mouth",
+      "expr_confused_brow",
+      "expr_confused_eyes",
+      "expr_confused_mouth",
+      "expr_excited_brow",
+      "expr_excited_eyes",
+      "expr_excited_mouth",
+      "expr_laughing_brow",
+      "expr_laughing_eyes",
+      "expr_laughing_mouth",
+      "expr_crying_brow",
+      "expr_crying_eyes",
+      "expr_crying_mouth"
+    ],
+    "eyes": [
+      "eye_blink_L",
+      "eye_blink_R",
+      "eye_wide_L",
+      "eye_wide_R",
+      "eye_squint_L",
+      "eye_squint_R"
+    ],
+    "visemes": [
+      "vis_AI",
+      "vis_E",
+      "vis_O",
+      "vis_U",
+      "vis_FV",
+      "vis_L",
+      "vis_MBP",
+      "vis_WQ",
+      "vis_TH",
+      "vis_rest"
+    ]
+  },
+  "spec_digest": "b652ad63b446df82644c84d7df8a6bc6fe31ac1c9c10aea6032d64b3ab6d209f",
+  "validation": {
+    "build": {
+      "checks": 22,
+      "ok": true
+    },
+    "publish": {
+      "blender_version": "5.2.3 LTS",
+      "checks": 22,
+      "ok": true
+    }
+  },
+  "version": "2.0",
+  "version_id": "01a1a766-33fd-722f-a689-f964ced3dda8"
+}

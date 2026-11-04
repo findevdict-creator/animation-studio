@@ -1,0 +1,46 @@
+{
+  "blender_version": "5.2.3 LTS",
+  "characters": [
+    {
+      "file": "/tmp/claude-0/-home-claude-animation-studio/11dd7093-adb9-51a9-ac75-2e5c8bd21e51/scratchpad/phase3/1.0/character.blend",
+      "collection": "CHAR_Ali",
+      "library": "/tmp/claude-0/-home-claude-animation-studio/11dd7093-adb9-51a9-ac75-2e5c8bd21e51/scratchpad/phase3/1.0/character.blend",
+      "rig": "rig",
+      "linked_mesh_data": true,
+      "stamps": {
+        "studio_rig_profile": "cartoon_humanoid@1.0",
+        "studio_attachment_points": "<bpy id prop: owner=\"OBrig\", name=\"studio_attachment_points\", address=0xead34b8>",
+        "studio_character_name": "Ali",
+        "studio_template": "TPL-HUMANOID-STANDIN@0.1",
+        "studio_style_profile": "family_cartoon@1.0",
+        "studio_fit_profile": "child_average",
+        "studio_spec_digest": "6816efcad0ba7b0d7ce3c22a784989929f55742f0f557037984147c9d4a559eb",
+        "studio_height_m": 1.28
+      },
+      "ok": true,
+      "failed": [],
+      "checks": 22
+    },
+    {
+      "file": "/tmp/claude-0/-home-claude-animation-studio/11dd7093-adb9-51a9-ac75-2e5c8bd21e51/scratchpad/phase3/2.0/character.blend",
+      "collection": "CHAR_Ali.001",
+      "library": "/tmp/claude-0/-home-claude-animation-studio/11dd7093-adb9-51a9-ac75-2e5c8bd21e51/scratchpad/phase3/2.0/character.blend",
+      "rig": "rig.001",
+      "linked_mesh_data": true,
+      "stamps": {
+        "studio_rig_profile": "cartoon_humanoid@1.0",
+        "studio_attachment_points": "<bpy id prop: owner=\"OBrig.001\", name=\"studio_attachment_points\", address=0x10e7d4f8>",
+        "studio_character_name": "Ali",
+        "studio_template": "TPL-HUMANOID-STANDIN@0.1",
+        "studio_style_profile": "family_cartoon@1.0",
+        "studio_fit_profile": "child_average",
+        "studio_spec_digest": "b652ad63b446df82644c84d7df8a6bc6fe31ac1c9c10aea6032d64b3ab6d209f",
+        "studio_height_m": 1.31
+      },
+      "ok": true,
+      "failed": [],
+      "checks": 22
+    }
+  ],
+  "ok": true
+}
