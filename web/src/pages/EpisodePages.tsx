@@ -454,7 +454,8 @@ function VersionTab({ ep }: { ep: EpisodeOut }) {
               <td><Link to={`/scenes/${s.scene_id}`}>{s.scene_code} v{s.scene_version}</Link></td>
               <td>{s.start_s.toFixed(2)} s</td><td>{s.duration_s.toFixed(2)} s</td>
               <td>{(s.transition as { kind: string }).kind}</td>
-              <td><StatusChip status={`build-${s.build_status}`} /></td><td><StatusChip status={`reopen-${s.verify_status}`} /></td>
+              <td><span className={`chip chip-build-${s.build_status}`}>{s.build_status}</span></td>
+              <td><span className={`chip chip-reopen-${s.verify_status}`}>{s.verify_status}</span></td>
             </tr>
           ))}</tbody>
         </table>
