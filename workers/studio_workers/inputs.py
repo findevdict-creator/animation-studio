@@ -8,7 +8,8 @@ a mismatch is permanent (the stored object is not the file the row describes).
 Scene jobs stage every pinned file at ``assets/<kind>/<code>/<version>/`` (the paths the
 saved ``scene.blend`` links through) and make them read-only; ``verify_scene`` also gets
 the stored ``scene.blend`` at ``scene/scene.blend``. Each staged file is checked against
-both the registry row and the hash frozen in the scene version's resolution.
+both the registry row and the hash frozen in the scene version's resolution. Dialogue
+recordings go to ``audio/<code>/dialogue.wav`` the same way, read-only.
 """
 
 from __future__ import annotations
@@ -77,6 +78,14 @@ def _scene_pins(session: Session, params: dict[str, Any]) -> Wanted:
             if f.sha256 != sha:
                 raise InputRefused(f"{p.code}@{p.version} {name} is not the pinned file")
             wanted.append((_bucket(v.status), f.storage_key, sha, f"{p.path}/{name}"))
+    for a in rs.audio():
+        from app.models.audio import AudioClip
+        from sqlalchemy import select
+
+        clip = session.scalar(select(AudioClip).where(AudioClip.code == a.code))
+        if clip is None or clip.status != "ready" or clip.wav_sha256 != a.sha256:
+            raise InputRefused(f"{a.code} is not the recording the scene version froze")
+        wanted.append(("work", clip.wav_storage_key, a.sha256, a.path))
     return wanted
 
 
@@ -108,7 +117,7 @@ def _generate_animation(session: Session, params: dict[str, Any]) -> Wanted:
 
 STAGERS: dict[str, Stager] = {"fit_outfit": _fit_outfit, "assemble_scene": _scene_pins, "verify_scene": _verify_scene,
                               "generate_animation": _generate_animation}
-READ_ONLY_PREFIXES = ("assets/",)
+READ_ONLY_PREFIXES = ("assets/", "audio/")
 
 
 def stage(session: Session, job_type: str, params: dict[str, Any], workspace: Path, settings: Settings,

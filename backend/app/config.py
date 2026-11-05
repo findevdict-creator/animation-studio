@@ -50,6 +50,10 @@ class Settings(BaseSettings):
                                                                               "verify_scene": 1200})
     default_job_timeout_s: int = 1800
     keep_failed_workspaces: bool = True
+    # Media worker (lipsync): ffmpeg normalises recordings; Rhubarb Lip Sync finds the mouth
+    # cues when its binary is set, otherwise the built-in phonetic analyser does
+    ffmpeg_binary: str = "ffmpeg"
+    rhubarb_binary: str | None = Field(default=None, description="path to the rhubarb executable; unset: built-in analyser")
     worker_host: str | None = None
 
     # Authentication (architecture 14): OIDC bearer tokens, Keycloak in the dev stack.

@@ -5,6 +5,7 @@ from app.models import (  # noqa: F401
     ai,
     animations,
     assets,
+    audio,
     audit,
     characters,
     identity,

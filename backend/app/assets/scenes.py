@@ -256,8 +256,7 @@ def resolve(session: Session, manifest: SceneManifest, *, base: SceneVersion | N
             key=inst.key, character=cpin, rig_profile=rig.ref, fit_profile=cv.fit_profile,
             outfit=opin, outfit_compatibility=compat_doc, accessories=tuple(accs), transform=inst.transform,
             expressions=tuple(inst.expressions), blink=inst.blink, animations=clips,
-            dialogue=tuple(ResolvedDialogueLine(start_frame=d.start_frame, end_frame=d.end_frame, text=d.text)
-                           for d in inst.dialogue), state=inst.state))
+            dialogue=_resolve_dialogue(session, inst, p, issues, manifest), state=inst.state))
         res.rows.append((cv, ov, compat, acc_rows, anim_rows))
     if not res.errors:
         res.resolved = ResolvedScene(manifest_digest=manifest.digest(), name=manifest.name, fps=manifest.fps,
@@ -307,6 +306,39 @@ def _resolve_animations(session: Session, inst, cv, rig, p: str, issues: list[Is
                                      compat=compat.model_dump(mode="json"), travel=a.travel and compat.travels))
         rows.append((av, j, a.start_frame))
     return clips, rows
+
+
+def _resolve_dialogue(session: Session, inst, p: str, issues: list[Issue],
+                      manifest: SceneManifest) -> tuple[ResolvedDialogueLine, ...]:
+    """A line with a recording freezes the clip's WAV hash and mouth cues; only a ready clip
+    (analysed without error) can be used."""
+    from app.assets import audio as audio_svc
+    from app.models.audio import AudioClip
+
+    out = []
+    for j, d in enumerate(inst.dialogue):
+        audio = None
+        if d.audio is not None:
+            dp = f"{p}.dialogue[{j}].audio"
+            clip = session.scalar(select(AudioClip).where(AudioClip.code == d.audio))
+            if clip is None:
+                issues.append(Issue(path=dp, code="not_found", message=f"no dialogue clip {d.audio}"))
+            elif clip.status != "ready":
+                issues.append(Issue(path=dp, code="not_ready", message=f"{d.audio} is {clip.status}"
+                                    + (f": {clip.error}" if clip.error else "")))
+            else:
+                audio = audio_svc.resolved(clip)
+                frames = audio.duration_s * manifest.fps
+                if d.start_frame + frames > d.end_frame + 1:
+                    issues.append(Issue(path=f"{p}.dialogue[{j}]", code="audio_longer_than_line", severity="warning",
+                                        message=f"{d.audio} lasts {audio.duration_s:.2f} s ({frames:.0f} frames); the "
+                                                f"line ends at frame {d.end_frame}, the mouth keeps moving to the end "
+                                                f"of the recording"))
+                if d.start_frame + frames > manifest.frame_end + 1:
+                    issues.append(Issue(path=f"{p}.dialogue[{j}]", code="runs_past_end", severity="warning",
+                                        message=f"{d.audio} plays past the end of the scene; it is cut there"))
+        out.append(ResolvedDialogueLine(start_frame=d.start_frame, end_frame=d.end_frame, text=d.text, audio=audio))
+    return tuple(out)
 
 
 def _refuse(res: Resolution) -> None:

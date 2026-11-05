@@ -70,9 +70,14 @@ def build_face_track(rig, inst: ResolvedInstance, fps: int, start: int, end: int
             if getattr(d, "audio", None) is not None:
                 cues = [c for c in d.audio.cues if d.start_frame + c.start_s * fps < d.end_frame]
                 for c in cues:
-                    f = d.start_frame + c.start_s * fps
+                    # each shape holds for its cue and hands over to the next in half a frame
+                    f0 = d.start_frame + c.start_s * fps
+                    f1 = min(d.start_frame + c.end_s * fps, float(d.end_frame)) - 0.5
                     for v in all_vis:
-                        key(v, 1.0 if v == f"vis_{c.viseme}" else 0.0, f)
+                        val = 1.0 if v == f"vis_{c.viseme}" else 0.0
+                        key(v, val, f0)
+                        if f1 - f0 >= 0.5:
+                            key(v, val, f1)
                 for v in all_vis:
                     key(v, 1.0 if v == "vis_rest" else 0.0, d.end_frame)
                 lines.append({"start_frame": d.start_frame, "end_frame": d.end_frame, "audio": d.audio.code,

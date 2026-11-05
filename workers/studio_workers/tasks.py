@@ -3,6 +3,7 @@
     celery -A studio_workers.tasks worker -Q blender --concurrency 1
     celery -A studio_workers.tasks worker -Q ai --concurrency 4
     celery -A studio_workers.tasks worker -Q publish --concurrency 1   # publisher storage identity
+    celery -A studio_workers.tasks worker -Q media --concurrency 2     # ffmpeg + lip sync, no Blender
     celery -A studio_workers.tasks beat        # runs the outbox sweeper
 """
 
@@ -42,6 +43,10 @@ def run_job(job_id: str) -> str:
         from studio_workers.ai_runner import AIRunner
 
         outcome = AIRunner().run(jid)
+    elif JOB_QUEUES[JobType(job_type)] == Queue.media:
+        from studio_workers.media_runner import MediaRunner
+
+        outcome = MediaRunner().run(jid)
     elif JOB_QUEUES[JobType(job_type)] == Queue.publish:
         from studio_workers.publisher import PublisherRunner
 

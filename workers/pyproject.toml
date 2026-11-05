@@ -3,7 +3,7 @@ name = "studio-workers"
 version = "0.1.0"
 description = "Celery workers: job supervision, Blender process management, result upload."
 requires-python = ">=3.13"
-dependencies = ["studio-backend", "studio-contracts", "celery[redis]>=5.4"]
+dependencies = ["studio-backend", "studio-contracts", "celery[redis]>=5.4", "numpy>=2.0"]  # numpy: the lip-sync analyser
 
 [build-system]
 requires = ["setuptools>=68"]

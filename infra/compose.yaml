@@ -162,6 +162,28 @@ services:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
 
+  # Media jobs (lipsync): ffmpeg normalises dialogue recordings and the analyser finds the
+  # mouth cues. No Blender, no provider keys. Build with WITH_RHUBARB=1 and set
+  # STUDIO_RHUBARB_BINARY=/usr/local/bin/rhubarb to use Rhubarb Lip Sync instead of the
+  # built-in phonetic analyser.
+  worker-media:
+    build: {context: .., dockerfile: infra/docker/worker.Dockerfile, target: media, args: *build-args}
+    image: studio-worker-media:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-worker
+      STUDIO_S3_SECRET_KEY: dev-worker-secret
+      STUDIO_RHUBARB_BINARY: ${STUDIO_RHUBARB_BINARY:-}
+    volumes: [work:/work]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 1g
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
   beat:
     image: studio-worker:dev
     environment:

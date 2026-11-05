@@ -19,6 +19,7 @@ from the one it was saved in). Opened with scripts disabled, the file must:
 from __future__ import annotations
 
 import math
+from pathlib import Path
 from typing import Any
 
 import numpy as np
@@ -261,6 +262,33 @@ def _library_animation_checks(inst, scene, parts, add) -> list[dict]:
     return []
 
 
+def _dialogue_audio_checks(rs: ResolvedScene, scene) -> list[dict]:
+    """Every recorded line has its sound strip, stored relative to the scene file, opening
+    the staged recording the scene version froze, at the line's first frame."""
+    import hashlib
+
+    import bpy
+
+    want = {f"{inst.key}:{d.audio.code}": (d, i) for i, inst in enumerate(rs.instances) for d in inst.dialogue
+            if d.audio is not None}
+    if not want:
+        return []
+    se = scene.sequence_editor
+    strips = {s.name: s for s in ((se.strips_all if hasattr(se, "strips_all") else se.sequences_all) if se else [])
+              if s.type == "SOUND"}
+    out = []
+    for name, (d, _) in sorted(want.items()):
+        st = strips.get(name)
+        path = Path(bpy.path.abspath(st.sound.filepath)) if st is not None and st.sound else None
+        sha = hashlib.sha256(path.read_bytes()).hexdigest() if path is not None and path.is_file() else None
+        out.append({"name": f"dialogue_audio:{name}", "ok": st is not None and sha == d.audio.sha256
+                    and st.get("studio_audio") == f"{d.audio.code}#{d.audio.sha256}"
+                    and int(st.frame_start) == d.start_frame and st.sound.filepath.startswith("//"),
+                    "stored": st.sound.filepath if st is not None and st.sound else None, "sha256": sha,
+                    "frame_start": int(st.frame_start) if st is not None else None})
+    return out
+
+
 def run(ctx: JobContext) -> dict[str, Any]:
     from cartoon_engine.jobs.assemble_scene import preview_frames
     from cartoon_engine.scene import files
@@ -285,6 +313,7 @@ def run(ctx: JobContext) -> dict[str, Any]:
     missing = [lib.filepath for lib in bpy.data.libraries if lib.is_missing]
     checks.append({"name": "libraries_resolve", "ok": libs["ok"] and not missing, "missing": missing,
                    "libraries": libs["libraries"]})
+    checks.extend(_dialogue_audio_checks(rs, scene))
     checks.append({"name": "manifest_digest", "ok": scene.get("studio_manifest_digest") == rs.manifest_digest})
     checks.append({"name": "frame_range", "ok": (scene.frame_start, scene.frame_end, scene.render.fps)
                    == (rs.frame_start, rs.frame_end, rs.fps)})
