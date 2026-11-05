@@ -239,11 +239,11 @@ LIGHTING: dict[str, LightingPreset] = {p.key: p for p in (
                    sun_color="#9FB4E8", sky_color="#1C2540", sky_strength=0.35, ceiling_energy_w=0,
                    ceiling_color="#FFD9A8", fill_share=0.5),
     LightingPreset(key="indoor_warm", label="Indoor, lamps on", sun_energy=0.8, sun_elevation_deg=35,
-                   sun_heading_deg=-40, sun_color="#FFF1DC", sky_color="#D9D2C6", sky_strength=0.5,
-                   ceiling_energy_w=180, ceiling_color="#FFE2B8", fill_share=0.4),
-    LightingPreset(key="indoor_day", label="Indoor, daylight", sun_energy=2.2, sun_elevation_deg=40,
-                   sun_heading_deg=-35, sun_color="#FFF6E8", sky_color="#DCE6EF", sky_strength=0.9,
-                   ceiling_energy_w=60, ceiling_color="#FFF1DC", fill_share=0.45),
+                   sun_heading_deg=-40, sun_color="#FFF1DC", sky_color="#D9D2C6", sky_strength=0.3,
+                   ceiling_energy_w=45, ceiling_color="#FFE2B8", fill_share=0.4),
+    LightingPreset(key="indoor_day", label="Indoor, daylight", sun_energy=2.0, sun_elevation_deg=40,
+                   sun_heading_deg=-35, sun_color="#FFF6E8", sky_color="#DCE6EF", sky_strength=0.4,
+                   ceiling_energy_w=15, ceiling_color="#FFF1DC", fill_share=0.45),
 )}
 
 
@@ -296,7 +296,7 @@ ENVIRONMENTS: tuple[EnvironmentDef, ...] = (
                    dressing=(Placement(prop="sofa", at=(-0.05, 0.36)), Placement(prop="table", at=(-0.05, 0.14),
                                                                                 params={"height": 0.0, "size": 0.2}),
                              Placement(prop="lamp", at=(0.36, 0.38)), Placement(prop="bookshelf", at=(-0.43, 0.2),
-                                                                                rotation_deg=-90),
+                                                                                rotation_deg=90),
                              Placement(prop="ball", at=(0.25, -0.15)))),
     EnvironmentDef(id="ENVD-BEDROOM", version=CATALOG_VERSION, key="bedroom", label="Bedroom", kind="room",
                    default_size=(4.5, 4.0, 2.6), min_size=(3.0, 3.0, 2.4), max_size=(8.0, 7.0, 3.2),
@@ -316,7 +316,7 @@ ENVIRONMENTS: tuple[EnvironmentDef, ...] = (
                    tuple(Placement(prop="chair", at=(x, y - 0.09), rotation_deg=180) for y in (0.05, 0.25)
                          for x in (-0.3, -0.12, 0.12, 0.3)) +
                    (Placement(prop="table", at=(0.0, 0.42), params={"size": 0.6}),
-                    Placement(prop="bookshelf", at=(-0.45, 0.38), rotation_deg=-90))),
+                    Placement(prop="bookshelf", at=(-0.45, 0.38), rotation_deg=90))),
     EnvironmentDef(id="ENVD-PARK", version=CATALOG_VERSION, key="park", label="Park", kind="outdoor",
                    default_size=(16.0, 12.0, 0.0), min_size=(8.0, 6.0, 0.0), max_size=(40.0, 30.0, 0.0),
                    floor_finishes=("grass",), default_floor="grass", default_floor_color="#6FA24A",
