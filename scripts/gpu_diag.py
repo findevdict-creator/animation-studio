@@ -44,6 +44,10 @@ def main():
                                  "/usr/lib/x86_64-linux-gnu/libnvoptix*", "/usr/lib/x86_64-linux-gnu/libEGL_nvidia*",
                                  "/usr/lib64/libcuda*") for p in glob.glob(pat)})
     line("driver libraries", ", ".join(libs) or "none")
+    for d in ("/usr/lib/x86_64-linux-gnu", "/usr/lib/wsl/lib"):
+        names = sorted(n for n in (os.listdir(d) if os.path.isdir(d) else [])
+                       if any(t in n for t in ("cuda", "nvidia", "nvoptix", "dxcore", "d3d12", "nvdxg", "nvwgf")))
+        line(f"{d}", ", ".join(names) or ("empty" if os.path.isdir(d) else "missing"))
     drivers = glob.glob("/usr/lib/wsl/drivers/*")
     line("/usr/lib/wsl/drivers", f"{len(drivers)} entries" + (f" e.g. {os.path.basename(drivers[0])}" if drivers else ""))
     line("egl vendors", ", ".join(sorted(os.path.basename(p) for p in glob.glob("/usr/share/glvnd/egl_vendor.d/*"))) or "none")
@@ -61,6 +65,12 @@ def main():
     with open("/proc/self/maps") as f:
         where = sorted({ln.split()[-1] for ln in f if "libcuda" in ln})
     line("libcuda loaded from", ", ".join(where))
+    if where and shutil.which("ldd"):
+        r = subprocess.run(["ldd", where[0]], capture_output=True, text=True)
+        missing = [ln.strip() for ln in r.stdout.splitlines() if "not found" in ln]
+        line("libcuda dependencies", "all found" if not missing else "MISSING " + "; ".join(missing))
+    for d in drivers[:1]:
+        line("driver store files", ", ".join(sorted(n for n in os.listdir(d) if n.endswith((".so", ".so.1", ".so.1.1")))[:12]))
     rc = cuda.cuInit(0)
     line("cuInit(0)", f"{rc} {CUDA_ERRORS.get(rc, '')}")
     if rc == 0:
