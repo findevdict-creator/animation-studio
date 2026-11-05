@@ -2566,6 +2566,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/render-jobs/{ref}/outputs/{output_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One render output, or one frame of a shot's frames */
+        get: operations["render_output_api_v1_render_jobs__ref__outputs__output_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -13159,6 +13176,49 @@ export interface operations {
             header?: never;
             path: {
                 ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    render_output_api_v1_render_jobs__ref__outputs__output_id__get: {
+        parameters: {
+            query?: {
+                /** @description for a frames output: which frame, counted from 1 in the shot */
+                frame?: number | null;
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                ref: string;
+                output_id: string;
             };
             cookie?: never;
         };
