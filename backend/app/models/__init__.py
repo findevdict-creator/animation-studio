@@ -9,6 +9,7 @@ from app.models import (  # noqa: F401
     identity,
     jobs,
     outfits,
+    scenes,
 )
 from app.models.base import Base
 

@@ -120,5 +120,28 @@ def _generate_accessory(session: Session, job_id: uuid.UUID, uploaded: list[Uplo
             **recorded}
 
 
-OUTCOMES: dict[str, Outcome] = {"generate_accessory": _generate_accessory, "blender_smoke": _blender_smoke, "generate_character": _generate_character,
-                                "generate_outfit": _generate_outfit, "fit_outfit": _fit_outfit}
+def _assemble_scene(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                    blender_version: str | None) -> dict[str, Any]:
+    """scene.blend, its report and preview frames onto the scene version (once)."""
+    from app.assets import scenes
+    from app.models.jobs import Job
+
+    params = session.get(Job, job_id).params
+    return scenes.record_build(session, job_id, uuid.UUID(params["scene_version_id"]), uploaded, data,
+                               blender_version)
+
+
+def _verify_scene(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                  blender_version: str | None) -> dict[str, Any]:
+    """The reopen check's verdict and evidence onto the scene version."""
+    from app.assets import scenes
+    from app.models.jobs import Job
+
+    params = session.get(Job, job_id).params
+    return scenes.record_verify(session, job_id, uuid.UUID(params["scene_version_id"]), uploaded, data)
+
+
+OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character,
+                                "generate_outfit": _generate_outfit, "fit_outfit": _fit_outfit,
+                                "generate_accessory": _generate_accessory, "assemble_scene": _assemble_scene,
+                                "verify_scene": _verify_scene}

@@ -10,6 +10,7 @@ from app.api.v1 import (
     me,
     outfit_spec,
     outfits,
+    scenes,
 )
 
 api_router = APIRouter()
@@ -24,3 +25,5 @@ api_router.include_router(outfits.router)
 api_router.include_router(outfits.wardrobe_router)
 api_router.include_router(accessories.catalog_router)
 api_router.include_router(accessories.router)
+api_router.include_router(scenes.catalog_router)
+api_router.include_router(scenes.router)

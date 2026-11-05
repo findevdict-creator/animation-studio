@@ -10,7 +10,7 @@ from __future__ import annotations
 PERMISSIONS: tuple[str, ...] = (
     "asset.read", "asset.create", "asset.edit_identity", "asset.edit_draft", "asset.submit",
     "asset.review", "asset.publish", "ai.use", "series.manage", "episode.manage", "render.submit",
-    "job.read", "job.submit", "job.cancel", "comment.write", "admin.users", "admin.ai",
+    "job.read", "job.submit", "job.cancel", "comment.write", "scene.edit", "admin.users", "admin.ai",
     "admin.workers", "audit.read",
 )
 
@@ -18,12 +18,12 @@ ROLE_PERMISSIONS: dict[str, frozenset[str]] = {
     "admin": frozenset(PERMISSIONS),
     "creator": frozenset({
         "asset.read", "asset.create", "asset.edit_identity", "asset.edit_draft", "asset.submit",
-        "ai.use", "job.read", "job.submit", "job.cancel", "comment.write",
+        "ai.use", "job.read", "job.submit", "job.cancel", "comment.write", "scene.edit",
     }),
     "director": frozenset({
         "asset.read", "asset.review", "asset.publish", "asset.edit_identity", "ai.use",
         "series.manage", "episode.manage", "render.submit", "job.read", "job.submit", "job.cancel",
-        "comment.write",
+        "comment.write", "scene.edit",
     }),
     "reviewer": frozenset({"asset.read", "asset.review", "job.read", "comment.write"}),
 }

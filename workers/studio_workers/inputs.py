@@ -4,6 +4,11 @@ The Blender process never reads storage or the database, so the worker materiali
 files it needs under ``inputs/`` and lists them in the job envelope with their SHA-256.
 Every file is checked against the SHA-256 recorded on its asset row while it downloads;
 a mismatch is permanent (the stored object is not the file the row describes).
+
+Scene jobs stage every pinned file at ``assets/<kind>/<code>/<version>/`` (the paths the
+saved ``scene.blend`` links through) and make them read-only; ``verify_scene`` also gets
+the stored ``scene.blend`` at ``scene/scene.blend``. Each staged file is checked against
+both the registry row and the hash frozen in the scene version's resolution.
 """
 
 from __future__ import annotations
@@ -13,13 +18,12 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from sqlalchemy.orm import Session
-
 from app.assets import outfits as outfit_svc
 from app.config import Settings
 from app.core.storage import Storage
 from app.models.characters import CharacterVersion
 from app.models.outfits import OutfitVersion
+from sqlalchemy.orm import Session
 from studio_contracts.jobs import InputFile
 
 
@@ -57,7 +61,38 @@ def _fit_outfit(session: Session, params: dict[str, Any]) -> Wanted:
             (_bucket(ov.status), blend.storage_key, blend.sha256, "inputs/outfit.blend")]
 
 
-STAGERS: dict[str, Stager] = {"fit_outfit": _fit_outfit}
+def _scene_pins(session: Session, params: dict[str, Any]) -> Wanted:
+    from app.assets import scenes as scene_svc
+    from studio_contracts.scene import ResolvedScene
+
+    rs = ResolvedScene.model_validate(params["resolved"])
+    wanted: Wanted = []
+    for p in rs.pins():
+        v = session.get(scene_svc.MODELS[p.kind], uuid.UUID(p.version_id))
+        if v is None:
+            raise InputRefused(f"{p.code}@{p.version} no longer exists")
+        files = {f.storage_key.rsplit("/", 1)[-1]: f for f in v.entry.files}
+        for name, sha in p.files.items():
+            f = _pick(files, name, f"{p.code}@{p.version}")
+            if f.sha256 != sha:
+                raise InputRefused(f"{p.code}@{p.version} {name} is not the pinned file")
+            wanted.append((_bucket(v.status), f.storage_key, sha, f"{p.path}/{name}"))
+    return wanted
+
+
+def _verify_scene(session: Session, params: dict[str, Any]) -> Wanted:
+    from app.assets import scenes as scene_svc
+    from app.models.scenes import SceneVersion
+
+    v = session.get(SceneVersion, uuid.UUID(params["scene_version_id"]))
+    blend = scene_svc.scene_blend(v) if v is not None else None
+    if blend is None or blend["sha256"] != params["scene_blend_sha256"]:
+        raise InputRefused("the scene version has no stored scene.blend with that SHA-256")
+    return [*_scene_pins(session, params), ("work", blend["storage_key"], blend["sha256"], "scene/scene.blend")]
+
+
+STAGERS: dict[str, Stager] = {"fit_outfit": _fit_outfit, "assemble_scene": _scene_pins, "verify_scene": _verify_scene}
+READ_ONLY_PREFIXES = ("assets/",)
 
 
 def stage(session: Session, job_type: str, params: dict[str, Any], workspace: Path, settings: Settings,
@@ -76,5 +111,7 @@ def stage(session: Session, job_type: str, params: dict[str, Any], workspace: Pa
             store.get_file(key, workspace / rel, expected_sha256=sha)
         except ChecksumMismatch as exc:
             raise InputRefused(f"{rel} does not match its recorded SHA-256: {exc}") from exc
+        if rel.startswith(READ_ONLY_PREFIXES):
+            (workspace / rel).chmod(0o444)
         out.append(InputFile(path=rel, sha256=sha))
     return out

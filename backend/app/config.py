@@ -45,7 +45,9 @@ class Settings(BaseSettings):
                                                                               "publish_character": 900, "generate_outfit": 1800,
                                                                               "fit_outfit": 900, "publish_outfit": 900,
                                                                               "generate_accessory": 900,
-                                                                              "publish_accessory": 900})
+                                                                              "publish_accessory": 900,
+                                                                              "assemble_scene": 1800,
+                                                                              "verify_scene": 1200})
     default_job_timeout_s: int = 1800
     keep_failed_workspaces: bool = True
     worker_host: str | None = None
