@@ -76,6 +76,8 @@ docs/architecture/
 
 ## Running the stack
 
+Step by step, for one machine: [docs/RUNNING.md](docs/RUNNING.md).
+
 ```
 docker compose -f infra/compose.yaml up -d --build
 python scripts/phase1_acceptance.py        # logs in through Keycloak, runs a Blender job, checks the file

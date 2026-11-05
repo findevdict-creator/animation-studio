@@ -44,8 +44,12 @@ services:
 
   seaweedfs:
     image: chrislusf/seaweedfs:${SEAWEEDFS_VERSION:-4.50}
-    command: ["server", "-dir=/data", "-ip=seaweedfs", "-ip.bind=0.0.0.0", "-s3", "-s3.port=8333",
-              "-s3.config=/etc/seaweedfs/s3.json"]
+    # -volume.max is set because by default SeaweedFS sizes its volume slots from the free
+    # disk (one per GB), and each collection takes 7 slots when first written to: with less than
+    # about 22 GB free, the library bucket got none and every publish failed. Volumes are not
+    # preallocated, so a fixed count costs no disk.
+    command: ["server", "-dir=/data", "-ip=seaweedfs", "-ip.bind=0.0.0.0", "-volume.max=64",
+              "-s3", "-s3.port=8333", "-s3.config=/etc/seaweedfs/s3.json"]
     volumes:
       - ./seaweedfs/s3.json:/etc/seaweedfs/s3.json:ro
       - s3data:/data
