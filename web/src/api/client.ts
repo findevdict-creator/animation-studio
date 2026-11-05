@@ -22,6 +22,18 @@ export type FitDetail = S["FitDetail"];
 export type FitJobOut = S["FitJobOut"];
 export type Garment = S["GarmentDef"];
 export type Conventions = S["ConventionsOut"];
+export type AccessoryOut = S["AccessoryOut"];
+export type AccessoryDetail = S["AccessoryDetail"];
+export type AccessoryVersionDetail = S["AccessoryVersionDetail"];
+export type AccessoryVersionJobOut = S["AccessoryVersionJobOut"];
+export type AccessoryDef = S["AccessoryDef"];
+export type SceneOut = S["SceneOut"];
+export type SceneDetail = S["SceneDetail"];
+export type SceneVersionSummary = S["SceneVersionSummary"];
+export type SceneVersionDetail = S["SceneVersionDetail"];
+export type SceneVersionJobOut = S["SceneVersionJobOut"];
+export type SceneValidationOut = S["SceneValidationOut"];
+export type ClipDef = S["ClipDef"];
 
 export const API = "/api/v1";
 
@@ -50,5 +62,10 @@ export async function fileUrl(characterId: string, versionId: string, name: stri
 
 export async function outfitFileUrl(outfitId: string, versionId: string, name: string): Promise<string> {
   const r = await api<{ url: string }>(`/outfits/${outfitId}/versions/${versionId}/files/${name}?redirect=false`);
+  return r.url;
+}
+
+export async function accessoryFileUrl(accessoryId: string, versionId: string, name: string): Promise<string> {
+  const r = await api<{ url: string }>(`/accessories/${accessoryId}/versions/${versionId}/files/${name}?redirect=false`);
   return r.url;
 }

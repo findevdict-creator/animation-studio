@@ -1,5 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+  AccessoryDef, AccessoryDetail, AccessoryOut, AccessoryVersionDetail, ClipDef, SceneDetail, SceneOut,
+  SceneVersionDetail,
   api, CharacterDetail, CharacterOut, Conventions, FitDetail, FitOut, Garment, JobOut, Me, OutfitDetail, OutfitOut,
   OutfitVersionDetail, VersionDetail, VersionJobOut,
 } from "./client";
@@ -114,6 +116,79 @@ export function useOutfitAction<TBody, TOut = unknown>(oid: string, run: (body: 
     onSuccess: () => {
       for (const key of [["outfit", oid], ["outfit-version", oid], ["outfits"], ["fits", oid], ["fit", oid], ["wardrobe"]])
         qc.invalidateQueries({ queryKey: key });
+    },
+  });
+}
+
+// ---------------------------------------------------------------- accessories
+export interface AccessoryFilter { q?: string; category?: string; status?: string; attach_point?: string; fit_profile?: string }
+
+export const useAccessories = (f: AccessoryFilter) =>
+  useQuery({
+    queryKey: ["accessories", f],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      for (const [k, v] of Object.entries(f)) if (v) p.set(k, v);
+      return api<{ items: AccessoryOut[]; next_cursor: string | null }>(`/accessories?${p}`);
+    },
+  });
+
+export const useAccessory = (id: string) =>
+  useQuery({ queryKey: ["accessory", id], queryFn: () => api<AccessoryDetail>(`/accessories/${id}`) });
+
+export const useAccessoryVersion = (aid: string, vid: string | undefined) =>
+  useQuery({
+    queryKey: ["accessory-version", aid, vid],
+    queryFn: () => api<AccessoryVersionDetail>(`/accessories/${aid}/versions/${vid}`),
+    enabled: !!vid,
+  });
+
+export const useAccessoryItems = () =>
+  useQuery({ queryKey: ["accessory-items"], queryFn: () => api<AccessoryDef[]>("/accessory-items"), staleTime: Infinity });
+
+/** Every mutation on an accessory refreshes its detail, versions and the gallery. */
+export function useAccessoryAction<TBody, TOut = unknown>(aid: string, run: (body: TBody) => Promise<TOut>) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      for (const key of [["accessory", aid], ["accessory-version", aid], ["accessories"]]) qc.invalidateQueries({ queryKey: key });
+    },
+  });
+}
+
+// ---------------------------------------------------------------- scenes
+export const useScenes = (f: { q?: string; uses_version_id?: string }) =>
+  useQuery({
+    queryKey: ["scenes", f],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      for (const [k, v] of Object.entries(f)) if (v) p.set(k, v);
+      return api<{ items: SceneOut[]; next_cursor: string | null }>(`/scenes?${p}`);
+    },
+  });
+
+export const useScene = (id: string | undefined) =>
+  useQuery({ queryKey: ["scene", id], queryFn: () => api<SceneDetail>(`/scenes/${id}`), enabled: !!id });
+
+export const useSceneVersion = (sid: string | undefined, vid: string | undefined) =>
+  useQuery({
+    queryKey: ["scene-version", sid, vid],
+    queryFn: () => api<SceneVersionDetail>(`/scenes/${sid}/versions/${vid}`),
+    enabled: !!sid && !!vid,
+    // poll while a build or a reopen check is queued
+    refetchInterval: (q) => (q.state.data && (q.state.data.build_status === "queued" || q.state.data.verify_status === "queued") ? 2000 : false),
+  });
+
+export const useClips = () =>
+  useQuery({ queryKey: ["clips"], queryFn: () => api<ClipDef[]>("/animation-clips"), staleTime: Infinity });
+
+export function useSceneAction<TBody, TOut = unknown>(sid: string, run: (body: TBody) => Promise<TOut>) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      for (const key of [["scene", sid], ["scene-version", sid], ["scenes"]]) qc.invalidateQueries({ queryKey: key });
     },
   });
 }

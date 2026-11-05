@@ -102,3 +102,30 @@ aside { background: var(--panel); border: 1px solid var(--line); border-radius: 
 .wardrobe small { color: var(--muted); }
 .chip-verified, .chip-approved { background: var(--published-bg); color: var(--published); }
 .chip-candidate { background: var(--review-bg); color: var(--review); } .chip-revoked { background: var(--deprecated-bg); color: var(--deprecated); }
+
+/* ---- Phase 5: accessories and scenes */
+.chip-build-built, .chip-reopen-verified { background: var(--published-bg); color: var(--published); }
+.chip-build-failed, .chip-reopen-failed { background: #fde4e1; color: var(--danger); }
+.chip-build-queued, .chip-reopen-queued { background: var(--review-bg); color: var(--review); }
+.chip-build-none, .chip-reopen-none { background: var(--draft-bg); color: var(--draft); }
+.thumb.wide { aspect-ratio: 16 / 9; }
+.scene-editor { display: flex; flex-direction: column; gap: 12px; max-width: 980px; }
+.scene-editor .grid2, .instance .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.row { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; margin: 4px 0; }
+.row input[type="number"] { width: 6em; }
+.row .grow { flex: 1 1 240px; }
+.instance { border: 1px solid var(--line, #ddd); border-radius: 8px; padding: 12px; }
+.instance legend { display: flex; gap: 8px; align-items: center; }
+.instance h4 { margin: 12px 0 4px; }
+label.inline { display: inline-flex; gap: 6px; align-items: center; font-weight: normal; }
+.checks { display: flex; flex-wrap: wrap; gap: 12px; list-style: none; padding: 0; }
+.checks-report .checks { flex-direction: column; gap: 2px; }
+.checks li.bad { color: var(--danger); }
+.pins { width: 100%; border-collapse: collapse; font-size: 14px; margin: 8px 0; }
+.pins th, .pins td { text-align: left; padding: 4px 6px; border-bottom: 1px solid var(--line, #eee); vertical-align: top; }
+.frames { display: flex; flex-direction: column; gap: 12px; margin: 12px 0; }
+.frames img { max-width: 100%; border-radius: 6px; }
+.note.ok { background: var(--published-bg); color: var(--published); padding: 8px 12px; border-radius: 6px; }
+li.warning { color: var(--review); }
+.hint { font-size: 13px; color: var(--muted, #666); }
+@media (max-width: 640px) { .row input[type="number"] { width: 4.5em; } }

@@ -2,12 +2,18 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, Route, Routes, useNavigate } from "react-router-dom";
 import { useMe } from "./api/hooks";
 import { currentUser, userManager } from "./auth";
+import { AccessoryGalleryPage } from "./pages/AccessoryGalleryPage";
+import { AccessoryPage } from "./pages/AccessoryPage";
 import { CharacterPage } from "./pages/CharacterPage";
 import { GalleryPage } from "./pages/GalleryPage";
 import { NewCharacterPage } from "./pages/NewCharacterPage";
 import { NewOutfitPage } from "./pages/NewOutfitPage";
 import { OutfitGalleryPage } from "./pages/OutfitGalleryPage";
+import { NewAccessoryPage } from "./pages/NewAccessoryPage";
 import { OutfitPage } from "./pages/OutfitPage";
+import { SceneEditorPage } from "./pages/SceneEditorPage";
+import { SceneListPage } from "./pages/SceneListPage";
+import { ScenePage } from "./pages/ScenePage";
 
 let redirecting = false;
 let callback: ReturnType<typeof userManager.signinRedirectCallback> | undefined; // the code is single-use
@@ -29,6 +35,8 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Link to="/characters" className="brand">Studio</Link>
         <Link to="/characters">Characters</Link>
         <Link to="/outfits">Outfits</Link>
+        <Link to="/accessories">Accessories</Link>
+        <Link to="/scenes">Scenes</Link>
         <span className="spacer" />
         {me.data && <span className="who">{me.data.name} · {me.data.roles.join(", ")}</span>}
         <button onClick={() => userManager.signoutRedirect()}>Sign out</button>
@@ -61,6 +69,13 @@ export function App() {
       <Route path="/outfits" element={<Shell><OutfitGalleryPage /></Shell>} />
       <Route path="/outfits/new" element={<Shell><NewOutfitPage /></Shell>} />
       <Route path="/outfits/:id" element={<Shell><OutfitPage /></Shell>} />
+      <Route path="/accessories" element={<Shell><AccessoryGalleryPage /></Shell>} />
+      <Route path="/accessories/new" element={<Shell><NewAccessoryPage /></Shell>} />
+      <Route path="/accessories/:id" element={<Shell><AccessoryPage /></Shell>} />
+      <Route path="/scenes" element={<Shell><SceneListPage /></Shell>} />
+      <Route path="/scenes/new" element={<Shell><SceneEditorPage /></Shell>} />
+      <Route path="/scenes/:id" element={<Shell><ScenePage /></Shell>} />
+      <Route path="/scenes/:id/edit" element={<Shell><SceneEditorPage /></Shell>} />
     </Routes>
   );
 }
