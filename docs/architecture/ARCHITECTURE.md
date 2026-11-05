@@ -1167,6 +1167,20 @@ previews, Cycles for finals, settings from the style profile version) → `assem
 versions, the asset closure hash, Blender version, engine version, render settings, times,
 status, errors and output keys.
 
+**As built in Phase 8.** A render job (`RENDER-NNN`) takes a *locked* episode version only.
+Each shot is already a built scene version (`assemble_scene`, checked by `verify_scene`), so
+there is no assemble step inside the render: the API submits one `render_scene` job per shot
+on the `render` queue (its own worker, one job at a time). Each job stages `scene.blend` and
+every pinned library file, checks their hashes, renders the shot's frames as PNG with the
+settings in force and writes a render report. When the last shot is in, its outcome submits
+`export_episode` on the `media` queue: FFmpeg joins the PNG sequences (cuts, fades from
+black, dissolves), mixes the dialogue clips at their line times with music and effects, and
+encodes H.264 and AAC into one MP4 with a metadata file. Status (`queued`, `rendering`,
+`exporting`, `completed`, `failed`, `cancelled`) and progress are derived from the jobs.
+Cancel and retry act on the shot jobs. The render job row keeps the settings and the pinned
+asset versions, and the database refuses to change them. Cycles on the CPU is used for both
+previews and finals, because Eevee needs a GPU or EGL (section 19).
+
 ---
 
 ## 12. API endpoint specification
@@ -1486,4 +1500,8 @@ Per SRS 32.20 these need approval because they differ from the text, even if sli
 | 23 uploads (`POST /uploads` then `/complete`) | One `POST /uploads?kind=&name=` with the raw body, stored write-once and hashed; jobs re-check the hash | The files are small (BVH ≤ 20 MB, audio ≤ 25 MB); a separate completion step added nothing. Presigned multipart can come with video. |
 | 12 environment "navigation and interaction points" | Named marks (`spawn`, `seat`, `interaction`) plus floor footprints of solid dressing; walkability is "free floor inside the set", checked on the plan by the validator and measured again in Blender. No navigation mesh | Enough for placing characters and checking their paths in Phase 7; a navmesh can be derived from the same footprints when shots need path finding. |
 | 16.4 / 30 Phase 7 "kits, generators" for sets and props | A fixed catalog of procedural props (14 items) and environment templates (5) with parameters, finishes and colours; no AI prop builder yet | Deterministic and testable first; the AI Asset Builder loop for new props is later work and will produce catalog entries the same pipeline builds. |
+| 18 "Eevee for previews, Cycles for final" | Cycles on the CPU for both, with OpenImageDenoise; the engine stays a series setting, and asking for Eevee on a worker without a GPU or EGL fails the job instead of silently switching | The CPU workers have no GPU or EGL, so Eevee cannot render there. A GPU render worker can take the `render` queue later without code changes. |
+| 17 text-to-speech | A provider interface with one provider, espeak-ng 1.51 (synthetic, deterministic voices; each member's voice, variant, pitch and rate kept with every clip) | Runs offline in the media worker with no account. A neural TTS provider can be added behind the same interface; clips name their provider and version. |
+| 14, 15 AI script and shot generation | `generate_script` and `suggest_shots` AI jobs with closed schemas, validation, one repair turn and the AI log; their output loads into the editor and is saved only by a person. Tested with fake providers only | No AI provider key is configured in this environment, so they were not run against a live model. The acceptance run uses a hand-written script and the rule-based storyboard. |
+| 16 episode editing | An episode version compiles every storyboard shot into its own scene version (one shot per scene) | A shot is the unit Blender builds, checks and renders, so each can be rebuilt and re-rendered on its own. |
 | 18 "Do not execute unrelated concurrent production jobs in one shared Blender process" | Satisfied; additionally, related jobs also get their own process | Simpler and safer. |

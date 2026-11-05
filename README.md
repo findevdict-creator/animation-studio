@@ -6,7 +6,7 @@ then assembled into scenes and episodes.
 
 The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md);
 the phase demonstrations are in [docs/demos/](docs/demos/) ([Phase 1](docs/demos/phase-1.md),
-[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md), [Phase 6](docs/demos/phase-6.md), [Phase 7](docs/demos/phase-7.md)).
+[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md), [Phase 6](docs/demos/phase-6.md), [Phase 7](docs/demos/phase-7.md), [Phase 8](docs/demos/phase-8.md)).
 
 ## Branches
 
@@ -51,6 +51,12 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-34-scene-environments` | Scenes in a set: environment and prop pins, characters at marks, props on tops, lighting override, camera marks, preview video, reopen checks for the set |
 | `v2-35-environment-web` | Web prop and environment libraries with a live layout check and plan, set controls in the scene editor |
 | `v2-36-phase7-acceptance` | Phase 7 acceptance script and demonstration record |
+| `v2-37-episode-spec` | Episode contracts: series settings and render settings, voice profiles, the script format (SRS 14.1), storyboards and shots, the rule-based storyboard planner, episode manifests, shot-to-scene compilation, render and export job parameters |
+| `v2-38-render-engine` | Camera moves (push-in, pull-out, pans) and the `render_scene` Blender job: staged pins checked by hash, settings applied, PNG frames and a render report |
+| `v2-39-episode-library` | Series, episodes, scripts, storyboards, episode versions and render jobs: tables and guards (migration 0012), the `/series`, `/episodes`, `/storyboards`, `/episode-versions` and `/render-jobs` APIs, voices per line, build, reopen and lock, render jobs with cancel, retry, logs and outputs, the `generate_script` and `suggest_shots` AI tasks |
+| `v2-40-episode-media` | The media worker speaks lines with espeak-ng, normalises music and effects, and exports a render job to an H.264 and AAC MP4 with FFmpeg; the `render` worker in compose |
+| `v2-41-episode-web` | Web series pages and the episode editor: script editor, storyboard strip and shot cards, voices, episode versions, render panel with the video |
+| `v2-42-phase8-acceptance` | Phase 8 acceptance script and demonstration record |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the

@@ -908,3 +908,27 @@ def render_video(ref: str, redirect: bool = True, session: Session = Depends(get
     if redirect:
         return RedirectResponse(url, status_code=302)
     return DownloadOut(url=url, expires_in_s=store.presign_expiry_s)
+
+
+@renders_router.get("/{ref}/outputs/{output_id}", summary="One render output, or one frame of a shot's frames",
+                    responses={302: {"description": "redirect"}, 200: {"model": DownloadOut}})
+def render_output(ref: str, output_id: uuid.UUID, frame: int | None = Query(default=None, ge=1,
+                  description="for a frames output: which frame, counted from 1 in the shot"),
+                  redirect: bool = True, session: Session = Depends(get_session),
+                  _: Principal = Depends(require("job.read"))):
+    rj = rsvc.get(session, ref)
+    out = next((o for o in rj.outputs if o.id == output_id), None)
+    if out is None:
+        raise ApiError(404, "not_found", f"{rj.code} has no output {output_id}")
+    if out.kind == "frames":
+        frames = (out.meta or {}).get("frames", [])
+        if frame is None or frame > len(frames):
+            raise ApiError(422, "frame_required", f"{out.shot_id} has frames 1 to {len(frames)}; ask for one")
+        key, name = frames[frame - 1]["storage_key"], f"{rj.code}-{out.shot_id}-{frame:04d}.png"
+    else:
+        key, name = out.storage_key, out.storage_key.rsplit("/", 1)[-1]
+    store = Storage.for_bucket("work")
+    url = store.presign_get(key, filename=name)
+    if redirect:
+        return RedirectResponse(url, status_code=302)
+    return DownloadOut(url=url, expires_in_s=store.presign_expiry_s)

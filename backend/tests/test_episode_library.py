@@ -303,10 +303,12 @@ def test_lock_build_render_and_the_guards(api_as, db, episode, dispatcher):
     with db() as s:
         wanted = {w[3] for w in STAGERS["render_scene"](s, s.get(Job, uuid.UUID(jobs[0]["id"])).params)}
     assert "scene/scene.blend" in wanted and f"assets/environment/{episode['env']}/1.0/environment.blend" in wanted
+    draft = director.post(f"{base}/versions", json={"storyboard_id": sb["id"]}).json()
+    assert draft["status"] == "draft"
     with db() as s, pytest.raises(Exception, match="only a locked version"):
         s.execute(text("INSERT INTO render_jobs (id, code, episode_id, episode_version_id, status, settings, "
                        "asset_versions, cancel_requested) SELECT gen_random_uuid(), 'RENDER-X', episode_id, id, "
-                       "'queued', '{}', '[]', false FROM episode_versions WHERE status = 'draft' LIMIT 1"))
+                       "'queued', '{}', '[]', false FROM episode_versions WHERE id = :i"), {"i": uuid.UUID(draft["id"])})
 
     # shot outcomes; the last one queues the export
     for i, j in enumerate(jobs):
@@ -343,6 +345,13 @@ def test_lock_build_render_and_the_guards(api_as, db, episode, dispatcher):
     assert done["status"] == "completed" and done["video_url"] and done["finished_at"]
     assert director.get(f"/api/v1/render-jobs/{rj['code']}/video", follow_redirects=False).status_code == 302
     assert len(director.get(f"/api/v1/render-jobs/{rj['code']}/logs").json()) == 4
+    shot_frames = next(o for o in done["outputs"] if o["kind"] == "frames" and o["shot_id"] == "SH-002")
+    one = f"/api/v1/render-jobs/{rj['code']}/outputs/{shot_frames['id']}"
+    assert director.get(one).json()["code"] == "frame_required"
+    assert director.get(f"{one}?frame=4").json()["code"] == "frame_required"
+    url = director.get(f"{one}?frame=2&redirect=false").json()["url"]
+    assert "frame_0002.png" in url and f"{rj['code']}-SH-002-0002.png" in url
+    assert director.get(f"/api/v1/render-jobs/{rj['code']}/outputs/{uuid.uuid4()}").status_code == 404
     assert director.post(f"/api/v1/render-jobs/{rj['code']}/cancel").json()["code"] == "render_not_cancellable"
     with db() as s, pytest.raises(Exception, match="kept as a record"):
         s.execute(text("DELETE FROM render_jobs WHERE code = :c"), {"c": rj["code"]})
