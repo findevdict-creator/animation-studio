@@ -13,6 +13,7 @@ from app.api.v1 import (
     outfit_spec,
     outfits,
     scenes,
+    sets,
     uploads,
 )
 
@@ -30,6 +31,9 @@ api_router.include_router(accessories.catalog_router)
 api_router.include_router(accessories.router)
 api_router.include_router(animations.catalog_router)
 api_router.include_router(animations.router)
+api_router.include_router(sets.catalog_router)
+api_router.include_router(sets.props_router)
+api_router.include_router(sets.environments_router)
 api_router.include_router(uploads.router)
 api_router.include_router(audio.router)
 api_router.include_router(scenes.catalog_router)

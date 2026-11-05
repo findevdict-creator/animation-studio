@@ -144,6 +144,32 @@ def _generate_animation(session: Session, job_id: uuid.UUID, uploaded: list[Uplo
             **recorded}
 
 
+def _generate_set(name: str):
+    def outcome(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                blender_version: str | None) -> dict[str, Any]:
+        """The build goes onto its draft; without a draft the job creates the prop or environment."""
+        from app.assets.sets import SERVICES
+        from app.models.jobs import Job
+
+        svc = SERVICES[name]
+        job = session.get(Job, job_id)
+        draft_id = job.params.get("draft_version_id") if job else None
+        if draft_id:
+            version = session.get(svc.kind.model, uuid.UUID(draft_id), with_for_update=True, populate_existing=True)
+            if version is None:
+                return {"attached": False, "reason": "the draft was discarded"}
+        else:
+            spec = job.params["spec"]
+            _, version = svc.create(session, name=spec["name"], description=spec.get("description", ""), tags=[],
+                                    spec=spec, created_by=job.requested_by)
+            svc.begin_generate(version, job_id)
+        recorded = svc.attach_build(session, version, job_id, uploaded, data, blender_version)
+        return {svc.kind.owner_field: str(version.owner_id), "asset_version_id": str(version.id),
+                "display_code": version.entry.display_code,
+                "check_ok": bool((data.get("check") or {}).get("ok")), **recorded}
+    return outcome
+
+
 def _assemble_scene(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
                     blender_version: str | None) -> dict[str, Any]:
     """scene.blend, its report and preview frames onto the scene version (once)."""
@@ -168,4 +194,6 @@ def _verify_scene(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded],
 OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character,
                                 "generate_outfit": _generate_outfit, "fit_outfit": _fit_outfit,
                                 "generate_accessory": _generate_accessory, "assemble_scene": _assemble_scene,
-                                "verify_scene": _verify_scene, "generate_animation": _generate_animation}
+                                "verify_scene": _verify_scene, "generate_animation": _generate_animation,
+                                "generate_prop": _generate_set("prop"),
+                                "generate_environment": _generate_set("environment")}

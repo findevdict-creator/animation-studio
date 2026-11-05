@@ -1,5 +1,6 @@
 """The publisher (queue ``publish``, architecture 6.3): an approved asset version in review
-becomes an immutable library version. Characters, outfits and accessories go through the same steps;
+becomes an immutable library version. Characters, outfits, accessories, animations, props and
+environments go through the same steps;
 what differs per kind (which file Blender re-checks, the manifest, the service module) is
 in ``KINDS``.
 
@@ -34,6 +35,7 @@ from app.assets import accessories as accessory_svc
 from app.assets import animations as animation_svc
 from app.assets import characters as svc
 from app.assets import outfits as outfit_svc
+from app.assets import sets as set_svc
 from app.config import Settings
 from app.core.errors import ApiError
 from app.core.storage import ChecksumMismatch, ObjectExists, Storage, sha256_file
@@ -43,6 +45,7 @@ from app.models.animations import AnimationVersion
 from app.models.audit import AuditLog
 from app.models.characters import CharacterVersion
 from app.models.outfits import OutfitVersion
+from app.models.sets import EnvironmentVersion, PropVersion
 from studio_contracts.jobs import (
     JOB_QUEUES,
     InputFile,
@@ -52,7 +55,9 @@ from studio_contracts.jobs import (
     PublishAccessoryParams,
     PublishAnimationParams,
     PublishCharacterParams,
+    PublishEnvironmentParams,
     PublishOutfitParams,
+    PublishPropParams,
 )
 from studio_contracts.rig_profile import CARTOON_HUMANOID_V1
 
@@ -78,7 +83,7 @@ def _canonical(doc: dict[str, Any]) -> bytes:
 
 @dataclass(frozen=True)
 class Kind:
-    name: str  # character | outfit | accessory | animation
+    name: str  # character | outfit | accessory | animation | prop | environment
     job_type: JobType
     params: type
     model: type
@@ -89,7 +94,7 @@ class Kind:
     @property
     def svc(self) -> ModuleType:  # looked up on every call, so tests can patch the module
         return {"character": svc, "outfit": outfit_svc, "accessory": accessory_svc,
-                "animation": animation_svc}[self.name]
+                "animation": animation_svc, "prop": set_svc.props, "environment": set_svc.environments}[self.name]
 
     @property
     def owner_field(self) -> str:
@@ -110,6 +115,11 @@ KINDS: dict[str, Kind] = {
     JobType.publish_animation.value: Kind("animation", JobType.publish_animation, PublishAnimationParams,
                                           AnimationVersion, "animation.blend", "animation_blend_sha256",
                                           "studio_animation_digest"),
+    JobType.publish_prop.value: Kind("prop", JobType.publish_prop, PublishPropParams, PropVersion, "prop.blend",
+                                     "prop_blend_sha256", "studio_prop_digest"),
+    JobType.publish_environment.value: Kind("environment", JobType.publish_environment, PublishEnvironmentParams,
+                                            EnvironmentVersion, "environment.blend", "environment_blend_sha256",
+                                            "studio_environment_digest"),
 }
 
 
@@ -226,7 +236,8 @@ class PublisherRunner(Supervisor):
 
         manifest_doc = {"character": self._manifest, "outfit": self._outfit_manifest,
                         "accessory": self._accessory_manifest,
-                        "animation": self._animation_manifest}[kind.name](snap, major, minor, files, report)
+                        "animation": self._animation_manifest, "prop": self._set_manifest,
+                        "environment": self._set_manifest}[kind.name](snap, major, minor, files, report)
         manifest_path = workspace / "library" / "manifest.json"
         manifest_path.write_bytes(_canonical(manifest_doc))
         manifest = self._put(prefix + "manifest.json", manifest_path, "application/json", "manifest", None,
@@ -261,6 +272,8 @@ class PublisherRunner(Supervisor):
             return self._accessory_snapshot(version_id)
         if kind.name == "animation":
             return self._animation_snapshot(version_id)
+        if kind.name in ("prop", "environment"):
+            return self._set_snapshot(kind, version_id)
         with self.sessions() as s:
             v = s.get(CharacterVersion, version_id)
             if v is None:
@@ -298,7 +311,7 @@ class PublisherRunner(Supervisor):
         if blend is None:
             raise PublishRefused(f"the version has no {kind.blend}")
         params = {"version_id": snap["version_id"]}
-        if kind.name in ("outfit", "accessory", "animation"):
+        if kind.name in ("outfit", "accessory", "animation", "prop", "environment"):
             params["spec"] = snap["spec"]
         if kind.name == "animation":
             params["compat"] = snap["compat"]
@@ -532,6 +545,71 @@ class PublisherRunner(Supervisor):
             "compatibility": {"rig_profile": snap["rig_profile_ref"], "attach_point": snap["attach_point"],
                               "attach_points": snap["attach_points"], "fit_profiles": snap["fit_profiles"],
                               "conflicts_with_slots": snap["conflicts_with_slots"]},
+            "spec_digest": snap["spec_digest"],
+            "blender_version": snap["blender_version"], "engine_version": draft.get("engine_version"),
+            "validation": {"build": {"ok": draft.get("ok"), "checks": len(draft.get("checks", []))},
+                           "publish": {"ok": report["ok"], "checks": len(report.get("checks", [])),
+                                       "blender_version": report.get("blender_version")}},
+            "approved_by": snap["reviewed_by"], "approved_at": snap["reviewed_at"],
+        }
+
+    # -------------------------------------------------------------- props and environments
+    def _set_snapshot(self, kind: Kind, version_id: uuid.UUID) -> dict[str, Any]:
+        ksvc = kind.svc
+        with self.sessions() as s:
+            v = s.get(kind.model, version_id)
+            if v is None:
+                raise PublishRefused(f"{kind.name} version {version_id} does not exist")
+            if v.status in ("published", "deprecated"):
+                return {"already": {"asset_version_id": str(v.id), kind.owner_field: str(v.owner_id),
+                                    "version": v.version_label, "manifest_key": v.manifest_key,
+                                    "manifest_sha256": v.manifest_sha256, "already_published": True}}
+            try:
+                ksvc.check_publishable(v)
+            except ApiError as exc:
+                raise PublishRefused(exc.detail) from exc
+            problems = ksvc.readiness(v)
+            if problems:
+                raise PublishRefused("; ".join(problems))
+            based_on = s.get(kind.model, v.based_on_version_id) if v.based_on_version_id else None
+            if kind.name == "prop":
+                compat = {"item": v.item_ref, "category": v.owner.category, "size": list(v.size), "solid": v.solid,
+                          "rests_on": v.rests_on, "top_z": v.top_z, "seat_z": v.seat_z}
+                deps = [{"kind": "prop_catalog", "ref": v.catalog_ref}]
+            else:
+                compat = {"template": v.template_ref, "kind": v.owner.kind, "size": list(v.size),
+                          "lighting": v.lighting, "layout": v.layout}
+                deps = [{"kind": "environment_catalog", "ref": v.catalog_ref}]
+            return {
+                "kind": kind.name, "version_id": str(v.id), kind.owner_field: str(v.owner_id),
+                "owner_field": kind.owner_field, "code": v.entry.display_code, "name": v.spec.get("name"),
+                "spec": v.spec, "spec_digest": v.spec_digest, "built_digest": v.built_digest,
+                "style_profile_ref": v.style_profile_ref, "compat": compat,
+                "dependencies": [{"kind": "style_profile", "ref": v.style_profile_ref}, *deps],
+                "blender_version": v.blender_version, "draft_report": v.check_report,
+                "reviewed_by": str(v.reviewed_by) if v.reviewed_by else None,
+                "reviewed_at": v.reviewed_at.isoformat() if v.reviewed_at else None, "review_notes": v.review_notes,
+                "based_on": ({"version_id": str(based_on.id), "version": based_on.version_label}
+                             if based_on else None),
+                "files": [{"name": f.storage_key.rsplit("/", 1)[-1], "role": f.role, "storage_key": f.storage_key,
+                           "sha256": f.sha256, "size_bytes": f.size_bytes, "mime_type": f.mime_type}
+                          for f in sorted(v.entry.files, key=lambda f: f.storage_key)],
+            }
+
+    @staticmethod
+    def _set_manifest(snap: dict[str, Any], major: int, minor: int, files: list[dict[str, Any]],
+                      report: dict[str, Any]) -> dict[str, Any]:
+        """AssetVersionManifest for a prop or an environment, with what a scene places by."""
+        draft = snap["draft_report"] or {}
+        return {
+            "manifest_version": "asset_manifest/1",
+            "kind": snap["kind"], "code": snap["code"], snap["owner_field"]: snap[snap["owner_field"]],
+            "version": f"{major}.{minor}", "version_id": snap["version_id"], "name": snap["name"],
+            "based_on": snap["based_on"],
+            "files": [{"role": f["role"], "key": f["storage_key"].rsplit("/", 1)[-1], "sha256": f["sha256"],
+                       "size": f["size_bytes"], "mime": f["mime_type"]}
+                      for f in sorted(files, key=lambda f: f["storage_key"])],
+            "dependencies": snap["dependencies"], "compatibility": snap["compat"],
             "spec_digest": snap["spec_digest"],
             "blender_version": snap["blender_version"], "engine_version": draft.get("engine_version"),
             "validation": {"build": {"ok": draft.get("ok"), "checks": len(draft.get("checks", []))},

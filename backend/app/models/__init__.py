@@ -12,6 +12,7 @@ from app.models import (  # noqa: F401
     jobs,
     outfits,
     scenes,
+    sets,
     uploads,
 )
 from app.models.base import Base
