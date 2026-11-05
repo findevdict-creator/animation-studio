@@ -273,7 +273,14 @@ class StoryboardSpecification(Model):
     shots: list[Shot] = Field(min_length=1, max_length=200)
 
     def duration_s(self) -> float:
-        return round(sum(s.duration_s for s in self.shots), 3)
+        """The running time: a dissolve overlaps the shot before it by its length."""
+        t = 0.0
+        for i, s in enumerate(self.shots):
+            start = t
+            if i > 0 and s.transition_in.kind == "dissolve":
+                start = t - min(s.transition_in.duration_s, self.shots[i - 1].duration_s, s.duration_s)
+            t = start + s.duration_s
+        return round(t, 3)
 
 
 def line_span(line: ShotLine, audio_s: dict[str, float] | None = None) -> float:

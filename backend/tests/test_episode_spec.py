@@ -88,6 +88,13 @@ def test_the_rule_based_plan_gives_an_establishing_shot_and_a_shot_per_line():
     assert est2.transition_in.kind == "fade" and est.transition_in.kind == "cut"
     assert l1.duration_s == pytest.approx(line_seconds("Where is my homework?") + 0.8)
     assert validate_storyboard(sb, s) == []
+    assert sb.duration_s() == pytest.approx(sum(x.duration_s for x in sb.shots), abs=1e-3)  # a fade does not overlap
+    # a dissolve overlaps the shot before by its length, never by more than either shot
+    d = sb.model_copy(deep=True)
+    d.shots[1].transition_in = d.shots[1].transition_in.model_copy(update={"kind": "dissolve", "duration_s": 0.5})
+    d.shots[2].transition_in = d.shots[2].transition_in.model_copy(update={"kind": "dissolve", "duration_s": 30.0})
+    cap = min(d.shots[1].duration_s, d.shots[2].duration_s)
+    assert d.duration_s() == pytest.approx(sum(x.duration_s for x in d.shots) - 0.5 - cap, abs=1e-3)
 
 
 def test_storyboard_problems_are_reported_together():

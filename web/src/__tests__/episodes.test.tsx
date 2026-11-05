@@ -23,6 +23,9 @@ describe("storyboard timeline", () => {
     expect(timeline(shots)).toEqual([{ start: 0, end: 2 }, { start: 2, end: 5 }, { start: 4.5, end: 6.5 }]);
     expect(totalSeconds(shots)).toBe(6.5);
     expect(totalSeconds([])).toBe(0);
+    // never by more than the shot before (as the episode version compiles it)
+    expect(timeline([shot(1, { duration_s: 1 }), shot(2, { transition_in: { kind: "dissolve", duration_s: 1.5 } })])[1])
+      .toEqual({ start: 0, end: 2 });
   });
 
   it("draws each shot at its length and selects one", () => {

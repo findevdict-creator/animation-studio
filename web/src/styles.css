@@ -174,7 +174,7 @@ li.warning { color: var(--review); }
   align-items: flex-start; overflow: hidden; font-size: 12px; text-align: left; white-space: nowrap; min-width: 0; }
 .sb-shot small { color: var(--muted); }
 .sb-wide { background: #e3eafc; } .sb-medium { background: #efe7ff; } .sb-close { background: #fff4c2; }
-.sb-selected { outline: 2px solid var(--accent); z-index: 1; }
+.sb-selected { outline: 2px solid var(--accent); outline-offset: -2px; }
 .sb-tr { position: absolute; right: 4px; bottom: 2px; font-size: 10px; color: var(--review); }
 .shot-card .row input[type="number"] { width: 5.5em; }
 .script { border: none; padding: 0; margin: 0; display: grid; gap: 12px; }

@@ -23,7 +23,7 @@ export function timeline(shots: Pick<Shot, "duration_s" | "transition_in">[]): {
   let t = 0;
   return shots.map((s, i) => {
     let start = t;
-    if (i > 0 && s.transition_in.kind === "dissolve") start = Math.max(0, t - Math.min(s.transition_in.duration_s, s.duration_s));
+    if (i > 0 && s.transition_in.kind === "dissolve") start = t - Math.min(s.transition_in.duration_s, shots[i - 1].duration_s, s.duration_s);
     t = start + s.duration_s;
     return { start, end: t };
   });
@@ -47,7 +47,7 @@ export function StoryboardStrip({ shots, names, selected, onSelect }: { shots: S
       {shots.map((s, i) => (
         <button key={s.shot_id} role="listitem" type="button" onClick={() => onSelect?.(i)}
           className={`sb-shot sb-${s.camera.type}${selected === i ? " sb-selected" : ""}`}
-          style={{ left: `${(t[i].start / total) * 100}%`, width: `${(s.duration_s / total) * 100}%` }}
+          style={{ left: `${(t[i].start / total) * 100}%`, width: `${(s.duration_s / total) * 100}%`, zIndex: i + 1 }}
           title={`${s.shot_id} · ${s.duration_s.toFixed(1)} s · ${s.camera.type}${s.camera.movement !== "static" ? ` ${s.camera.movement}` : ""}`}>
           <strong>{s.shot_id}</strong>
           <small>{s.camera.type}{s.dialogue[0] ? ` · ${who(names, s.dialogue[0].character_id)}` : ""}</small>
