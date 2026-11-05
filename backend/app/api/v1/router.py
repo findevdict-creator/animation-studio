@@ -2,6 +2,7 @@ from fastapi import APIRouter
 
 from app.api.v1 import (
     accessories,
+    animations,
     assets,
     characters,
     health,
@@ -11,6 +12,7 @@ from app.api.v1 import (
     outfit_spec,
     outfits,
     scenes,
+    uploads,
 )
 
 api_router = APIRouter()
@@ -25,5 +27,8 @@ api_router.include_router(outfits.router)
 api_router.include_router(outfits.wardrobe_router)
 api_router.include_router(accessories.catalog_router)
 api_router.include_router(accessories.router)
+api_router.include_router(animations.catalog_router)
+api_router.include_router(animations.router)
+api_router.include_router(uploads.router)
 api_router.include_router(scenes.catalog_router)
 api_router.include_router(scenes.router)

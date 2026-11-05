@@ -95,6 +95,7 @@ def test_cmu_walk_is_retargeted(tmp_path):
     AC.save_action(action, tmp_path / "a.blend")
     play = AC.play_and_measure(tmp_path / "a.blend", ra, compat, "child_average")
     assert play["max_slide_cm"] <= AC.MAX_SLIDE_CM["bvh"] and play["leg_stretch"] <= 1.001
+    assert play["lowest_foot_below_rest_m"] <= AC.MAX_SINK_M  # grounded: no foot point in the floor
     assert play["control_motion_deg"]["thigh_fk.L"] > 20  # the legs really walk
 
 

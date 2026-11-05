@@ -32,17 +32,20 @@ from pydantic import ValidationError
 from sqlalchemy import select, text
 from sqlalchemy.orm import Session
 from studio_contracts.accessory import get_accessory_def
+from studio_contracts.animation import AnimationCompat, compatibility_issues
 from studio_contracts.character import Issue
 from studio_contracts.ids import uuid7
 from studio_contracts.rig_profile import BUILTIN_RIG_PROFILES
 from studio_contracts.scene import (
     Pin,
     ResolvedAccessoryUse,
+    ResolvedClipUse,
     ResolvedDialogueLine,
     ResolvedInstance,
     ResolvedPin,
     ResolvedScene,
     SceneManifest,
+    is_library_clip,
     pin_path,
     resolve_clip,
     validate_manifest,
@@ -50,15 +53,23 @@ from studio_contracts.scene import (
 
 from app.core.errors import ApiError
 from app.models.accessories import AccessoryVersion
+from app.models.animations import AnimationVersion
 from app.models.assets import AssetVersion
 from app.models.characters import CharacterVersion
 from app.models.outfits import OutfitCompatibility, OutfitVersion
-from app.models.scenes import Scene, SceneInstance, SceneInstanceAccessory, SceneVersion
+from app.models.scenes import (
+    Scene,
+    SceneInstance,
+    SceneInstanceAccessory,
+    SceneInstanceAnimation,
+    SceneVersion,
+)
 
 USABLE = ("published", "deprecated")
 PIN_FILES = {"character": ("character.blend", "character.json"), "outfit": ("outfit.blend",),
-             "accessory": ("accessory.blend",)}
-MODELS = {"character": CharacterVersion, "outfit": OutfitVersion, "accessory": AccessoryVersion}
+             "accessory": ("accessory.blend",), "animation": ("animation.blend",)}
+MODELS = {"character": CharacterVersion, "outfit": OutfitVersion, "accessory": AccessoryVersion,
+          "animation": AnimationVersion}
 
 
 def now() -> datetime:
@@ -80,8 +91,9 @@ class Resolution:
     manifest: SceneManifest
     issues: list[Issue] = field(default_factory=list)
     resolved: ResolvedScene | None = None
-    #: per instance: (character version, outfit version, compatibility row, [(accessory version, point)])
-    rows: list[tuple[Any, Any, Any, list[tuple[Any, str]]]] = field(default_factory=list)
+    #: per instance: (character version, outfit version, compatibility row, [(accessory version, point)],
+    #: [(animation version, position in the instance's animations, start frame)])
+    rows: list[tuple[Any, Any, Any, list[tuple[Any, str]], list[tuple[Any, int, int]]]] = field(default_factory=list)
     overrides: list[dict[str, Any]] = field(default_factory=list)
 
     @property
@@ -238,22 +250,63 @@ def resolve(session: Session, manifest: SceneManifest, *, base: SceneVersion | N
             accs.append(ResolvedAccessoryUse(pin=apin, attach_point=point, attach_bone=rig.attachment_points[point],
                                              item=d.ref, placement=d.placement))
             acc_rows.append((av, point))
-        try:
-            clips = tuple(resolve_clip(a) for a in inst.animations)
-        except KeyError:
-            continue  # reported by validate_manifest
+        clips_l, anim_rows = _resolve_animations(session, inst, cv, rig, p, issues, previous, manifest)
+        clips = tuple(clips_l)
         instances.append(ResolvedInstance(
             key=inst.key, character=cpin, rig_profile=rig.ref, fit_profile=cv.fit_profile,
             outfit=opin, outfit_compatibility=compat_doc, accessories=tuple(accs), transform=inst.transform,
             expressions=tuple(inst.expressions), blink=inst.blink, animations=clips,
             dialogue=tuple(ResolvedDialogueLine(start_frame=d.start_frame, end_frame=d.end_frame, text=d.text)
                            for d in inst.dialogue), state=inst.state))
-        res.rows.append((cv, ov, compat, acc_rows))
+        res.rows.append((cv, ov, compat, acc_rows, anim_rows))
     if not res.errors:
         res.resolved = ResolvedScene(manifest_digest=manifest.digest(), name=manifest.name, fps=manifest.fps,
                                      frame_start=manifest.frame_start, frame_end=manifest.frame_end,
                                      camera=manifest.camera, instances=tuple(instances))
     return res
+
+
+def _resolve_animations(session: Session, inst, cv, rig, p: str, issues: list[Issue], previous: set[uuid.UUID],
+                        manifest: SceneManifest) -> tuple[list[ResolvedClipUse], list[tuple[Any, int, int]]]:
+    """Library animations are pinned like any asset and checked against this character's rig
+    profile and fit profile with the compatibility record their build measured; stand-in
+    catalog clips resolve from the catalog."""
+    clips: list[ResolvedClipUse] = []
+    rows: list[tuple[Any, int, int]] = []
+    for j, a in enumerate(inst.animations):
+        ap = f"{p}.animations[{j}]"
+        if not is_library_clip(a.clip):
+            try:
+                clips.append(resolve_clip(a))
+            except KeyError:
+                pass  # reported by validate_manifest
+            continue
+        code, ver = a.clip.split("@")
+        av, apin = _pin(session, "animation", Pin(code=code, version=ver), f"{ap}.clip", issues, previous,
+                        lambda v: v.animation.name)
+        if apin is None:
+            continue
+        if av.compat is None:
+            issues.append(Issue(path=f"{ap}.clip", code="no_compatibility", message=f"{a.clip} has no compatibility record"))
+            continue
+        compat = AnimationCompat.model_validate(av.compat)
+        problems = compatibility_issues(compat, rig.ref, cv.fit_profile)
+        for pr in problems:
+            issues.append(Issue(path=f"{ap}.clip", code="incompatible",
+                                message=f"{a.clip} cannot play on {inst.character.ref}: {pr}"))
+        if problems:
+            continue
+        length = compat.frames * a.repeat / a.speed * manifest.fps / 24
+        if a.start_frame + length > manifest.frame_end + 1:
+            issues.append(Issue(path=ap, code="runs_past_end", severity="warning",
+                                message=f"{a.clip} plays to frame {a.start_frame + length:.0f}, after the scene ends "
+                                        f"at {manifest.frame_end}; it is cut there"))
+        clips.append(ResolvedClipUse(clip=a.clip, key=code.lower().replace("-", "_"), start_frame=a.start_frame,
+                                     repeat=a.repeat, speed=a.speed, influence=a.influence, frames=compat.frames,
+                                     loops=compat.loops, source="library", pin=apin,
+                                     compat=compat.model_dump(mode="json"), travel=a.travel and compat.travels))
+        rows.append((av, j, a.start_frame))
+    return clips, rows
 
 
 def _refuse(res: Resolution) -> None:
@@ -313,7 +366,7 @@ def _insert_version(session: Session, scene: Scene, res: Resolution, *, notes: s
                      verify_files=[])
     session.add(v)
     session.flush()
-    for pos, (inst, (cv, ov, compat, accs)) in enumerate(zip(res.resolved.instances, res.rows, strict=True)):
+    for pos, (inst, (cv, ov, compat, accs, anims)) in enumerate(zip(res.resolved.instances, res.rows, strict=True)):
         row = SceneInstance(id=uuid7(), scene_version_id=v.id, position=pos, key=inst.key, character_version_id=cv.id,
                             outfit_version_id=ov.id if ov else None,
                             outfit_compatibility_id=compat.id if compat else None,
@@ -324,6 +377,9 @@ def _insert_version(session: Session, scene: Scene, res: Resolution, *, notes: s
         for j, (av, point) in enumerate(accs):
             session.add(SceneInstanceAccessory(id=uuid7(), instance_id=row.id, position=j,
                                                accessory_version_id=av.id, attach_point=point))
+        for anv, j, start in anims:
+            session.add(SceneInstanceAnimation(id=uuid7(), instance_id=row.id, position=j,
+                                               animation_version_id=anv.id, start_frame=start))
     session.flush()
     session.refresh(scene)
     return v

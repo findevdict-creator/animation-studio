@@ -31,6 +31,7 @@ from typing import Any
 
 import studio_contracts
 from app.assets import accessories as accessory_svc
+from app.assets import animations as animation_svc
 from app.assets import characters as svc
 from app.assets import outfits as outfit_svc
 from app.config import Settings
@@ -38,6 +39,7 @@ from app.core.errors import ApiError
 from app.core.storage import ChecksumMismatch, ObjectExists, Storage, sha256_file
 from app.jobs import service
 from app.models.accessories import AccessoryVersion
+from app.models.animations import AnimationVersion
 from app.models.audit import AuditLog
 from app.models.characters import CharacterVersion
 from app.models.outfits import OutfitVersion
@@ -48,6 +50,7 @@ from studio_contracts.jobs import (
     JobStatus,
     JobType,
     PublishAccessoryParams,
+    PublishAnimationParams,
     PublishCharacterParams,
     PublishOutfitParams,
 )
@@ -75,7 +78,7 @@ def _canonical(doc: dict[str, Any]) -> bytes:
 
 @dataclass(frozen=True)
 class Kind:
-    name: str  # character | outfit | accessory
+    name: str  # character | outfit | accessory | animation
     job_type: JobType
     params: type
     model: type
@@ -85,7 +88,8 @@ class Kind:
 
     @property
     def svc(self) -> ModuleType:  # looked up on every call, so tests can patch the module
-        return {"character": svc, "outfit": outfit_svc, "accessory": accessory_svc}[self.name]
+        return {"character": svc, "outfit": outfit_svc, "accessory": accessory_svc,
+                "animation": animation_svc}[self.name]
 
     @property
     def owner_field(self) -> str:
@@ -103,6 +107,9 @@ KINDS: dict[str, Kind] = {
     JobType.publish_accessory.value: Kind("accessory", JobType.publish_accessory, PublishAccessoryParams,
                                           AccessoryVersion, "accessory.blend", "accessory_blend_sha256",
                                           "studio_accessory_digest"),
+    JobType.publish_animation.value: Kind("animation", JobType.publish_animation, PublishAnimationParams,
+                                          AnimationVersion, "animation.blend", "animation_blend_sha256",
+                                          "studio_animation_digest"),
 }
 
 
@@ -218,7 +225,8 @@ class PublisherRunner(Supervisor):
                                report["blender_version"], adopt=True))
 
         manifest_doc = {"character": self._manifest, "outfit": self._outfit_manifest,
-                        "accessory": self._accessory_manifest}[kind.name](snap, major, minor, files, report)
+                        "accessory": self._accessory_manifest,
+                        "animation": self._animation_manifest}[kind.name](snap, major, minor, files, report)
         manifest_path = workspace / "library" / "manifest.json"
         manifest_path.write_bytes(_canonical(manifest_doc))
         manifest = self._put(prefix + "manifest.json", manifest_path, "application/json", "manifest", None,
@@ -251,6 +259,8 @@ class PublisherRunner(Supervisor):
             return self._outfit_snapshot(version_id)
         if kind.name == "accessory":
             return self._accessory_snapshot(version_id)
+        if kind.name == "animation":
+            return self._animation_snapshot(version_id)
         with self.sessions() as s:
             v = s.get(CharacterVersion, version_id)
             if v is None:
@@ -288,8 +298,10 @@ class PublisherRunner(Supervisor):
         if blend is None:
             raise PublishRefused(f"the version has no {kind.blend}")
         params = {"version_id": snap["version_id"]}
-        if kind.name in ("outfit", "accessory"):
+        if kind.name in ("outfit", "accessory", "animation"):
             params["spec"] = snap["spec"]
+        if kind.name == "animation":
+            params["compat"] = snap["compat"]
         envelope = JobEnvelope(job_id=job_id, type=kind.job_type, attempt=attempt, params=params,
                                inputs=[InputFile(path=f"inputs/{kind.blend}", sha256=blend["sha256"])],
                                contracts_version=studio_contracts.__version__)
@@ -520,6 +532,70 @@ class PublisherRunner(Supervisor):
             "compatibility": {"rig_profile": snap["rig_profile_ref"], "attach_point": snap["attach_point"],
                               "attach_points": snap["attach_points"], "fit_profiles": snap["fit_profiles"],
                               "conflicts_with_slots": snap["conflicts_with_slots"]},
+            "spec_digest": snap["spec_digest"],
+            "blender_version": snap["blender_version"], "engine_version": draft.get("engine_version"),
+            "validation": {"build": {"ok": draft.get("ok"), "checks": len(draft.get("checks", []))},
+                           "publish": {"ok": report["ok"], "checks": len(report.get("checks", [])),
+                                       "blender_version": report.get("blender_version")}},
+            "approved_by": snap["reviewed_by"], "approved_at": snap["reviewed_at"],
+        }
+
+    # -------------------------------------------------------------- animations
+    def _animation_snapshot(self, version_id: uuid.UUID) -> dict[str, Any]:
+        with self.sessions() as s:
+            v = s.get(AnimationVersion, version_id)
+            if v is None:
+                raise PublishRefused(f"animation version {version_id} does not exist")
+            if v.status in ("published", "deprecated"):
+                return {"already": {"asset_version_id": str(v.id), "animation_id": str(v.animation_id),
+                                    "version": v.version_label, "manifest_key": v.manifest_key,
+                                    "manifest_sha256": v.manifest_sha256, "already_published": True}}
+            try:
+                animation_svc.check_publishable(v)
+            except ApiError as exc:
+                raise PublishRefused(exc.detail) from exc
+            problems = animation_svc.readiness(v)
+            if problems:
+                raise PublishRefused("; ".join(problems))
+            based_on = s.get(AnimationVersion, v.based_on_version_id) if v.based_on_version_id else None
+            return {
+                "version_id": str(v.id), "animation_id": str(v.animation_id), "code": v.entry.display_code,
+                "name": v.spec.get("name"), "spec": v.spec, "spec_digest": v.spec_digest,
+                "built_digest": v.built_digest, "category": v.animation.category, "source_kind": v.source_kind,
+                "generator_ref": v.generator_ref, "source_sha256": v.source_sha256, "licence": v.licence,
+                "style_profile_ref": v.style_profile_ref, "rig_profile_ref": v.rig_profile_ref,
+                "fit_profiles": list(v.fit_profiles), "compat": v.compat,
+                "blender_version": v.blender_version, "draft_report": v.check_report,
+                "reviewed_by": str(v.reviewed_by) if v.reviewed_by else None,
+                "reviewed_at": v.reviewed_at.isoformat() if v.reviewed_at else None, "review_notes": v.review_notes,
+                "based_on": ({"version_id": str(based_on.id), "version": based_on.version_label}
+                             if based_on else None),
+                "files": [{"name": f.storage_key.rsplit("/", 1)[-1], "role": f.role, "storage_key": f.storage_key,
+                           "sha256": f.sha256, "size_bytes": f.size_bytes, "mime_type": f.mime_type}
+                          for f in sorted(v.entry.files, key=lambda f: f.storage_key)],
+            }
+
+    @staticmethod
+    def _animation_manifest(snap: dict[str, Any], major: int, minor: int, files: list[dict[str, Any]],
+                            report: dict[str, Any]) -> dict[str, Any]:
+        """AssetVersionManifest for an animation, with the compatibility record a scene checks
+        before it pins the version, and the provenance of a motion-capture take."""
+        draft = snap["draft_report"] or {}
+        source = ({"kind": "generator", "ref": snap["generator_ref"]} if snap["source_kind"] == "generator" else
+                  {"kind": "bvh", "sha256": snap["source_sha256"], "licence": snap["licence"]})
+        return {
+            "manifest_version": "asset_manifest/1",
+            "kind": "animation", "code": snap["code"], "animation_id": snap["animation_id"],
+            "version": f"{major}.{minor}", "version_id": snap["version_id"], "name": snap["name"],
+            "based_on": snap["based_on"], "category": snap["category"], "source": source,
+            "files": [{"role": f["role"], "key": f["storage_key"].rsplit("/", 1)[-1], "sha256": f["sha256"],
+                       "size": f["size_bytes"], "mime": f["mime_type"]}
+                      for f in sorted(files, key=lambda f: f["storage_key"])],
+            "dependencies": [{"kind": "rig_profile", "ref": snap["rig_profile_ref"]},
+                             {"kind": "style_profile", "ref": snap["style_profile_ref"]},
+                             *([{"kind": "animation_generator", "ref": snap["generator_ref"]}]
+                               if snap["generator_ref"] else [])],
+            "compatibility": snap["compat"],
             "spec_digest": snap["spec_digest"],
             "blender_version": snap["blender_version"], "engine_version": draft.get("engine_version"),
             "validation": {"build": {"ok": draft.get("ok"), "checks": len(draft.get("checks", []))},

@@ -91,7 +91,23 @@ def _verify_scene(session: Session, params: dict[str, Any]) -> Wanted:
     return [*_scene_pins(session, params), ("work", blend["storage_key"], blend["sha256"], "scene/scene.blend")]
 
 
-STAGERS: dict[str, Stager] = {"fit_outfit": _fit_outfit, "assemble_scene": _scene_pins, "verify_scene": _verify_scene}
+def _generate_animation(session: Session, params: dict[str, Any]) -> Wanted:
+    """A BVH take is staged as ``inputs/source.bvh`` from its upload, checked against the
+    SHA-256 the specification names; a generator needs no input."""
+    from app.models.uploads import Upload
+    from sqlalchemy import select
+
+    src = params["spec"]["source"]
+    if src.get("kind") != "bvh":
+        return []
+    up = session.scalar(select(Upload).where(Upload.storage_key == src["upload_key"]))
+    if up is None or up.sha256 != src["sha256"]:
+        raise InputRefused(f"no upload {src['upload_key']} with SHA-256 {src['sha256']}")
+    return [("work", up.storage_key, up.sha256, "inputs/source.bvh")]
+
+
+STAGERS: dict[str, Stager] = {"fit_outfit": _fit_outfit, "assemble_scene": _scene_pins, "verify_scene": _verify_scene,
+                              "generate_animation": _generate_animation}
 READ_ONLY_PREFIXES = ("assets/",)
 
 

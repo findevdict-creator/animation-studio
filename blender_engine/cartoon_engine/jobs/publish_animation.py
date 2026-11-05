@@ -17,6 +17,8 @@ from studio_contracts.animation import (
     resolve_animation,
 )
 
+import cartoon_engine
+from cartoon_engine.core import blend_io
 from cartoon_engine.core.context import JobContext, write_json
 from cartoon_engine.jobs import animation_common as AC
 from cartoon_engine.jobs.outfit_common import sha256
@@ -54,7 +56,8 @@ def run(ctx: JobContext) -> dict[str, Any]:
     ok = check["ok"] and bool(plays) and all(c["ok"] for c in file_checks)
     report = {"animation": ra.name, "spec_digest": digest, "animation_blend_sha256": sha, "purpose": "publish",
               **check, "ok": ok, "failed": [c["name"] for c in file_checks if not c["ok"]] + check["failed"],
-              "file_checks": file_checks}
+              "file_checks": file_checks, "blender_version": blend_io.blender_version(),
+              "engine_version": cartoon_engine.__version__}
     write_json(ctx.out_dir / "publish_validation.json", report)
     ctx.progress(1.0, "validated" if ok else "validation failed")
     return {"report": report, "stamps": {k: v for k, v in stamps.items() if isinstance(v, (str, int, float))}}

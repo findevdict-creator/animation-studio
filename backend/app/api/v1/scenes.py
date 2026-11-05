@@ -30,7 +30,13 @@ from app.core.auth import Principal, audit, require
 from app.core.database import get_session
 from app.core.errors import ApiError
 from app.core.storage import Storage
-from app.models.scenes import Scene, SceneInstance, SceneInstanceAccessory, SceneVersion
+from app.models.scenes import (
+    Scene,
+    SceneInstance,
+    SceneInstanceAccessory,
+    SceneInstanceAnimation,
+    SceneVersion,
+)
 
 router = APIRouter(prefix="/scenes", tags=["scenes"])
 catalog_router = APIRouter(tags=["scenes"])
@@ -294,7 +300,9 @@ def list_scenes(session: Session = Depends(get_session), q: str | None = Query(d
         query = query.where(Scene.tags.contains(tag))
     if uses_version_id:
         acc = select(SceneInstanceAccessory.instance_id).where(
-            SceneInstanceAccessory.accessory_version_id == uses_version_id)
+            SceneInstanceAccessory.accessory_version_id == uses_version_id).union(
+            select(SceneInstanceAnimation.instance_id).where(
+                SceneInstanceAnimation.animation_version_id == uses_version_id))
         sub = select(SceneInstance.id).join(SceneVersion, SceneVersion.id == SceneInstance.scene_version_id).where(
             SceneVersion.scene_id == Scene.id,
             or_(SceneInstance.character_version_id == uses_version_id,
@@ -312,7 +320,8 @@ def list_scenes(session: Session = Depends(get_session), q: str | None = Query(d
             summary="Every scene version and instance that pins this asset version")
 def usage(version_id: uuid.UUID, session: Session = Depends(get_session),
           _: Principal = Depends(require("asset.read"))) -> list[SceneUsage]:
-    acc = select(SceneInstanceAccessory.instance_id).where(SceneInstanceAccessory.accessory_version_id == version_id)
+    acc = select(SceneInstanceAccessory.instance_id).where(SceneInstanceAccessory.accessory_version_id == version_id).union(
+        select(SceneInstanceAnimation.instance_id).where(SceneInstanceAnimation.animation_version_id == version_id))
     rows = session.execute(
         select(SceneInstance, SceneVersion, Scene).join(SceneVersion, SceneVersion.id == SceneInstance.scene_version_id)
         .join(Scene, Scene.id == SceneVersion.scene_id)

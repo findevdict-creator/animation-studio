@@ -217,20 +217,26 @@ def retarget(rig, anim: ResolvedAnimation, path: Path, name: str):
 
 
 def ground(rig, action, frames: int) -> float:
-    """Shift the torso keys so the lowest foot point over the take is at its rest height;
-    returns the shift in metres."""
+    """Shift the torso keys so no foot point (heel, ball, toe tip, ankle) goes below the
+    height it has when the foot stands flat: the deepest one touches the floor. Returns the
+    shift in metres."""
     import bpy
 
     from cartoon_engine.animation.generators import fcurves
-    from cartoon_engine.animation.measure import foot_tracks
+    from cartoon_engine.animation.measure import POINTS, foot_tracks
 
     scene = bpy.context.scene
     rig.animation_data.action = action
     rig.animation_data.action_slot = action.slots[0]
     tracks = foot_tracks(rig, scene, list(range(frames + 1)))
-    rest = min(rig.data.bones[f"DEF-toe.{s}"].head_local.z for s in R.SIDES)
-    low = min(float(t[:, 2].min()) for k, t in tracks.items() if k.startswith("ball"))
-    shift = rest - low
+    points = {n: (b, e) for n, b, e in POINTS}
+
+    def rest_z(key):
+        name, side = key.split(".")
+        bone, end = points[name]
+        b = rig.data.bones[f"{bone}.{side}"]
+        return float((b.head_local if end == "head" else b.tail_local).z)
+    shift = max(rest_z(k) - float(t[:, 2].min()) for k, t in tracks.items())
     # torso location is in its bone space, which is aligned with the armature
     for fc in fcurves(action):
         if fc.data_path == 'pose.bones["torso"].location' and fc.array_index == 2:
@@ -241,3 +247,54 @@ def ground(rig, action, frames: int) -> float:
             fc.update()
     rig.animation_data.action = None
     return round(shift, 4)
+
+
+def plant_feet(rig, action, frames: int, speed: float, contact_m: float = 0.015) -> dict:
+    """Lock the stance foot of a travelling take. Mocap feet drift a little while planted
+    (marker noise, a body of other proportions, travel taken out as a straight line); with
+    the scene's straight-line travel added back, the drift shows as sliding. Each frame the
+    foot point nearest its own lowest height is the contact; while it stays on that foot and on the floor, the torso
+    is shifted to cancel its horizontal motion (the heel at heel strike, the ball on the roll). The forward part of the accumulated shift
+    becomes travel (returned as the new speed per frame), the rest stays in the keys.
+
+    Torso location is in its bone space, aligned with the armature (as in ``ground``)."""
+    import bpy
+
+    from cartoon_engine.animation.generators import fcurves
+    from cartoon_engine.animation.measure import foot_tracks
+
+    scene = bpy.context.scene
+    rig.animation_data.action = action
+    rig.animation_data.action_slot = action.slots[0]
+    try:
+        tracks = foot_tracks(rig, scene, list(range(frames + 1)), travel=lambda f: (0.0, -speed * f, 0.0))
+    finally:
+        rig.animation_data.action = None
+    # height of each point over the lowest it gets: the contact is the point nearest its floor
+    lift = {k: t[:, 2] - float(t[:, 2].min()) for k, t in tracks.items()}
+    delta = np.zeros((frames + 1, 2))
+    locked = 0
+    prev = None
+    for f in range(1, frames + 1):
+        k = min(lift, key=lambda p: lift[p][f])
+        delta[f] = delta[f - 1]
+        same_foot = prev is not None and prev.split(".")[1] == k.split(".")[1]
+        if same_foot and lift[k][f] <= contact_m and lift[k][f - 1] <= contact_m:
+            delta[f] += tracks[k][f - 1, :2] - tracks[k][f, :2]
+            locked += 1
+        prev = k
+    # forward shift that grows over the take is travel, not pose
+    drift_y = float(delta[-1, 1] - delta[0, 1])
+    delta[:, 1] -= np.linspace(0.0, drift_y, frames + 1)
+    new_speed = speed - drift_y / max(frames, 1)  # -Y is forward
+    for fc in fcurves(action):
+        if fc.data_path == 'pose.bones["torso"].location' and fc.array_index in (0, 1):
+            for kp in fc.keyframe_points:
+                k = int(round(kp.co[0]))
+                if 0 <= k <= frames:
+                    d = float(delta[k, fc.array_index])
+                    kp.co[1] += d
+                    kp.handle_left[1] += d
+                    kp.handle_right[1] += d
+            fc.update()
+    return {"locked_frames": locked, "speed": new_speed, "max_shift_m": round(float(np.abs(delta).max()), 4)}

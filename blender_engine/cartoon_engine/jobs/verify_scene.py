@@ -18,6 +18,7 @@ from the one it was saved in). Opened with scripts disabled, the file must:
 
 from __future__ import annotations
 
+import math
 from typing import Any
 
 import numpy as np
@@ -176,13 +177,23 @@ def check_instance(inst, scene, ws) -> list[dict]:
     ad = parts.rig.animation_data
     strips = {(t.name, s.action.name if s.action else None, round(s.frame_start, 3))
               for t in (ad.nla_tracks if ad else []) for s in t.strips}
-    want = {(f"{i:02d}_{u.key}", f"{inst.key}:{u.key}", float(u.start_frame)) for i, u in enumerate(inst.animations)}
+    want = {(f"{i:02d}_{u.key}", f"{inst.key}:{u.clip if u.source == 'library' else u.key}", float(u.start_frame))
+            for i, u in enumerate(inst.animations)}
     add("animations_assigned", want <= strips, want=sorted(map(list, want)), found=sorted(map(list, strips)))
+    checks.extend(_library_animation_checks(inst, scene, parts, add))
     if inst.dialogue:
         d = inst.dialogue[0]
-        scene.frame_set(d.start_frame)
+        frame = d.start_frame
+        pool = ("vis_AI", "vis_O", "vis_E", "vis_MBP")
+        if d.audio is not None:
+            # the first open-mouth cue of the recording, a frame into it
+            cue = next((c for c in d.audio.cues if c.viseme not in ("rest", "MBP") and c.end_s - c.start_s > 1.5 / scene.render.fps), None)
+            if cue is not None:
+                frame = int(round(d.start_frame + cue.end_s * scene.render.fps - 1))
+                pool = (f"vis_{cue.viseme}",)
+        scene.frame_set(frame)
         bpy.context.view_layer.update()
-        props = {v: float(pb.get(v, 0.0)) for v in ("vis_AI", "vis_O", "vis_E", "vis_MBP")}
+        props = {v: float(pb.get(v, 0.0)) for v in pool}
         active = max(props, key=props.get)
         with _shape_keys_only(parts.head):
             bpy.context.view_layer.update()
@@ -190,10 +201,64 @@ def check_instance(inst, scene, ws) -> list[dict]:
         # the visemes share mouth vertices, so the projection is approximate: it must show
         # the mouth clearly open, not match the property exactly
         add("dialogue_mouth_moves", props[active] > 0.5 and moved is not None and moved > 0.3,
-            frame=d.start_frame, viseme=active, prop=round(props[active], 3),
+            frame=frame, viseme=active, prop=round(props[active], 3), audio=d.audio.code if d.audio else None,
             measured=None if moved is None else round(moved, 3))
     scene.frame_set(scene.frame_start)
     return checks
+
+
+def _library_animation_checks(inst, scene, parts, add) -> list[dict]:
+    """Each library animation: appended from its pin and fitted to this rig; a travelling one
+    moves the root by the stride the feet imply, and its planted feet stay put in the world."""
+    import bpy
+    from studio_contracts.animation import AnimationCompat
+
+    from cartoon_engine.animation import measure as M
+    from cartoon_engine.animation.apply import wearer_ratio
+    from cartoon_engine.jobs.animation_common import MAX_SLIDE_CM
+
+    rig = parts.rig
+    for i, u in enumerate(inst.animations):
+        if u.source != "library":
+            continue
+        name = f"{inst.key}:{u.clip}"
+        act = bpy.data.actions.get(name)
+        compat = AnimationCompat.model_validate(u.compat)
+        ratio = wearer_ratio(rig, compat)
+        src = f"{u.pin.ref}#{u.pin.files['animation.blend']}"
+        add(f"animation:{u.clip}", act is not None and act.get("studio_source") == src
+            and abs(float(act.get("studio_scale", 0)) - ratio) < 1e-4, source=act.get("studio_source") if act else None,
+            leg_ratio=round(ratio, 4))
+        track = rig.animation_data.nla_tracks.get(f"{i:02d}_{u.key}") if rig.animation_data else None
+        if track is None or not track.strips or not (u.travel and compat.travels):
+            continue
+        strip = track.strips[0]
+        a, b = int(math.ceil(strip.frame_start)), int(math.floor(min(strip.frame_end, scene.frame_end)))
+
+        def root_at(f):
+            scene.frame_set(f)
+            return rig.matrix_world @ rig.pose.bones["root"].matrix.translation
+        moved = (root_at(b) - root_at(a)).length
+        expected = compat.stride_m * ratio * u.repeat * (b - a) / max(strip.frame_end - strip.frame_start, 1e-6)
+        add(f"travels:{u.clip}", abs(moved - expected) <= 0.02 * max(expected, 0.1) + 0.01, moved_m=round(moved, 4),
+            expected_m=round(expected, 4), frames=[a, b])
+        # measured where the strip plays at full weight (its blend in and out ease the feet),
+        # in the frames the scene shows; a foot point is planted near the lowest it gets over
+        # the whole strip, as the build check measures it, even when the scene ends mid-strip
+        full = [f for f in range(a, int(math.floor(strip.frame_end)) + 1)
+                if strip.frame_start + strip.blend_in <= f <= strip.frame_end - strip.blend_out]
+        tracks = M.foot_tracks(rig, scene, full)
+        shown = np.array([f <= scene.frame_end for f in full])
+        slides = {k: M.slide_cm(t[shown], floor=float(t[:, 2].min())) for k, t in tracks.items()} if shown.any() else {}
+        inner = [f for f, s in zip(full, shown, strict=True) if s]
+        # a generated cycle is held to the tighter limit it was published under
+        limit = MAX_SLIDE_CM["generator" if act is not None and act.get("studio_generator") else "bvh"]
+        worst = max(slides.values(), default=0.0)
+        add(f"feet_planted:{u.clip}", worst <= limit, max_slide_cm=worst, limit_cm=limit,
+            slide_cm={k: round(v, 2) for k, v in slides.items()},
+            frames=[inner[0], inner[-1]] if inner else None)
+    scene.frame_set(scene.frame_start)
+    return []
 
 
 def run(ctx: JobContext) -> dict[str, Any]:

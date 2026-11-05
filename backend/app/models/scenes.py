@@ -6,7 +6,7 @@ character, outfit or accessory version. ``scene_versions`` are append-only: the 
 file SHA-256s) never change after insert. Building ``scene.blend`` and reopening it are
 jobs whose results fill the build and verify columns once.
 
-``scene_instances`` and ``scene_instance_accessories`` repeat the pins of each version as
+``scene_instances``, ``scene_instance_accessories`` and ``scene_instance_animations`` repeat the pins of each version as
 rows with real foreign keys, so "which scenes use CHAR-001@1.0" is a query and a pinned
 version can never be deleted from under a scene.
 """
@@ -117,6 +117,8 @@ class SceneInstance(Base):
     scene_version: Mapped[SceneVersion] = relationship(back_populates="instances")
     accessories: Mapped[list[SceneInstanceAccessory]] = relationship(
         lazy="selectin", order_by="SceneInstanceAccessory.position")
+    animations: Mapped[list[SceneInstanceAnimation]] = relationship(
+        lazy="selectin", order_by="SceneInstanceAnimation.position")
 
 
 class SceneInstanceAccessory(Base):
@@ -128,3 +130,16 @@ class SceneInstanceAccessory(Base):
     position: Mapped[int] = mapped_column(Integer)
     accessory_version_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("accessory_versions.id"), index=True)
     attach_point: Mapped[str] = mapped_column(String(32))
+
+
+class SceneInstanceAnimation(Base):
+    """A library animation an instance plays (Phase 6): one row per assignment."""
+
+    __tablename__ = "scene_instance_animations"
+    __table_args__ = (UniqueConstraint("instance_id", "position", name="uq_scene_instance_animations_position"),)
+
+    id: Mapped[uuid.UUID] = uuid_pk()
+    instance_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("scene_instances.id"), index=True)
+    position: Mapped[int] = mapped_column(Integer, comment="index in the instance's animations list")
+    animation_version_id: Mapped[uuid.UUID] = mapped_column(ForeignKey("animation_versions.id"), index=True)
+    start_frame: Mapped[int] = mapped_column(Integer)

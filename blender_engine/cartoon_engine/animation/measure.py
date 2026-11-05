@@ -45,8 +45,10 @@ def foot_tracks(rig, scene, frames: list[float], travel=None) -> dict[str, np.nd
     return {k: np.array(v) for k, v in out.items()}
 
 
-def slide_cm(track: np.ndarray, contact_m: float = CONTACT_M) -> float:
-    floor = track[:, 2].min()
+def slide_cm(track: np.ndarray, contact_m: float = CONTACT_M, floor: float | None = None) -> float:
+    """``floor``: the lowest height of the point over the whole clip, when ``track`` covers
+    only part of it (a scene that ends mid-strip); the track's own lowest otherwise."""
+    floor = track[:, 2].min() if floor is None else floor
     planted = track[:, 2] <= floor + contact_m
     worst = run = 0.0
     for i in range(1, len(track)):

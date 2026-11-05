@@ -80,7 +80,13 @@ def make_action(ra: ResolvedAnimation, rig, ws: Path) -> tuple[Any, dict, float]
     src = ws / "inputs" / "source.bvh"
     action, info = RT.retarget(rig, ra, src, ra.action_name)
     info["ground_shift_m"] = RT.ground(rig, action, info["frames"])
-    return action, info, info["travel_m"] / max(info["frames"], 1)
+    speed = info["travel_m"] / max(info["frames"], 1)
+    if ra.travels:
+        planted = RT.plant_feet(rig, action, info["frames"], speed)
+        speed = planted.pop("speed")
+        info["plant"] = planted
+        info["travel_m"] = round(speed * info["frames"], 4)
+    return action, info, speed
 
 
 def describe(ra: ResolvedAnimation, rig, action, frames: int, speed: float) -> AnimationCompat:

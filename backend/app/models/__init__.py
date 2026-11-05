@@ -3,6 +3,7 @@
 from app.models import (  # noqa: F401
     accessories,
     ai,
+    animations,
     assets,
     audit,
     characters,
@@ -10,6 +11,7 @@ from app.models import (  # noqa: F401
     jobs,
     outfits,
     scenes,
+    uploads,
 )
 from app.models.base import Base
 
