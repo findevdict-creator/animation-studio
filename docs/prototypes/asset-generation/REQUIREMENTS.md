@@ -135,9 +135,10 @@ They work well alongside this, but they do not replace it.
 
 ### 3.1 What M has
 
-Windows PC with an NVIDIA GPU, Docker Desktop using WSL 2. **Still needed: the GPU model and
-its VRAM** (Task Manager, Performance, GPU, "Dedicated GPU memory"). The tiers below make the
-document useful before we know.
+Windows PC with an **NVIDIA GeForce RTX 3060 Ti, 8 GB VRAM**, Docker Desktop using WSL 2.
+Docker already sees the GPU (`docker run --rm --gpus all ubuntu nvidia-smi` worked on
+2026-11-05). That puts M in **tier A**, which is the prototype's starting point; section 3.5
+says exactly what fits. The other tiers stay in the document in case the GPU is upgraded.
 
 ### 3.2 VRAM tiers
 
@@ -178,6 +179,37 @@ Most of these models need custom GPU code compiled for Linux (for example `nvdif
 `spconv`, `kaolin`, and Hunyuan3D's texture rasteriser). Building these on Windows is the most
 common reason people fail to run them. Linux containers under WSL 2 avoid that, and each model
 gets its own container so their conflicting Python and PyTorch versions never meet.
+
+### 3.5 What fits on M's RTX 3060 Ti
+
+The card has 8 GB, but when `nvidia-smi` was run the Windows desktop, browser and other apps
+were already using about 1.8 GB. That leaves roughly **6 GB free** for the AI models. Two
+easy ways to get more back: close browsers, games and video apps before generating; and, if
+the PC's processor has built-in graphics, plug the monitor into the motherboard instead of
+the graphics card, which frees almost all 8 GB.
+
+| Model | Needs (approx.) | Fits in ~6 GB free? | Plan |
+|---|---|---|---|
+| **Hunyuan3D-2mini** (shape only) | ~5 GB | Yes | Candidate default for shape quality, if the licence allows it (4.4). |
+| **TripoSR** | ~6 GB | Just. Close other apps first. | Fallback and baseline. |
+| **Stable Fast 3D** | ~6 to 7 GB | Tight. Close other apps; may need the half-precision setting. | **Starting default**, because it already gives a UV texture. Measured in Phase 1. |
+| **TripoSG** | ~8 GB | Only with memory offloading or a smaller setting, if at all. | Try in Phase 3; drop it if it runs out of memory. |
+| **Hunyuan3D-2** full shape | ~6 GB | Borderline. | Try in Phase 3 with low-memory mode. |
+| Hunyuan3D-2 / 2.1 texture painting, TRELLIS, InstantMesh | 16 to 21 GB | No | Out for now. Texture is done in Blender instead (6.6). |
+| **SDXL** (text-to-image) | 8 GB normal, about 4 to 6 GB with CPU offloading | Yes, with offloading (slower, about 30 to 60 s per image) | Default text-to-image. |
+| FLUX.1 schnell | ~12 GB in 8-bit | No (offloaded versions are very slow) | Out for now. |
+
+What this means in practice:
+
+- The pipeline runs **one model at a time** and unloads it before the next stage (3.2).
+- Texture comes from Stable Fast 3D's own texture or from projecting the input picture,
+  then baking in Blender. Blender's cleanup and baking run on the CPU, so they do not compete
+  for VRAM.
+- Quality will be at the lower end of section 4's range. That is fine for proving the
+  pipeline and the output contract. If the bake-off (9.1) shows the look is held back by the
+  GPU, a 16 GB card (tier C) is the upgrade that unlocks TRELLIS and AI texture painting.
+- `assetgen doctor` measures the free VRAM before each run and warns if other apps are using
+  too much.
 
 ---
 
@@ -575,7 +607,7 @@ Each phase ends with something M can run and look at.
 | Phase | What | Done when | Rough size |
 |---|---|---|---|
 | **P0 Machine check** | Confirm the GPU works in Docker; `assetgen doctor`; decide the tier. | AC1 | 1 to 2 days |
-| **P1 One model, raw output** | One container (SF3D on tier A/B, TRELLIS on C/D), background removal, CLI `assetgen prop --image`. Raw GLB only. | A prop picture becomes a `raw.glb` M can open. | 2 to 4 days |
+| **P1 One model, raw output** | One container (Stable Fast 3D on M's 3060 Ti, with TripoSR as fallback), background removal, CLI `assetgen prop --image`. Raw GLB only. | A prop picture becomes a `raw.glb` M can open. | 2 to 4 days |
 | **P2 Clean, normalise, texture, check** | Blender stages 4 to 7, the output contract, the report and renders. | AC3, AC6, AC10, AC11 on the 10 props | 1 to 2 weeks |
 | **P3 Compare models** | Add one or two more models as adapters; `assetgen compare`; update section 4.5 from the results. | AC9, AC12 | 1 week |
 | **P4 Text and the web form** | Text-to-image stage, the Gradio page. | AC2, AC4, AC5 | 1 week |
@@ -589,7 +621,7 @@ Each phase ends with something M can run and look at.
 
 | # | Question | Default if no answer |
 |---|---|---|
-| 1 | Which GPU and how much VRAM? | Write for tier C, keep tier A working. |
+| 1 | ~~Which GPU and how much VRAM?~~ | **Answered:** RTX 3060 Ti, 8 GB (tier A, section 3.5). |
 | 2 | Which country are you in, and will the cartoons be sold or monetised? (Licences, 4.4.) | Treat as commercial and avoid Hunyuan and FLUX dev until answered. |
 | 3 | Where should the prototype's code live: a folder in this repo (`prototypes/assetgen/`) or its own repo? | A folder in this repo on its own branch, so it can share the studio's contracts later. |
 | 4 | For characters, a body base (no clothes, simple hair cap) or a fully dressed look? | Body base, because the studio keeps outfits and hair as separate assets. |
