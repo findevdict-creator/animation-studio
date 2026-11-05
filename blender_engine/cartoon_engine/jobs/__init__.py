@@ -12,6 +12,7 @@ Handler = Callable[[JobContext], dict[str, Any]]
 
 def handlers() -> dict[str, Handler]:
     from cartoon_engine.jobs import (
+        assemble_scene,
         blender_smoke,
         fit_outfit,
         generate_accessory,
@@ -20,9 +21,11 @@ def handlers() -> dict[str, Handler]:
         publish_accessory,
         publish_character,
         publish_outfit,
+        verify_scene,
     )
 
-    return {"generate_accessory": generate_accessory.run, "publish_accessory": publish_accessory.run,
+    return {"assemble_scene": assemble_scene.run, "verify_scene": verify_scene.run,
+            "generate_accessory": generate_accessory.run, "publish_accessory": publish_accessory.run,
             "blender_smoke": blender_smoke.run, "generate_character": generate_character.run,
             "publish_character": publish_character.run, "generate_outfit": generate_outfit.run,
             "fit_outfit": fit_outfit.run, "publish_outfit": publish_outfit.run}

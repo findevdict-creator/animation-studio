@@ -199,6 +199,49 @@ class PublishAccessoryParams(Model):
     bump: Literal["minor", "major"] = "minor"
 
 
+class ScenePreviewSettings(Model):
+    width: int = Field(default=640, ge=64, le=3840)
+    height: int = Field(default=360, ge=36, le=2160)
+    samples: int = Field(default=12, ge=1, le=256)
+    #: frames for the contact sheet; default: start, two in between, end
+    frames: list[int] | None = Field(default=None, max_length=8)
+
+
+class AssembleSceneParams(Model):
+    """Blender: build ``scene.blend`` for a scene version from its resolved manifest. The
+    worker stages every pinned file under ``assets/<kind>/<code>/<version>/`` (SHA-256 checked
+    against the registry); the job links them, saves ``out/scene.blend`` with relative library
+    paths and fails if any staged file changed."""
+
+    scene_version_id: UUID
+    resolved: dict[str, Any] = Field(description="ResolvedScene, computed by the API from the manifest")
+    previews: ScenePreviewSettings = Field(default_factory=ScenePreviewSettings)
+
+    @model_validator(mode="after")
+    def _resolved_is_valid(self) -> AssembleSceneParams:
+        from studio_contracts.scene import ResolvedScene
+
+        self.resolved = ResolvedScene.model_validate(self.resolved).model_dump(mode="json")
+        return self
+
+
+class VerifySceneParams(Model):
+    """Blender: reopen a saved ``scene.blend`` in a fresh workspace rebuilt from the manifest
+    (``scene/scene.blend`` plus the pinned files) and check it against the manifest."""
+
+    scene_version_id: UUID
+    resolved: dict[str, Any]
+    scene_blend_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    previews: ScenePreviewSettings = Field(default_factory=ScenePreviewSettings)
+
+    @model_validator(mode="after")
+    def _resolved_is_valid(self) -> VerifySceneParams:
+        from studio_contracts.scene import ResolvedScene
+
+        self.resolved = ResolvedScene.model_validate(self.resolved).model_dump(mode="json")
+        return self
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
@@ -210,6 +253,8 @@ class JobType(StrEnum):
     publish_outfit = "publish_outfit"
     generate_accessory = "generate_accessory"
     publish_accessory = "publish_accessory"
+    assemble_scene = "assemble_scene"
+    verify_scene = "verify_scene"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -223,13 +268,16 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.publish_outfit: PublishOutfitParams,
     JobType.generate_accessory: GenerateAccessoryParams,
     JobType.publish_accessory: PublishAccessoryParams,
+    JobType.assemble_scene: AssembleSceneParams,
+    JobType.verify_scene: VerifySceneParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
                                     JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish,
                                     JobType.generate_outfit: Queue.blender, JobType.fit_outfit: Queue.blender,
                                     JobType.publish_outfit: Queue.publish,
-                                    JobType.generate_accessory: Queue.blender, JobType.publish_accessory: Queue.publish}
+                                    JobType.generate_accessory: Queue.blender, JobType.publish_accessory: Queue.publish,
+                                    JobType.assemble_scene: Queue.blender, JobType.verify_scene: Queue.blender}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
@@ -238,7 +286,8 @@ RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpre
                                    JobType.publish_character: True,
                                    JobType.generate_outfit: True, JobType.fit_outfit: True,
                                    JobType.publish_outfit: True,
-                                   JobType.generate_accessory: True, JobType.publish_accessory: True}
+                                   JobType.generate_accessory: True, JobType.publish_accessory: True,
+                                   JobType.assemble_scene: True, JobType.verify_scene: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
@@ -248,7 +297,9 @@ JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: 
                                                    JobType.fit_outfit: ("asset.create",),
                                                    JobType.publish_outfit: ("asset.publish",),
                                                    JobType.generate_accessory: ("asset.create",),
-                                                   JobType.publish_accessory: ("asset.publish",)}
+                                                   JobType.publish_accessory: ("asset.publish",),
+                                                   JobType.assemble_scene: ("scene.edit",),
+                                                   JobType.verify_scene: ("scene.edit",)}
 
 
 class InputFile(Model):
