@@ -15,7 +15,12 @@ A scene version is created from a ``SceneManifest`` in one step: the pure checks
   restrict) the character's body-fit profile, goes on the chosen attachment point, does not
   conflict with a slot the outfit fills (a beanie on an outfit with headwear), and no two
   accessories share an attachment point;
-* the expressions exist on the character's rig profile.
+* the expressions exist on the character's rig profile;
+* (Phase 7) the environment and every prop are published versions, and where things stand
+  is checked against the environment version's layout (``check_layout``): marks and camera
+  marks exist, characters start on free floor inside the set, props stand inside it, on the
+  floor clear of solid dressing and of each other, or on a top. Instances placed at a mark
+  get the mark's spot and facing in their resolved transform.
 
 Nothing here changes a library asset. Scene state lives in ``scene_versions`` and in the
 scene's own ``scene.blend``.
@@ -38,16 +43,21 @@ from studio_contracts.ids import uuid7
 from studio_contracts.rig_profile import BUILTIN_RIG_PROFILES
 from studio_contracts.scene import (
     Pin,
+    PropFacts,
     ResolvedAccessoryUse,
     ResolvedClipUse,
     ResolvedDialogueLine,
     ResolvedInstance,
     ResolvedPin,
+    ResolvedPropUse,
     ResolvedScene,
     SceneManifest,
+    check_layout,
     is_library_clip,
     pin_path,
+    prop_heights,
     resolve_clip,
+    start_transform,
     validate_manifest,
 )
 
@@ -64,12 +74,14 @@ from app.models.scenes import (
     SceneInstanceAnimation,
     SceneVersion,
 )
+from app.models.sets import EnvironmentVersion, PropVersion
 
 USABLE = ("published", "deprecated")
 PIN_FILES = {"character": ("character.blend", "character.json"), "outfit": ("outfit.blend",),
-             "accessory": ("accessory.blend",), "animation": ("animation.blend",)}
+             "accessory": ("accessory.blend",), "animation": ("animation.blend",), "prop": ("prop.blend",),
+             "environment": ("environment.blend",)}
 MODELS = {"character": CharacterVersion, "outfit": OutfitVersion, "accessory": AccessoryVersion,
-          "animation": AnimationVersion}
+          "animation": AnimationVersion, "prop": PropVersion, "environment": EnvironmentVersion}
 
 
 def now() -> datetime:
@@ -167,6 +179,7 @@ def resolve(session: Session, manifest: SceneManifest, *, base: SceneVersion | N
     issues = res.issues
     issues += validate_manifest(manifest)
     previous = previous_pins(base)
+    env_pin, layout, lighting, props = _resolve_set(session, manifest, issues, previous)
     instances = []
     for i, inst in enumerate(manifest.instances):
         p = f"instances[{i}]"
@@ -254,15 +267,51 @@ def resolve(session: Session, manifest: SceneManifest, *, base: SceneVersion | N
         clips = tuple(clips_l)
         instances.append(ResolvedInstance(
             key=inst.key, character=cpin, rig_profile=rig.ref, fit_profile=cv.fit_profile,
-            outfit=opin, outfit_compatibility=compat_doc, accessories=tuple(accs), transform=inst.transform,
+            outfit=opin, outfit_compatibility=compat_doc, accessories=tuple(accs),
+            transform=start_transform(inst, layout),
             expressions=tuple(inst.expressions), blink=inst.blink, animations=clips,
             dialogue=_resolve_dialogue(session, inst, p, issues, manifest), state=inst.state))
         res.rows.append((cv, ov, compat, acc_rows, anim_rows))
     if not res.errors:
         res.resolved = ResolvedScene(manifest_digest=manifest.digest(), name=manifest.name, fps=manifest.fps,
                                      frame_start=manifest.frame_start, frame_end=manifest.frame_end,
-                                     camera=manifest.camera, instances=tuple(instances))
+                                     camera=manifest.camera, instances=tuple(instances), environment=env_pin,
+                                     layout=layout, props=tuple(props), lighting=lighting)
     return res
+
+
+def _resolve_set(session: Session, manifest: SceneManifest, issues: list[Issue], previous: set[uuid.UUID]):
+    """The environment and props: pins, their placement against the layout, and the
+    resolved prop uses (standing height from the top they are on)."""
+    env_pin = layout = lighting = None
+    if manifest.environment is not None:
+        ev, env_pin = _pin(session, "environment", manifest.environment, "environment", issues, previous,
+                           lambda v: v.owner.name)
+        if env_pin is not None:
+            layout = ev.layout
+            lighting = ev.lighting
+    if manifest.lighting is not None:
+        lighting = manifest.lighting
+    facts: dict[str, PropFacts] = {}
+    pins: dict[int, tuple[Any, ResolvedPin]] = {}
+    for i, use in enumerate(manifest.props):
+        pv, ppin = _pin(session, "prop", use.prop, f"props[{i}].prop", issues, previous, lambda v: v.owner.name)
+        if ppin is None:
+            continue
+        pins[i] = (pv, ppin)
+        facts[use.prop.ref] = PropFacts(size=tuple(pv.size), solid=pv.solid, rests_on=pv.rests_on, top_z=pv.top_z)
+    if manifest.environment is None or env_pin is not None:
+        issues += check_layout(manifest, layout, facts)
+    heights = prop_heights(manifest, layout, facts)
+    out: list[ResolvedPropUse] = []
+
+    for i, use in enumerate(manifest.props):
+        if i not in pins:
+            continue
+        pv, ppin = pins[i]
+        out.append(ResolvedPropUse(key=use.key, pin=ppin, item=pv.item_ref, size=tuple(pv.size), at=use.at,
+                                   z=heights[use.key], rotation_deg=use.rotation_deg, on=use.on))
+    return env_pin, layout, lighting, out
 
 
 def _resolve_animations(session: Session, inst, cv, rig, p: str, issues: list[Issue], previous: set[uuid.UUID],

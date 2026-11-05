@@ -482,6 +482,26 @@ def check_layout(m: SceneManifest, layout: dict | None, props: dict[str, PropFac
     return issues
 
 
+def prop_heights(m: SceneManifest, layout: dict | None, props: dict[str, PropFacts]) -> dict[str, float]:
+    """The height each scene prop stands at: 0 on the floor, the top of the dressing item or
+    of the scene prop it is ``on`` otherwise (props on props add up)."""
+    tops = {t[0]: float(t[6]) for t in (layout or {}).get("tops", [])}
+    by_key = {u.key: u for u in m.props}
+
+    def height(use: PropUse, seen: tuple[str, ...] = ()) -> float:
+        if use.on is None or use.on in seen:
+            return 0.0
+        if use.on in tops:
+            return tops[use.on]
+        under = by_key.get(use.on)
+        f = props.get(under.prop.ref) if under is not None else None
+        if f is None or f.top_z is None:
+            return 0.0
+        return height(under, (*seen, use.key)) + f.top_z
+
+    return {u.key: round(height(u), 4) for u in m.props}
+
+
 class ResolvedPin(_Frozen):
     kind: Literal["character", "outfit", "accessory", "animation", "prop", "environment"]
     code: str

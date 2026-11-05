@@ -163,6 +163,10 @@ def assemble(ws: Path, rs: ResolvedScene, progress=None) -> tuple[list[Assembled
             progress(i / max(len(rs.instances), 1), f"assembling {inst.key} ({inst.character.ref})")
         built.append(assemble_instance(ws, inst, scene))
     add_dialogue_audio(ws, rs, scene)
+    if rs.environment is not None or rs.props or rs.lighting:
+        from cartoon_engine.scene.set_dressing import build_set
+
+        scene["studio_set_report"] = json.dumps(build_set(ws, rs, scene))
     scene.frame_set(rs.frame_start)
     return built, scene
 
@@ -187,12 +191,17 @@ def add_dialogue_audio(ws: Path, rs: ResolvedScene, scene) -> list[dict]:
 
 # ------------------------------------------------------------------ camera and light
 def stage_camera(scene, built: list[Assembled], rs: ResolvedScene):
-    """A fixed camera and two suns framing the cast (or the focus instance) over the whole
-    scene: the bounds are taken at frames across it, so a character that walks stays in shot."""
+    """A fixed camera framing the cast (or the focus instance) over the whole scene: the
+    bounds are taken at frames across it, so a character that walks stays in shot. Without an
+    environment it adds the Phase 5 stage (a floor, two suns, a grey sky); in a set the
+    camera stays inside the room's walls, and a camera mark replaces the framing entirely."""
     import bpy
 
     from cartoon_engine.character import previews as P
+    from cartoon_engine.scene.set_dressing import keep_inside, set_camera
 
+    if rs.camera.mark is not None:
+        return set_camera(scene, rs)
     targets = [b for b in built if rs.camera.focus in (None, b.key)]
     objs = [o for b in targets for o in (*b.parts.meshes(), *b.garments, *(a.obj for a in b.accessories))]
     span = max(rs.frame_end - rs.frame_start, 0)
@@ -216,6 +225,11 @@ def stage_camera(scene, built: list[Assembled], rs: ResolvedScene):
     scene.camera = cam
     P._frame(cam, lo, hi, rs.camera.angle_deg, margin=1.2, aspect=16 / 9, elevation_deg=8.0)
     _fit_box(scene, cam, lo, hi)
+    if rs.environment is not None:
+        moved = keep_inside(scene, cam, rs, lo, hi)
+        if moved:
+            cam["studio_kept_inside"] = json.dumps(moved)
+        return cam  # the set brings its floor, lights and sky
     for name, energy, rot in (("SUN_key", 3.0, (50, 0, -35)), ("SUN_rim", 1.4, (60, 0, 160))):
         data = bpy.data.lights.new(name, "SUN")
         data.energy = energy

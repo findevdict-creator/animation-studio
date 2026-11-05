@@ -111,7 +111,7 @@ def test_same_character_two_outfits_resolves_and_pins(api_as, db, cast):
     # the library is untouched: nothing about the scene is on the character or outfits
     with db() as sess:
         n = sess.execute(text("SELECT count(*) FROM asset_versions_registry WHERE kind NOT IN "
-                              "('character','outfit','accessory','animation')")).scalar_one()
+                              "('character','outfit','accessory','animation','prop','environment')")).scalar_one()
         assert n == 0
 
 

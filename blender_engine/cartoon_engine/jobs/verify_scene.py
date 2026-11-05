@@ -12,6 +12,10 @@ from the one it was saved in). Opened with scripts disabled, the file must:
 * place each rig where the manifest says;
 * play the face track: at every expression key the face control properties have the
   manifest's values and the face geometry moves by the expression's weight; clips are NLA strips at their frames;
+* (Phase 7) link the environment and each prop from its pin, stand every prop where and
+  as high as the manifest says, inside the set and clear of solid dressing and of other
+  props, use the named camera mark and the lighting in force, and keep every character's
+  root on free floor for the whole scene (sampled every 4 frames);
 * render a frame;
 * leave every pinned source byte-identical (hashed before and after).
 """
@@ -320,6 +324,11 @@ def run(ctx: JobContext) -> dict[str, Any]:
     for i, inst in enumerate(rs.instances):
         ctx.progress(0.15 + 0.5 * i / len(rs.instances), f"checking {inst.key}")
         checks.extend(check_instance(inst, scene, ws))
+    if rs.environment is not None or rs.props or rs.camera.mark:
+        from cartoon_engine.scene.set_dressing import root_paths, set_checks
+
+        ctx.progress(0.66, "checking the set and the paths through it")
+        checks.extend(set_checks(rs, scene, ws, root_paths(rs, scene) if rs.layout else {}))
     ctx.progress(0.7, "rendering from the reopened file")
     tmp = ws / "tmp" / "frames"
     tmp.mkdir(parents=True, exist_ok=True)

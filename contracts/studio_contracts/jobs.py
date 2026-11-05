@@ -321,6 +321,8 @@ class ScenePreviewSettings(Model):
     samples: int = Field(default=12, ge=1, le=256)
     #: frames for the contact sheet; default: start, two in between, end
     frames: list[int] | None = Field(default=None, max_length=8)
+    #: also render every Nth frame of the scene into ``preview.mp4`` (0: no video)
+    video_every: int = Field(default=0, ge=0, le=24)
 
 
 class AssembleSceneParams(Model):

@@ -8,11 +8,14 @@ library paths (``//../assets/...``), the library check, and the post-condition t
 staged source file still hashes as it did: a scene can never change an asset.
 
 Previews are rendered after the save from the same session: a contact sheet of a few
-frames and a thumbnail. The reopen check is its own job (``verify_scene``).
+frames, a thumbnail and, when asked, ``preview.mp4`` of every Nth frame. In Phase 7 the
+scene's set (environment, props, lighting, camera mark) is added after the instances. The
+reopen check is its own job (``verify_scene``).
 """
 
 from __future__ import annotations
 
+import json
 import time
 from typing import Any
 
@@ -85,6 +88,22 @@ def run(ctx: JobContext) -> dict[str, Any]:
     (out / "thumbnail.png").write_bytes(paths[0].read_bytes())
     ctx.output(out / "frames.png", "preview", "image/png")
     ctx.output(out / "thumbnail.png", "thumbnail", "image/png")
+    video = None
+    if params.previews.video_every:
+        from cartoon_engine.character.previews import encode_mp4
+
+        step = params.previews.video_every
+        vframes = list(range(rs.frame_start, rs.frame_end + 1, step))
+        ctx.progress(0.8, f"rendering {len(vframes)} frames for preview.mp4")
+        vdir = ws / "tmp" / "video"
+        vdir.mkdir(parents=True, exist_ok=True)
+        vpaths = render_frames(scene, vdir, vframes, (params.previews.width, params.previews.height),
+                               params.previews.samples)
+        encode_mp4(vpaths, out / "preview.mp4", max(1, round(rs.fps / step)), params.previews.width,
+                   params.previews.height)
+        ctx.output(out / "preview.mp4", "preview", "video/mp4")
+        video = {"frames": len(vframes), "every": step, "fps": max(1, round(rs.fps / step)),
+                 "bytes": (out / "preview.mp4").stat().st_size}
     lap("previews_s")
     # rendering must not have touched the sources either
     ok_final, changed = files.unchanged(ws, rs)
@@ -97,7 +116,10 @@ def run(ctx: JobContext) -> dict[str, Any]:
            "fps": rs.fps, "frame_start": rs.frame_start, "frame_end": rs.frame_end, "instances": instances,
            "libraries": libs, "sources": {"before": before, "after": files.hash_sources(ws, rs),
                                           "unchanged": ok_final},
-           "preview_frames": frames, "ok": ok_final and libs["ok"] and not acc_failed, "failed": acc_failed,
+           "preview_frames": frames, "video": video, "set": json.loads(scene.get("studio_set_report", "null")),
+           "camera": {"name": scene.camera.name, "lens_mm": round(scene.camera.data.lens, 2),
+                      "kept_inside": json.loads(scene.camera.get("studio_kept_inside", "null"))},
+           "ok": ok_final and libs["ok"] and not acc_failed, "failed": acc_failed,
            "blender_version": blend_io.blender_version(), "engine_version": cartoon_engine.__version__,
            "timings_s": timings}
     write_json(out / "scene_report.json", doc)

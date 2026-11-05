@@ -181,12 +181,12 @@ def turntable(parts: Parts, out_dir: Path, opts: RenderOptions, progress=None) -
     return {"frames": len(frames), "thumbnail": thumb, "sheet": sheet_path, "mp4": mp4, "bounds": [lo.tolist(), hi.tolist()]}
 
 
-def encode_mp4(frames: list[Path], path: Path, fps: int, size: int) -> None:
+def encode_mp4(frames: list[Path], path: Path, fps: int, size: int, height: int | None = None) -> None:
     """Image strips through the sequencer into H.264 with Blender's bundled FFmpeg."""
     import bpy
 
     scene = bpy.data.scenes.new("encode")
-    scene.render.resolution_x = scene.render.resolution_y = size
+    scene.render.resolution_x, scene.render.resolution_y = size, height or size
     scene.render.resolution_percentage = 100
     scene.render.fps = fps
     se = scene.sequence_editor_create()
