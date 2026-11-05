@@ -1356,6 +1356,511 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/prop-items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The prop catalog (procedural stand-ins) */
+        get: operations["list_prop_items_api_v1_prop_items_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environment-templates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The environment templates (procedural stand-ins) */
+        get: operations["list_templates_api_v1_environment_templates_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/lighting-presets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Lighting presets */
+        get: operations["list_lighting_api_v1_lighting_presets_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/spec/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate a prop specification
+         * @description Always 200: an invalid spec is a normal answer here, listing every issue.
+         */
+        post: operations["props_validate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gallery: search and filter props */
+        get: operations["props_gallery"];
+        put?: never;
+        /** Create a prop and its first draft from a specification */
+        post: operations["props_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail */
+        get: operations["props_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Name, description, tags, recommended version */
+        patch: operations["props_patch_identity"];
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version history, newest first */
+        get: operations["props_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version Detail */
+        get: operations["props_version_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/versions/{version_id}/files/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A version file: 302 to a presigned URL */
+        get: operations["props_version_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/versions/{version_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve, or reject back to draft with notes */
+        post: operations["props_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/versions/{version_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish an approved version (job on the publisher queue) */
+        post: operations["props_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/versions/{version_id}/deprecate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide a published version from pickers; scenes that pin it still load it */
+        post: operations["props_deprecate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** New draft, optionally copying the spec of an existing (e.g. published) version */
+        post: operations["props_create_draft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/drafts/{draft_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Discard a draft */
+        delete: operations["props_discard"];
+        options?: never;
+        head?: never;
+        /** Edit a draft's spec */
+        patch: operations["props_edit_draft"];
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/drafts/{draft_id}/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Build the draft in Blender and measure it (job) */
+        post: operations["props_generate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/props/{owner_id}/drafts/{draft_id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a built draft whose measured check passed to review */
+        post: operations["props_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/spec/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate a environment specification
+         * @description Always 200: an invalid spec is a normal answer here, listing every issue.
+         */
+        post: operations["environments_validate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gallery: search and filter environments */
+        get: operations["environments_gallery"];
+        put?: never;
+        /** Create a environment and its first draft from a specification */
+        post: operations["environments_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail */
+        get: operations["environments_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Name, description, tags, recommended version */
+        patch: operations["environments_patch_identity"];
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version history, newest first */
+        get: operations["environments_history"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version Detail */
+        get: operations["environments_version_detail"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/versions/{version_id}/files/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A version file: 302 to a presigned URL */
+        get: operations["environments_version_file"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/versions/{version_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve, or reject back to draft with notes */
+        post: operations["environments_review"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/versions/{version_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish an approved version (job on the publisher queue) */
+        post: operations["environments_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/versions/{version_id}/deprecate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide a published version from pickers; scenes that pin it still load it */
+        post: operations["environments_deprecate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** New draft, optionally copying the spec of an existing (e.g. published) version */
+        post: operations["environments_create_draft"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/drafts/{draft_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Discard a draft */
+        delete: operations["environments_discard"];
+        options?: never;
+        head?: never;
+        /** Edit a draft's spec */
+        patch: operations["environments_edit_draft"];
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/drafts/{draft_id}/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Build the draft in Blender and measure it (job) */
+        post: operations["environments_generate"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/environments/{owner_id}/drafts/{draft_id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a built draft whose measured check passed to review */
+        post: operations["environments_submit"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/uploads": {
         parameters: {
             query?: never;
@@ -2552,6 +3057,28 @@ export interface components {
              */
             source_name: string;
         };
+        /** CameraMark */
+        CameraMark: {
+            /** Name */
+            name: string;
+            /** At */
+            at: [
+                number,
+                number,
+                number
+            ];
+            /** Look At */
+            look_at: [
+                number,
+                number,
+                number
+            ];
+            /**
+             * Lens Mm
+             * @default 28
+             */
+            lens_mm: number;
+        };
         /** CharacterCreate */
         CharacterCreate: {
             /** Name */
@@ -2748,6 +3275,317 @@ export interface components {
             spec: {
                 [key: string]: unknown;
             };
+        };
+        /** EnvironmentDef */
+        EnvironmentDef: {
+            /** Id */
+            id: string;
+            /** Version */
+            version: string;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "room" | "outdoor";
+            /** Default Size */
+            default_size: [
+                number,
+                number,
+                number
+            ];
+            /** Min Size */
+            min_size: [
+                number,
+                number,
+                number
+            ];
+            /** Max Size */
+            max_size: [
+                number,
+                number,
+                number
+            ];
+            /** Floor Finishes */
+            floor_finishes: string[];
+            /** Default Floor */
+            default_floor: string;
+            /** Default Floor Color */
+            default_floor_color: string;
+            /**
+             * Wall Finishes
+             * @default []
+             */
+            wall_finishes: string[];
+            /** Default Wall */
+            default_wall?: string | null;
+            /** Default Wall Color */
+            default_wall_color?: string | null;
+            /** Default Lighting */
+            default_lighting: string;
+            /**
+             * Dressing
+             * @default []
+             */
+            dressing: components["schemas"]["Placement"][];
+            /**
+             * Door
+             * @default true
+             */
+            door: boolean;
+            /**
+             * Door Offset
+             * @default 0.32
+             */
+            door_offset: number;
+            /**
+             * Windows
+             * @default 1
+             */
+            windows: number;
+        };
+        /** EnvironmentDetail */
+        EnvironmentDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+            /** Template Key */
+            template_key: string;
+            /** Kind */
+            kind: string;
+            /**
+             * Versions
+             * @default []
+             */
+            versions: components["schemas"]["EnvironmentVersionSummary"][];
+        };
+        /** EnvironmentOut */
+        EnvironmentOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+            /** Template Key */
+            template_key: string;
+            /** Kind */
+            kind: string;
+        };
+        /** EnvironmentValidationOut */
+        EnvironmentValidationOut: {
+            /** Valid */
+            valid: boolean;
+            /** Issues */
+            issues: components["schemas"]["Issue"][];
+            resolved?: components["schemas"]["ResolvedEnvironment"] | null;
+            /** Layout */
+            layout?: {
+                [key: string]: unknown;
+            } | null;
+            /** Digest */
+            digest?: string | null;
+        };
+        /** EnvironmentVersionDetail */
+        EnvironmentVersionDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Size */
+            size: number[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Check Ok */
+            check_ok?: boolean | null;
+            /**
+             * Environment Id
+             * Format: uuid
+             */
+            environment_id: string;
+            /** Template Ref */
+            template_ref: string | null;
+            /** Lighting */
+            lighting: string | null;
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+            /** Style Profile Ref */
+            style_profile_ref: string | null;
+            /** Catalog Ref */
+            catalog_ref: string | null;
+            /** Blender Version */
+            blender_version: string | null;
+            /** Check Report */
+            check_report: {
+                [key: string]: unknown;
+            } | null;
+            /** Generate Job Id */
+            generate_job_id: string | null;
+            /** Review Notes */
+            review_notes: string;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Manifest Key */
+            manifest_key: string | null;
+            /** Manifest Sha256 */
+            manifest_sha256: string | null;
+            /** Published By */
+            published_by: string | null;
+            /**
+             * Files
+             * @default []
+             */
+            files: components["schemas"]["FileOut"][];
+            /**
+             * Ready For Review
+             * @description what blocks submit; empty when ready
+             */
+            ready_for_review?: string[];
+            /** Layout */
+            layout: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** EnvironmentVersionJobOut */
+        EnvironmentVersionJobOut: {
+            version: components["schemas"]["EnvironmentVersionDetail"];
+            job: components["schemas"]["JobOut"];
+        };
+        /** EnvironmentVersionSummary */
+        EnvironmentVersionSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Size */
+            size: number[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Check Ok */
+            check_ok?: boolean | null;
+            /**
+             * Environment Id
+             * Format: uuid
+             */
+            environment_id: string;
+            /** Template Ref */
+            template_ref: string | null;
+            /** Lighting */
+            lighting: string | null;
         };
         /** Fabric */
         Fabric: {
@@ -3147,6 +3985,31 @@ export interface components {
             params?: {
                 [key: string]: unknown;
             };
+        };
+        /** LightingPreset */
+        LightingPreset: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Sun Energy */
+            sun_energy: number;
+            /** Sun Elevation Deg */
+            sun_elevation_deg: number;
+            /** Sun Heading Deg */
+            sun_heading_deg: number;
+            /** Sun Color */
+            sun_color: string;
+            /** Sky Color */
+            sky_color: string;
+            /** Sky Strength */
+            sky_strength: number;
+            /** Ceiling Energy W */
+            ceiling_energy_w: number;
+            /** Ceiling Color */
+            ceiling_color: string;
+            /** Fill Share */
+            fill_share: number;
         };
         /** MeOut */
         MeOut: {
@@ -3551,6 +4414,13 @@ export interface components {
             /** Next Cursor */
             next_cursor?: string | null;
         };
+        /** Page[EnvironmentOut] */
+        Page_EnvironmentOut_: {
+            /** Items */
+            items: components["schemas"]["EnvironmentOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
         /** Page[JobOut] */
         Page_JobOut_: {
             /** Items */
@@ -3562,6 +4432,13 @@ export interface components {
         Page_OutfitOut_: {
             /** Items */
             items: components["schemas"]["OutfitOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** Page[PropOut] */
+        Page_PropOut_: {
+            /** Items */
+            items: components["schemas"]["PropOut"][];
             /** Next Cursor */
             next_cursor?: string | null;
         };
@@ -3582,6 +4459,28 @@ export interface components {
             default: number;
             /** Description */
             description: string;
+        };
+        /**
+         * Placement
+         * @description A dressing item in a template, or in a specification.
+         */
+        Placement: {
+            /** Prop */
+            prop: string;
+            /** At */
+            at: [
+                number,
+                number
+            ];
+            /**
+             * Rotation Deg
+             * @default 0
+             */
+            rotation_deg: number;
+            /** Params */
+            params?: {
+                [key: string]: number;
+            };
         };
         /** PreviewSettings */
         PreviewSettings: {
@@ -3620,6 +4519,304 @@ export interface components {
              * @default true
              */
             glb: boolean;
+        };
+        /** PropDef */
+        PropDef: {
+            /** Id */
+            id: string;
+            /** Version */
+            version: string;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "furniture" | "household" | "toy" | "nature" | "vehicle" | "food";
+            /** Base Size */
+            base_size: [
+                number,
+                number,
+                number
+            ];
+            /** Params */
+            params?: {
+                [key: string]: components["schemas"]["ParamDef"];
+            };
+            /** Finishes */
+            finishes: string[];
+            /** Default Finish */
+            default_finish: string;
+            /** Default Color */
+            default_color: string;
+            /** Accent */
+            accent?: string | null;
+            /** Default Accent */
+            default_accent?: string | null;
+            /**
+             * Solid
+             * @default true
+             */
+            solid: boolean;
+            /**
+             * Rests On
+             * @default floor
+             * @enum {string}
+             */
+            rests_on: "floor" | "top";
+            /**
+             * Surfaces
+             * @default []
+             */
+            surfaces: components["schemas"]["Surface"][];
+            /**
+             * Setting
+             * @default any
+             * @enum {string}
+             */
+            setting: "indoor" | "outdoor" | "any";
+        };
+        /** PropDetail */
+        PropDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+            /** Category */
+            category: string;
+            /**
+             * Versions
+             * @default []
+             */
+            versions: components["schemas"]["PropVersionSummary"][];
+        };
+        /** PropOut */
+        PropOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+            /** Category */
+            category: string;
+        };
+        /** PropValidationOut */
+        PropValidationOut: {
+            /** Valid */
+            valid: boolean;
+            /** Issues */
+            issues: components["schemas"]["Issue"][];
+            resolved?: components["schemas"]["ResolvedProp"] | null;
+            /** Digest */
+            digest?: string | null;
+        };
+        /** PropVersionDetail */
+        PropVersionDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Size */
+            size: number[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Check Ok */
+            check_ok?: boolean | null;
+            /**
+             * Prop Id
+             * Format: uuid
+             */
+            prop_id: string;
+            /** Item Ref */
+            item_ref: string | null;
+            /** Solid */
+            solid: boolean;
+            /** Rests On */
+            rests_on: string;
+            /** Top Z */
+            top_z: number | null;
+            /** Seat Z */
+            seat_z: number | null;
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+            /** Style Profile Ref */
+            style_profile_ref: string | null;
+            /** Catalog Ref */
+            catalog_ref: string | null;
+            /** Blender Version */
+            blender_version: string | null;
+            /** Check Report */
+            check_report: {
+                [key: string]: unknown;
+            } | null;
+            /** Generate Job Id */
+            generate_job_id: string | null;
+            /** Review Notes */
+            review_notes: string;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Manifest Key */
+            manifest_key: string | null;
+            /** Manifest Sha256 */
+            manifest_sha256: string | null;
+            /** Published By */
+            published_by: string | null;
+            /**
+             * Files
+             * @default []
+             */
+            files: components["schemas"]["FileOut"][];
+            /**
+             * Ready For Review
+             * @description what blocks submit; empty when ready
+             */
+            ready_for_review?: string[];
+        };
+        /** PropVersionJobOut */
+        PropVersionJobOut: {
+            version: components["schemas"]["PropVersionDetail"];
+            job: components["schemas"]["JobOut"];
+        };
+        /** PropVersionSummary */
+        PropVersionSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Size */
+            size: number[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Check Ok */
+            check_ok?: boolean | null;
+            /**
+             * Prop Id
+             * Format: uuid
+             */
+            prop_id: string;
+            /** Item Ref */
+            item_ref: string | null;
+            /** Solid */
+            solid: boolean;
+            /** Rests On */
+            rests_on: string;
+            /** Top Z */
+            top_z: number | null;
+            /** Seat Z */
+            seat_z: number | null;
         };
         /** PublishBody */
         PublishBody: {
@@ -3825,6 +5022,99 @@ export interface components {
             /** Seed */
             seed: number;
         };
+        /** ResolvedDressing */
+        ResolvedDressing: {
+            /** Id */
+            id: string;
+            prop: components["schemas"]["ResolvedProp"];
+            /** At */
+            at: [
+                number,
+                number
+            ];
+            /** Z */
+            z: number;
+            /** Rotation Deg */
+            rotation_deg: number;
+            /** On */
+            on: string | null;
+        };
+        /** ResolvedEnvironment */
+        ResolvedEnvironment: {
+            /** Name */
+            name: string;
+            /** Style Profile */
+            style_profile: string;
+            /** Catalog */
+            catalog: string;
+            /** Template */
+            template: string;
+            /** Key */
+            key: string;
+            /** Kind */
+            kind: string;
+            /** Size */
+            size: [
+                number,
+                number,
+                number
+            ];
+            /** Floor Finish */
+            floor_finish: string;
+            /** Floor Color */
+            floor_color: string;
+            /** Floor Roughness */
+            floor_roughness: number;
+            /** Wall Finish */
+            wall_finish: string | null;
+            /** Wall Color */
+            wall_color: string | null;
+            /** Wall Roughness */
+            wall_roughness: number | null;
+            lighting: components["schemas"]["LightingPreset"];
+            /** Openings */
+            openings: components["schemas"]["ResolvedOpening"][];
+            /** Dressing */
+            dressing: components["schemas"]["ResolvedDressing"][];
+            /** Marks */
+            marks: components["schemas"]["ResolvedMark"][];
+            /** Cameras */
+            cameras: components["schemas"]["CameraMark"][];
+            /** Seed */
+            seed: number;
+        };
+        /** ResolvedMark */
+        ResolvedMark: {
+            /** Name */
+            name: string;
+            /** Kind */
+            kind: string;
+            /** At */
+            at: [
+                number,
+                number,
+                number
+            ];
+            /** Facing Deg */
+            facing_deg: number;
+            /** Item */
+            item: string | null;
+        };
+        /** ResolvedOpening */
+        ResolvedOpening: {
+            /** Kind */
+            kind: string;
+            /** Wall */
+            wall: string;
+            /** Offset M */
+            offset_m: number;
+            /** Width M */
+            width_m: number;
+            /** Sill M */
+            sill_m: number;
+            /** Head M */
+            head_m: number;
+        };
         /** ResolvedOutfit */
         ResolvedOutfit: {
             /** Name */
@@ -3893,6 +5183,49 @@ export interface components {
             covers: string[];
             /** Hides */
             hides: string[];
+        };
+        /** ResolvedProp */
+        ResolvedProp: {
+            /** Name */
+            name: string;
+            /** Style Profile */
+            style_profile: string;
+            /** Catalog */
+            catalog: string;
+            /** Item */
+            item: string;
+            /** Key */
+            key: string;
+            /** Category */
+            category: string;
+            /** Params */
+            params: {
+                [key: string]: number;
+            };
+            /** Size */
+            size: [
+                number,
+                number,
+                number
+            ];
+            /** Finish */
+            finish: string;
+            /** Color */
+            color: string;
+            /** Accent Color */
+            accent_color: string | null;
+            /** Roughness */
+            roughness: number;
+            /** Specular */
+            specular: number;
+            /** Solid */
+            solid: boolean;
+            /** Rests On */
+            rests_on: string;
+            /** Surfaces */
+            surfaces: components["schemas"]["Surface"][];
+            /** Seed */
+            seed: number;
         };
         /** ReviewBody */
         ReviewBody: {
@@ -4145,6 +5478,11 @@ export interface components {
             samples: number;
             /** Frames */
             frames?: number[] | null;
+            /**
+             * Video Every
+             * @default 0
+             */
+            video_every: number;
         };
         /** SceneUsage */
         SceneUsage: {
@@ -4330,6 +5668,97 @@ export interface components {
             /** Thumbnail Url */
             thumbnail_url?: string | null;
         };
+        /** SetCreate */
+        SetCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Tags */
+            tags?: string[];
+            /**
+             * Spec
+             * @description the specification; its name defaults to the asset's
+             */
+            spec: {
+                [key: string]: unknown;
+            };
+        };
+        /** SetDraftCreate */
+        SetDraftCreate: {
+            /** Based On Version Id */
+            based_on_version_id?: string | null;
+            /** Spec */
+            spec?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** SetDraftPatch */
+        SetDraftPatch: {
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+        };
+        /** SetGenerateBody */
+        SetGenerateBody: {
+            previews?: components["schemas"]["SetPreviewSettings"];
+        };
+        /** SetPatch */
+        SetPatch: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Recommended Version Id */
+            recommended_version_id?: string | null;
+        };
+        /** SetPreviewSettings */
+        SetPreviewSettings: {
+            /**
+             * Resolution
+             * @default 512
+             */
+            resolution: number;
+            /**
+             * Samples
+             * @default 12
+             */
+            samples: number;
+            /**
+             * Glb
+             * @default true
+             */
+            glb: boolean;
+        };
+        /** SetPublishBody */
+        SetPublishBody: {
+            /**
+             * Bump
+             * @description major is forced when what scenes rely on changes (size, marks, tops, ...)
+             * @default minor
+             * @enum {string}
+             */
+            bump: "minor" | "major";
+        };
+        /** SetReviewBody */
+        SetReviewBody: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "reject";
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
         /** StyleProfile */
         StyleProfile: {
             /** Id */
@@ -4387,6 +5816,22 @@ export interface components {
              * @default cartoon_humanoid@1.0
              */
             rig_profile: string;
+        };
+        /**
+         * Surface
+         * @description A place on a prop: a seat or a top that something can stand on, at a height that
+         *     scales with the prop's height.
+         */
+        Surface: {
+            /** Name */
+            name: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "seat" | "top";
+            /** Height Share */
+            height_share: number;
         };
         /** ToonMaterial */
         ToonMaterial: {
@@ -7603,6 +9048,1176 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_prop_items_api_v1_prop_items_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropDef"][];
+                };
+            };
+        };
+    };
+    list_templates_api_v1_environment_templates_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentDef"][];
+                };
+            };
+        };
+    };
+    list_lighting_api_v1_lighting_presets_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LightingPreset"][];
+                };
+            };
+        };
+    };
+    props_validate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropValidationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_gallery: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                tag?: string[];
+                /** @description prop category or environment template */
+                category?: string | null;
+                status?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_PropOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_patch_identity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_history: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_version_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_version_file: {
+        parameters: {
+            query?: {
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect to the object */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetReviewBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_publish: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SetPublishBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_deprecate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_create_draft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetDraftCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_discard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_edit_draft: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetDraftPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_generate: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SetGenerateBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    props_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PropVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_validate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentValidationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_gallery: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                tag?: string[];
+                /** @description prop category or environment template */
+                category?: string | null;
+                status?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_EnvironmentOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_patch_identity: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_history: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_version_detail: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_version_file: {
+        parameters: {
+            query?: {
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect to the object */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_review: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetReviewBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_publish: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SetPublishBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_deprecate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_create_draft: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetDraftCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_discard: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_edit_draft: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SetDraftPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_generate: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["SetGenerateBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    environments_submit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                owner_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EnvironmentVersionDetail"];
                 };
             };
             /** @description Validation Error */

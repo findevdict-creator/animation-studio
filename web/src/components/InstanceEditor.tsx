@@ -10,7 +10,7 @@ export const EXPRESSIONS = ["neutral", "happy", "sad", "angry", "surprised", "fe
 export type Pin = { code: string; version: string };
 export type AccessoryUse = { accessory: Pin; attach_point?: string | null };
 export type Instance = {
-  key: string; character: Pin; outfit?: Pin | null; accessories?: AccessoryUse[];
+  key: string; character: Pin; outfit?: Pin | null; accessories?: AccessoryUse[]; mark?: string | null;
   transform?: { location?: number[]; rotation_deg?: number[]; scale?: number };
   expressions?: { frame: number; expression: string; weight?: number }[];
   blink?: boolean;
@@ -99,8 +99,10 @@ function AccessoryRow({ use, onChange, onRemove }: { use: AccessoryUse; onChange
   );
 }
 
-export function InstanceEditor({ inst, frameEnd, onChange, onRemove }: {
+export function InstanceEditor({ inst, frameEnd, onChange, onRemove, marks }: {
   inst: Instance; frameEnd: number; onChange: (i: Instance) => void; onRemove: () => void;
+  /** the environment's marks, when the scene has one */
+  marks?: { name: string; kind: string }[];
 }) {
   const clips = useClips();
   const library = useAnimations({ status: "published" });
@@ -133,14 +135,23 @@ export function InstanceEditor({ inst, frameEnd, onChange, onRemove }: {
       {list("accessories").map((u, i) => <AccessoryRow key={i} use={u} onChange={(v) => put("accessories", i, v)} onRemove={() => put("accessories", i, null)} />)}
       <button type="button" onClick={() => put("accessories", list("accessories").length, { accessory: { code: "", version: "" } })}>Add accessory</button>
 
-      <h4>Placement</h4>
+      <h4>Placement{inst.mark ? <small> (moved and turned from the mark)</small> : null}</h4>
       <div className="row">
+        {marks && (
+          <Field label="start at mark">
+            <select value={inst.mark ?? ""} aria-label="mark" onChange={(e) => set({ mark: e.target.value || null })}>
+              <option value="">no mark (x, y in the set)</option>
+              {inst.mark && !marks.some((m) => m.name === inst.mark) && <option value={inst.mark}>{inst.mark} (not in this environment)</option>}
+              {marks.map((m) => <option key={m.name} value={m.name}>{m.name} ({m.kind})</option>)}
+            </select>
+          </Field>
+        )}
         {["x", "y", "z"].map((a, i) => (
           <Field key={a} label={`${a} (m)`}>
             <input type="number" step={0.05} value={loc[i]} onChange={(e) => setT({ location: loc.map((v, j) => (j === i ? num(e.target.value) : v)) })} />
           </Field>
         ))}
-        <Field label="turn (°)">
+        <Field label={inst.mark ? "turn from the mark (°)" : "turn (°)"}>
           <input type="number" step={5} value={rot[2]} onChange={(e) => setT({ rotation_deg: [rot[0], rot[1], num(e.target.value)] })} />
         </Field>
         <Field label="scale">
@@ -217,7 +228,19 @@ export function InstanceEditor({ inst, frameEnd, onChange, onRemove }: {
 export function PinChips({ resolved }: { resolved: Record<string, unknown> }) {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const insts = ((resolved as any).instances ?? []) as any[];
+  const env = (resolved as any).environment;
+  const props = ((resolved as any).props ?? []) as any[];
   return (
+    <>
+    {(env || props.length > 0) && (
+      <dl className="facts set-pins">
+        {env && (<><dt>Environment</dt><dd>{env.name} <code>{env.code}@{env.version}</code></dd></>)}
+        {(resolved as any).lighting && (<><dt>Lighting</dt><dd>{(resolved as any).lighting}</dd></>)}
+        {props.length > 0 && (<><dt>Props</dt><dd>{props.map((p) => (
+          <div key={p.key}>{p.key}: <code>{p.pin.code}@{p.pin.version}</code> {p.on ? `on ${p.on} at ${Number(p.z).toFixed(2)} m` : "on the floor"}</div>
+        ))}</dd></>)}
+      </dl>
+    )}
     <table className="pins">
       <thead><tr><th>Instance</th><th>Character</th><th>Outfit</th><th>Fit</th><th>Accessories</th><th>Clips</th></tr></thead>
       <tbody>
@@ -233,5 +256,6 @@ export function PinChips({ resolved }: { resolved: Record<string, unknown> }) {
         ))}
       </tbody>
     </table>
+    </>
   );
 }

@@ -25,6 +25,7 @@ function BuildPanel({ sid, v }: { sid: string; v: SceneVersionDetail }) {
   const busy = assemble.isPending || reopen.isPending || v.build_status === "queued" || v.verify_status === "queued";
   const frames = v.build_files.find((f) => f.name === "frames.png");
   const reopened = v.verify_files.find((f) => f.name === "reopened_frames.png");
+  const video = v.build_files.find((f) => f.name === "preview.mp4");
   const instances = ((v.build_report ?? {}) as { instances?: InstanceReport[] }).instances ?? [];
   return (
     <section className="panel" aria-label="scene build">
@@ -54,6 +55,12 @@ function BuildPanel({ sid, v }: { sid: string; v: SceneVersionDetail }) {
         </div>
       )}
       {v.build_status === "built" && <p className="readonly">A built scene never changes; edits make a new version.</p>}
+      {video?.url && (
+        <figure className="scene-video">
+          <video src={video.url} controls loop muted playsInline aria-label="preview video" />
+          <figcaption>Preview video (low-sample Eevee, every few frames)</figcaption>
+        </figure>
+      )}
       <div className="frames">
         {frames?.url && <figure><img src={frames.url} alt="assembled frames" /><figcaption>Assembled: preview frames</figcaption></figure>}
         {reopened?.url && <figure><img src={reopened.url} alt="reopened frames" /><figcaption>Reopened in a fresh workspace</figcaption></figure>}

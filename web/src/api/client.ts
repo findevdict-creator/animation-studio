@@ -44,6 +44,20 @@ export type BoneMap = S["BoneMap"];
 export type UploadOut = S["UploadOut"];
 export type AudioOut = S["AudioOut"];
 export type AudioJobOut = S["AudioJobOut"];
+export type PropOut = S["PropOut"];
+export type PropDetail = S["PropDetail"];
+export type PropVersionDetail = S["PropVersionDetail"];
+export type EnvironmentOut = S["EnvironmentOut"];
+export type EnvironmentDetail = S["EnvironmentDetail"];
+export type EnvironmentVersionDetail = S["EnvironmentVersionDetail"];
+export type PropDef = S["PropDef"];
+export type EnvironmentDef = S["EnvironmentDef"];
+export type LightingPreset = S["LightingPreset"];
+/** Props and environments share one library shape; ``plural`` is the API collection. */
+export type SetPlural = "props" | "environments";
+export type SetOut = PropOut | EnvironmentOut;
+export type SetDetail = PropDetail | EnvironmentDetail;
+export type SetVersionDetail = PropVersionDetail | EnvironmentVersionDetail;
 
 export const API = "/api/v1";
 
@@ -77,6 +91,11 @@ export async function outfitFileUrl(outfitId: string, versionId: string, name: s
 
 export async function accessoryFileUrl(accessoryId: string, versionId: string, name: string): Promise<string> {
   const r = await api<{ url: string }>(`/accessories/${accessoryId}/versions/${versionId}/files/${name}?redirect=false`);
+  return r.url;
+}
+
+export async function setFileUrl(plural: SetPlural, ownerId: string, versionId: string, name: string): Promise<string> {
+  const r = await api<{ url: string }>(`/${plural}/${ownerId}/versions/${versionId}/files/${name}?redirect=false`);
   return r.url;
 }
 

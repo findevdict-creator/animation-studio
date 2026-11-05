@@ -14,6 +14,7 @@ import { NewCharacterPage } from "./pages/NewCharacterPage";
 import { NewOutfitPage } from "./pages/NewOutfitPage";
 import { OutfitGalleryPage } from "./pages/OutfitGalleryPage";
 import { NewAccessoryPage } from "./pages/NewAccessoryPage";
+import { NewSetPage, SetGalleryPage, SetPage } from "./pages/SetPages";
 import { OutfitPage } from "./pages/OutfitPage";
 import { SceneEditorPage } from "./pages/SceneEditorPage";
 import { SceneListPage } from "./pages/SceneListPage";
@@ -40,6 +41,8 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Link to="/characters">Characters</Link>
         <Link to="/outfits">Outfits</Link>
         <Link to="/accessories">Accessories</Link>
+        <Link to="/props">Props</Link>
+        <Link to="/environments">Environments</Link>
         <Link to="/animations">Animations</Link>
         <Link to="/audio">Dialogue audio</Link>
         <Link to="/scenes">Scenes</Link>
@@ -78,6 +81,11 @@ export function App() {
       <Route path="/accessories" element={<Shell><AccessoryGalleryPage /></Shell>} />
       <Route path="/accessories/new" element={<Shell><NewAccessoryPage /></Shell>} />
       <Route path="/accessories/:id" element={<Shell><AccessoryPage /></Shell>} />
+      {(["props", "environments"] as const).map((p) => [
+        <Route key={p} path={`/${p}`} element={<Shell><SetGalleryPage key={p} plural={p} /></Shell>} />,
+        <Route key={`${p}-new`} path={`/${p}/new`} element={<Shell><NewSetPage key={p} plural={p} /></Shell>} />,
+        <Route key={`${p}-one`} path={`/${p}/:id`} element={<Shell><SetPage key={p} plural={p} /></Shell>} />,
+      ])}
       <Route path="/animations" element={<Shell><AnimationGalleryPage /></Shell>} />
       <Route path="/animations/new" element={<Shell><NewAnimationPage /></Shell>} />
       <Route path="/animations/:id" element={<Shell><AnimationPage /></Shell>} />

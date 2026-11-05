@@ -5,6 +5,7 @@ import {
   SceneVersionDetail,
   api, CharacterDetail, CharacterOut, Conventions, FitDetail, FitOut, Garment, JobOut, Me, OutfitDetail, OutfitOut,
   OutfitVersionDetail, VersionDetail, VersionJobOut,
+  EnvironmentDef, LightingPreset, PropDef, SetDetail, SetOut, SetPlural, SetVersionDetail,
 } from "./client";
 
 export const useMe = () => useQuery({ queryKey: ["me"], queryFn: () => api<Me>("/me"), staleTime: 60_000 });
@@ -156,6 +157,42 @@ export function useAccessoryAction<TBody, TOut = unknown>(aid: string, run: (bod
       for (const key of [["accessory", aid], ["accessory-version", aid], ["accessories"]]) qc.invalidateQueries({ queryKey: key });
     },
   });
+}
+
+// ---------------------------------------------------------------- props and environments
+export interface SetFilter { q?: string; tag?: string; category?: string; status?: string }
+
+export const useSets = <T extends SetOut = SetOut>(plural: SetPlural, f: SetFilter) =>
+  useQuery({
+    queryKey: [plural, f],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      for (const [k, v] of Object.entries(f)) if (v) p.set(k, v);
+      return api<{ items: T[]; next_cursor: string | null }>(`/${plural}?${p}`);
+    },
+  });
+
+export const useSet = <T extends SetDetail = SetDetail>(plural: SetPlural, id: string) =>
+  useQuery({ queryKey: [plural, "one", id], queryFn: () => api<T>(`/${plural}/${id}`), enabled: !!id });
+
+export const useSetVersion = <T extends SetVersionDetail = SetVersionDetail>(plural: SetPlural, id: string, vid: string | undefined) =>
+  useQuery({
+    queryKey: [plural, "version", id, vid],
+    queryFn: () => api<T>(`/${plural}/${id}/versions/${vid}`),
+    enabled: !!id && !!vid,
+  });
+
+export const usePropItems = () =>
+  useQuery({ queryKey: ["prop-items"], queryFn: () => api<PropDef[]>("/prop-items"), staleTime: Infinity });
+export const useEnvironmentTemplates = () =>
+  useQuery({ queryKey: ["environment-templates"], queryFn: () => api<EnvironmentDef[]>("/environment-templates"), staleTime: Infinity });
+export const useLightingPresets = () =>
+  useQuery({ queryKey: ["lighting-presets"], queryFn: () => api<LightingPreset[]>("/lighting-presets"), staleTime: Infinity });
+
+/** Every mutation on a prop or environment refreshes everything under its collection key. */
+export function useSetAction<TBody, TOut = unknown>(plural: SetPlural, run: (body: TBody) => Promise<TOut>) {
+  const qc = useQueryClient();
+  return useMutation({ mutationFn: run, onSuccess: () => qc.invalidateQueries({ queryKey: [plural] }) });
 }
 
 // ---------------------------------------------------------------- animations

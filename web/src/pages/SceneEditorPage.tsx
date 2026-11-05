@@ -6,11 +6,13 @@ import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { api, SceneDetail, SceneValidationOut, SceneVersionDetail } from "../api/client";
 import { useCan, useScene, useSceneVersion } from "../api/hooks";
 import { ErrorNote, Field } from "../components/bits";
-import { Instance, InstanceEditor, PinChips } from "../components/InstanceEditor";
+import { Instance, InstanceEditor, Pin, PinChips } from "../components/InstanceEditor";
+import { PropUse, SceneSetEditor, useEnvironmentLayout } from "../components/SceneSetEditor";
 
 export type Manifest = {
   name: string; description?: string; fps: number; frame_start: number; frame_end: number;
-  instances: Instance[]; camera: { preset: string; angle_deg: number; focus?: string | null };
+  instances: Instance[]; camera: { preset: string; angle_deg: number; focus?: string | null; mark?: string | null };
+  environment?: Pin | null; props?: PropUse[]; lighting?: string | null;
 };
 
 export const blankInstance = (n: number): Instance => ({
@@ -22,10 +24,15 @@ export const blankInstance = (n: number): Instance => ({
 export const BLANK: Manifest = { name: "", fps: 24, frame_start: 1, frame_end: 72, instances: [blankInstance(1)],
   camera: { preset: "wide", angle_deg: 20, focus: null } };
 
-/** The manifest as sent: empty accessory rows and an unset focus are left out. */
+/** The manifest as sent: empty accessory and prop rows, an unset focus and set fields
+ * without an environment are left out. */
 export function cleanManifest(m: Manifest): Manifest {
-  return { ...m, camera: { ...m.camera, focus: m.camera.focus || null },
-    instances: m.instances.map((i) => ({ ...i, accessories: (i.accessories ?? []).filter((a) => a.accessory.code) })) };
+  const env = m.environment?.code ? m.environment : null;
+  return { ...m, environment: env, lighting: m.lighting || null,
+    props: (m.props ?? []).filter((p) => p.prop.code),
+    camera: { ...m.camera, focus: m.camera.focus || null, mark: env ? m.camera.mark || null : null },
+    instances: m.instances.map((i) => ({ ...i, mark: env ? i.mark || null : null,
+      accessories: (i.accessories ?? []).filter((a) => a.accessory.code) })) };
 }
 
 export function SceneEditorPage() {
@@ -43,6 +50,7 @@ export function SceneEditorPage() {
   const [check, setCheck] = useState<SceneValidationOut>();
   const [error, setError] = useState<unknown>();
   const [busy, setBusy] = useState(false);
+  const layout = useEnvironmentLayout(m.environment);
   useEffect(() => { if (base.data) setM(base.data.manifest as unknown as Manifest); }, [base.data?.id]); // eslint-disable-line react-hooks/exhaustive-deps
   useEffect(() => { if (!from && scene.data) setM((x) => ({ ...x, name: x.name || scene.data!.name })); }, [scene.data?.id]); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -91,7 +99,7 @@ export function SceneEditorPage() {
           <Field label="first frame"><input type="number" min={0} value={m.frame_start} onChange={(e) => set({ frame_start: Number(e.target.value) })} /></Field>
           <Field label="last frame"><input type="number" min={1} value={m.frame_end} onChange={(e) => set({ frame_end: Number(e.target.value) })} /></Field>
           <Field label="camera">
-            <select value={m.camera.preset} onChange={(e) => set({ camera: { ...m.camera, preset: e.target.value } })}>
+            <select value={m.camera.preset} disabled={!!m.camera.mark} onChange={(e) => set({ camera: { ...m.camera, preset: e.target.value } })}>
               {["wide", "medium", "close"].map((p) => <option key={p}>{p}</option>)}
             </select>
           </Field>
@@ -104,8 +112,10 @@ export function SceneEditorPage() {
           </Field>
         </div>
 
+        <SceneSetEditor m={m} instances={m.instances} onChange={(patch) => set(patch as Partial<Manifest>)} />
+
         {m.instances.map((inst, i) => (
-          <InstanceEditor key={i} inst={inst} frameEnd={m.frame_end} onChange={(v) => setInst(i, v)} onRemove={() => setInst(i, null)} />
+          <InstanceEditor key={i} inst={inst} frameEnd={m.frame_end} marks={layout?.marks} onChange={(v) => setInst(i, v)} onRemove={() => setInst(i, null)} />
         ))}
         <button type="button" disabled={m.instances.length >= 8} onClick={() => set({ instances: [...m.instances, blankInstance(m.instances.length + 1)] })}>
           Add character instance

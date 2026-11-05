@@ -110,7 +110,7 @@ aside { background: var(--panel); border: 1px solid var(--line); border-radius: 
 .chip-build-none, .chip-reopen-none { background: var(--draft-bg); color: var(--draft); }
 .thumb.wide { aspect-ratio: 16 / 9; }
 .scene-editor { display: flex; flex-direction: column; gap: 12px; max-width: 980px; }
-.scene-editor .grid2, .instance .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+.scene-editor .grid2, .instance .grid2, .environment-form .grid2, .scene-set .grid2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
 .row { display: flex; flex-wrap: wrap; align-items: end; gap: 8px; margin: 4px 0; }
 .row input[type="number"] { width: 6em; }
 .row .grow { flex: 1 1 240px; }
@@ -139,3 +139,28 @@ li.warning { color: var(--review); }
 .cue-strip .cue-rest { background: transparent; }
 .cue-strip .cue-MBP { opacity: 0.55; }
 .hint { font-size: 13px; opacity: 0.8; margin: 4px 0 8px; }
+
+/* Phase 7: set plans (metres in the SVG; --u is one fortieth of the larger side) */
+.set-plan { width: 100%; max-height: 420px; display: block; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; }
+.set-plan .floor { fill: #efe6d6; stroke: #8b7e6a; stroke-width: calc(var(--u) * 0.4); }
+.set-plan .floor-outdoor { fill: #dcebd2; stroke: #8aa37a; stroke-dasharray: calc(var(--u) * 1.5); }
+.set-plan .cutaway { stroke: var(--panel); stroke-width: calc(var(--u) * 0.6); stroke-dasharray: calc(var(--u) * 0.8); }
+.set-plan .solid { fill: #b9a98f; stroke: #6f6150; stroke-width: calc(var(--u) * 0.2); }
+.set-plan .top { fill: none; stroke: #3858e9; stroke-width: calc(var(--u) * 0.2); stroke-dasharray: calc(var(--u) * 0.6); }
+.set-plan .seat { fill: none; stroke: #16794c; stroke-width: calc(var(--u) * 0.25); }
+.set-plan .mark circle { fill: #ffd76a; stroke: #8a6d00; stroke-width: calc(var(--u) * 0.2); }
+.set-plan .mark-seat circle { fill: #9fe0bd; stroke: #16794c; }
+.set-plan .mark-interaction circle { fill: #e2d4ff; stroke: #6a3fbf; }
+.set-plan .facing { stroke: #1d2330; stroke-width: calc(var(--u) * 0.3); stroke-linecap: round; }
+.set-plan .camera line { stroke: #667085; stroke-width: calc(var(--u) * 0.2); stroke-dasharray: calc(var(--u) * 0.5); }
+.set-plan .camera circle { fill: #667085; }
+.set-plan .camera.on line, .set-plan .camera.on circle { stroke: #c4372b; fill: #c4372b; }
+.set-plan .dot-character circle { fill: #3858e9; fill-opacity: .7; }
+.set-plan .dot-prop circle, .set-plan .dot-prop rect { fill: #c4372b; fill-opacity: .7; }
+.set-plan text { font-size: calc(var(--u) * 1.4); fill: var(--ink); text-anchor: middle; }
+.scene-set { border: 1px solid var(--line); border-radius: 12px; padding: 12px; margin: 12px 0; }
+.environment-form .row input[type="number"] { width: 5.5em; }
+.scene-set .row input[type="number"] { width: 5.5em; }
+.issues { font-size: 13px; padding-left: 18px; } .issues .error { color: var(--danger); } .issues .warning { color: var(--draft); }
+.scene-video video { width: 100%; border-radius: 8px; background: #000; }
+.scene-video figcaption { font-size: 12px; color: var(--muted); }
