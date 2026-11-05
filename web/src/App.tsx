@@ -9,6 +9,7 @@ import { AnimationPage } from "./pages/AnimationPage";
 import { AudioPage } from "./pages/AudioPage";
 import { NewAnimationPage } from "./pages/NewAnimationPage";
 import { CharacterPage } from "./pages/CharacterPage";
+import { EpisodePage, SeriesListPage, SeriesPage } from "./pages/EpisodePages";
 import { GalleryPage } from "./pages/GalleryPage";
 import { NewCharacterPage } from "./pages/NewCharacterPage";
 import { NewOutfitPage } from "./pages/NewOutfitPage";
@@ -46,6 +47,7 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Link to="/animations">Animations</Link>
         <Link to="/audio">Dialogue audio</Link>
         <Link to="/scenes">Scenes</Link>
+        <Link to="/series">Series</Link>
         <span className="spacer" />
         {me.data && <span className="who">{me.data.name} · {me.data.roles.join(", ")}</span>}
         <button onClick={() => userManager.signoutRedirect()}>Sign out</button>
@@ -94,6 +96,9 @@ export function App() {
       <Route path="/scenes/new" element={<Shell><SceneEditorPage /></Shell>} />
       <Route path="/scenes/:id" element={<Shell><ScenePage /></Shell>} />
       <Route path="/scenes/:id/edit" element={<Shell><SceneEditorPage /></Shell>} />
+      <Route path="/series" element={<Shell><SeriesListPage /></Shell>} />
+      <Route path="/series/:ref" element={<Shell><SeriesPage /></Shell>} />
+      <Route path="/episodes/:ref" element={<Shell><EpisodePage /></Shell>} />
     </Routes>
   );
 }

@@ -164,3 +164,27 @@ li.warning { color: var(--review); }
 .issues { font-size: 13px; padding-left: 18px; } .issues .error { color: var(--danger); } .issues .warning { color: var(--draft); }
 .scene-video video { width: 100%; border-radius: 8px; background: #000; }
 .scene-video figcaption { font-size: 12px; color: var(--muted); }
+
+/* Phase 8: series, the episode editor and renders */
+.tabs { display: flex; gap: 4px; border-bottom: 1px solid var(--line); margin: 12px 0 16px; flex-wrap: wrap; }
+.tabs button { border: none; border-bottom: 2px solid transparent; border-radius: 0; background: none; }
+.tabs button.active { border-bottom-color: var(--accent); color: var(--accent); font-weight: 600; }
+.sb-strip { position: relative; height: 64px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; overflow: hidden; }
+.sb-shot { position: absolute; top: 4px; bottom: 4px; padding: 4px 6px; border-radius: 6px; display: flex; flex-direction: column;
+  align-items: flex-start; overflow: hidden; font-size: 12px; text-align: left; white-space: nowrap; min-width: 0; }
+.sb-shot small { color: var(--muted); }
+.sb-wide { background: #e3eafc; } .sb-medium { background: #efe7ff; } .sb-close { background: #fff4c2; }
+.sb-selected { outline: 2px solid var(--accent); z-index: 1; }
+.sb-tr { position: absolute; right: 4px; bottom: 2px; font-size: 10px; color: var(--review); }
+.shot-card .row input[type="number"] { width: 5.5em; }
+.script { border: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.script .grow, .shot-card .grow { flex: 1; min-width: 200px; }
+.chip-locked, .chip-completed, .chip-ready, .chip-build-built, .chip-reopen-verified { background: var(--published-bg); color: var(--published); }
+.chip-rendering, .chip-exporting, .chip-queued, .chip-running, .chip-build-queued, .chip-reopen-queued { background: var(--review-bg); color: var(--review); }
+.chip-build-failed, .chip-reopen-failed, .chip-cancelled { background: #fde4e1; color: var(--danger); }
+progress { width: 100%; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .sb-wide { background: #1f2a44; }
+  :root:not([data-theme="light"]) .sb-medium { background: #2d2342; }
+  :root:not([data-theme="light"]) .sb-close { background: #3a3110; }
+}

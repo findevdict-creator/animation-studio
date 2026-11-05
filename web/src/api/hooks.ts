@@ -6,6 +6,7 @@ import {
   api, CharacterDetail, CharacterOut, Conventions, FitDetail, FitOut, Garment, JobOut, Me, OutfitDetail, OutfitOut,
   OutfitVersionDetail, VersionDetail, VersionJobOut,
   EnvironmentDef, LightingPreset, PropDef, SetDetail, SetOut, SetPlural, SetVersionDetail,
+  EpisodeOut, EpisodeVersionOut, RenderLog, RenderOut, SeriesOut, StoryboardOut,
 } from "./client";
 
 export const useMe = () => useQuery({ queryKey: ["me"], queryFn: () => api<Me>("/me"), staleTime: 60_000 });
@@ -236,7 +237,7 @@ export function useAnimationAction<TBody, TOut = unknown>(aid: string, run: (bod
 }
 
 // ---------------------------------------------------------------- dialogue audio
-export const useAudioClips = (f: { status?: string; q?: string } = {}) =>
+export const useAudioClips = (f: { status?: string; q?: string; kind?: string } = {}) =>
   useQuery({
     queryKey: ["audio-clips", f],
     queryFn: () => {
@@ -280,6 +281,69 @@ export function useSceneAction<TBody, TOut = unknown>(sid: string, run: (body: T
     mutationFn: run,
     onSuccess: () => {
       for (const key of [["scene", sid], ["scene-version", sid], ["scenes"]]) qc.invalidateQueries({ queryKey: key });
+    },
+  });
+}
+
+// ---------------------------------------------------------------- series, episodes, renders
+export const useSeriesList = () =>
+  useQuery({ queryKey: ["series"], queryFn: () => api<{ items: SeriesOut[] }>("/series") });
+
+export const useSeries = (ref: string | undefined) =>
+  useQuery({ queryKey: ["series", ref], queryFn: () => api<SeriesOut>(`/series/${ref}`), enabled: !!ref });
+
+export const useEpisodes = (series?: string) =>
+  useQuery({
+    queryKey: ["episodes", series],
+    queryFn: () => api<{ items: EpisodeOut[] }>(`/episodes${series ? `?series=${encodeURIComponent(series)}` : ""}`),
+  });
+
+export const useEpisode = (ref: string | undefined) =>
+  useQuery({ queryKey: ["episode", ref], queryFn: () => api<EpisodeOut>(`/episodes/${ref}`), enabled: !!ref });
+
+export const useStoryboard = (id: string | undefined) =>
+  useQuery({ queryKey: ["storyboard", id], queryFn: () => api<StoryboardOut>(`/storyboards/${id}`), enabled: !!id });
+
+const busyShot = (v: EpisodeVersionOut) => v.shots.some((s) => s.build_status === "queued" || s.verify_status === "queued");
+
+export const useEpisodeVersion = (id: string | undefined) =>
+  useQuery({
+    queryKey: ["episode-version", id],
+    queryFn: () => api<EpisodeVersionOut>(`/episode-versions/${id}`),
+    enabled: !!id,
+    refetchInterval: (q) => (q.state.data && busyShot(q.state.data) ? 2500 : false),
+  });
+
+export const RENDER_DONE = ["completed", "failed", "cancelled"];
+
+export const useRenders = (episode: string | undefined) =>
+  useQuery({
+    queryKey: ["renders", episode],
+    queryFn: () => api<{ items: RenderOut[] }>(`/render-jobs?episode=${encodeURIComponent(episode ?? "")}`),
+    enabled: !!episode,
+    refetchInterval: (q) => (q.state.data?.items.some((r) => !RENDER_DONE.includes(r.status)) ? 3000 : false),
+  });
+
+export const useRender = (ref: string | undefined) =>
+  useQuery({
+    queryKey: ["render", ref],
+    queryFn: () => api<RenderOut>(`/render-jobs/${ref}`),
+    enabled: !!ref,
+    refetchInterval: (q) => (q.state.data && !RENDER_DONE.includes(q.state.data.status) ? 2000 : false),
+  });
+
+export const useRenderLogs = (ref: string | undefined, open: boolean) =>
+  useQuery({ queryKey: ["render-logs", ref], queryFn: () => api<RenderLog[]>(`/render-jobs/${ref}/logs`), enabled: !!ref && open });
+
+/** Every mutation in the episode editor refreshes the episode and everything under it. */
+export function useEpisodeAction<TBody, TOut = unknown>(run: (body: TBody) => Promise<TOut>) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      for (const key of [["episode"], ["episodes"], ["storyboard"], ["episode-version"], ["renders"], ["render"], ["series"],
+        ["audio-clips"]])
+        qc.invalidateQueries({ queryKey: key });
     },
   });
 }

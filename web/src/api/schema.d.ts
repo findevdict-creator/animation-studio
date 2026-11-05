@@ -2119,6 +2119,453 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/series": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Series, newest first */
+        get: operations["list_series_api_v1_series_get"];
+        put?: never;
+        /** Create a series: settings, cast and asset collection */
+        post: operations["create_series_api_v1_series_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/series/{ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Series */
+        get: operations["get_series_api_v1_series__ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Name, description, settings */
+        patch: operations["patch_series_api_v1_series__ref__patch"];
+        trace?: never;
+    };
+    "/api/v1/series/{ref}/members": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace the series cast */
+        put: operations["put_members_api_v1_series__ref__members_put"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/series/{ref}/assets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Add exact versions to the asset collection */
+        post: operations["add_assets_api_v1_series__ref__assets_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Episodes, newest first */
+        get: operations["list_episodes_api_v1_episodes_get"];
+        put?: never;
+        /** Create Episode */
+        post: operations["create_episode_api_v1_episodes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An episode with its scripts, storyboards, versions */
+        get: operations["get_episode_api_v1_episodes__ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/scripts/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Dry run: check a script against the series */
+        post: operations["validate_script_api_v1_episodes__ref__scripts_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/scripts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Save a script version (never edited; an edit is the next number) */
+        post: operations["save_script_api_v1_episodes__ref__scripts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/scripts/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask the AI for a script suggestion (a job; nothing is saved until a person saves it) */
+        post: operations["generate_script_api_v1_episodes__ref__scripts_generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/storyboards": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Save a storyboard: planned by rule, edited by hand, or an AI suggestion kept */
+        post: operations["save_storyboard_api_v1_episodes__ref__storyboards_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/storyboards/suggest": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Ask the AI to suggest shots for a script version (a job; nothing is saved) */
+        post: operations["suggest_shots_api_v1_episodes__ref__storyboards_suggest_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Compile a storyboard into an episode version: one scene version per shot, exact pins */
+        post: operations["create_version_api_v1_episodes__ref__versions_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episodes/{ref}/scenes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The scene each shot lives in */
+        get: operations["list_scenes_api_v1_episodes__ref__scenes_get"];
+        put?: never;
+        /** SRS 23 name for compiling the episode's scenes (same as POST /episodes/{id}/versions) */
+        post: operations["create_scenes_api_v1_episodes__ref__scenes_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/storyboards/{sb_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Storyboard */
+        get: operations["get_storyboard_api_v1_storyboards__sb_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/storyboards/{sb_id}/voice": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Speak every line without a recording with its character's voice (media jobs) */
+        post: operations["voice_api_v1_storyboards__sb_id__voice_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/storyboards/{sb_id}/voiced": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** A new storyboard with each line's recording, shots lengthened to fit */
+        post: operations["make_voiced_api_v1_storyboards__sb_id__voiced_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episode-versions/{vid}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Version */
+        get: operations["get_version_api_v1_episode_versions__vid__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episode-versions/{vid}/build": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Build every shot's scene.blend that is not built yet (Blender jobs) */
+        post: operations["build_api_v1_episode_versions__vid__build_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episode-versions/{vid}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reopen every shot's saved scene.blend from its pins and check it (Blender jobs) */
+        post: operations["reopen_api_v1_episode_versions__vid__reopen_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/episode-versions/{vid}/lock": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Lock the version: its shots, pins and audio never change; it can be rendered */
+        post: operations["lock_api_v1_episode_versions__vid__lock_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/render-jobs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Render jobs, newest first */
+        get: operations["list_renders_api_v1_render_jobs_get"];
+        put?: never;
+        /** Render a locked episode version: a Blender job per shot, then the FFmpeg export */
+        post: operations["create_render_api_v1_render_jobs_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/render-jobs/{ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Status, progress, settings, pins and outputs */
+        get: operations["get_render_api_v1_render_jobs__ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/render-jobs/{ref}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel every shot and the export */
+        post: operations["cancel_render_api_v1_render_jobs__ref__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/render-jobs/{ref}/retry": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Run the failed jobs of a failed render again */
+        post: operations["retry_render_api_v1_render_jobs__ref__retry_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/render-jobs/{ref}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Each job's captured log */
+        get: operations["render_logs_api_v1_render_jobs__ref__logs_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/render-jobs/{ref}/video": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The episode MP4: 302 to a presigned URL */
+        get: operations["render_video_api_v1_render_jobs__ref__video_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -2373,6 +2820,12 @@ export interface components {
             max_inside_depth_m: number;
             /** Clearance M */
             clearance_m: number;
+        };
+        /** AccessoryUse */
+        AccessoryUse: {
+            accessory: components["schemas"]["Pin"];
+            /** Attach Point */
+            attach_point?: string | null;
         };
         /** AccessoryValidationOut */
         AccessoryValidationOut: {
@@ -2919,6 +3372,13 @@ export interface components {
              * @description an upload of kind audio
              */
             upload_id: string;
+            /**
+             * Kind
+             * @description dialogue gets mouth cues; music and effects are normalised for the mix
+             * @default dialogue
+             * @enum {string}
+             */
+            kind: "dialogue" | "music" | "sfx";
             /** Name */
             name?: string | null;
             /**
@@ -2926,6 +3386,34 @@ export interface components {
              * @description the transcript; the analyser uses it to choose mouth shapes
              */
             dialog_text?: string | null;
+        };
+        /**
+         * AudioCue
+         * @description Music or a sound effect on the episode timeline (SRS 17).
+         */
+        AudioCue: {
+            /** Audio */
+            audio: string;
+            /**
+             * Start S
+             * @default 0
+             */
+            start_s: number;
+            /**
+             * Volume
+             * @default 1
+             */
+            volume: number;
+            /**
+             * Fade In S
+             * @default 0
+             */
+            fade_in_s: number;
+            /**
+             * Fade Out S
+             * @default 0
+             */
+            fade_out_s: number;
         };
         /** AudioJobOut */
         AudioJobOut: {
@@ -2944,10 +3432,26 @@ export interface components {
             /** Name */
             name: string;
             /**
-             * Upload Id
-             * Format: uuid
+             * Kind
+             * @description dialogue | music | sfx
              */
-            upload_id: string;
+            kind: string;
+            /**
+             * Source
+             * @description upload | tts (spoken by a speech provider)
+             */
+            source: string;
+            /** Upload Id */
+            upload_id: string | null;
+            /**
+             * Voice
+             * @description the VoiceProfile a speech clip was spoken with
+             */
+            voice: {
+                [key: string]: unknown;
+            } | null;
+            /** Provider */
+            provider: string | null;
             /** Dialog Text */
             dialog_text: string | null;
             /**
@@ -2981,6 +3485,27 @@ export interface components {
             created_at: string;
             /** Finished At */
             finished_at: string | null;
+        };
+        /** AudioUseOut */
+        AudioUseOut: {
+            /** Code */
+            code: string;
+            /** Role */
+            role: string;
+            /** Kind */
+            kind: string;
+            /** Source */
+            source: string;
+            /** Status */
+            status: string;
+            /** Duration S */
+            duration_s: number | null;
+            /** Voice */
+            voice: {
+                [key: string]: unknown;
+            } | null;
+            /** Text */
+            text: string | null;
         };
         /**
          * BodyType
@@ -3017,6 +3542,10 @@ export interface components {
              * @default []
              */
             passthrough: string[];
+        };
+        /** BuildBody */
+        BuildBody: {
+            previews?: components["schemas"]["ScenePreviewSettings"];
         };
         /** BvhSource */
         BvhSource: {
@@ -3078,6 +3607,18 @@ export interface components {
              * @default 28
              */
             lens_mm: number;
+        };
+        /** CastBody */
+        CastBody: {
+            /** Character */
+            character: string;
+            /** Key */
+            key?: string | null;
+            character_version?: components["schemas"]["Pin"] | null;
+            outfit?: components["schemas"]["Pin"] | null;
+            /** Accessories */
+            accessories?: components["schemas"]["AccessoryUse"][];
+            voice?: components["schemas"]["VoiceProfile"] | null;
         };
         /** CharacterCreate */
         CharacterCreate: {
@@ -3214,6 +3755,18 @@ export interface components {
             loops: boolean;
             /** Controls */
             controls: string[];
+        };
+        /** ClosureOut */
+        ClosureOut: {
+            /**
+             * Asset Version Id
+             * Format: uuid
+             */
+            asset_version_id: string;
+            /** Kind */
+            kind: string;
+            /** Display */
+            display: string;
         };
         /** ConventionsOut */
         ConventionsOut: {
@@ -3587,6 +4140,180 @@ export interface components {
             /** Lighting */
             lighting: string | null;
         };
+        /** EpisodeCreate */
+        EpisodeCreate: {
+            /**
+             * Series Id
+             * @description SERIES-001 or the series' id
+             */
+            series_id: string;
+            /** Title */
+            title: string;
+            /**
+             * Concept
+             * @default
+             */
+            concept: string;
+            /** Number */
+            number?: number | null;
+        };
+        /** EpisodeIssue */
+        EpisodeIssue: {
+            /** Path */
+            path: string;
+            /** Code */
+            code: string;
+            /** Message */
+            message: string;
+            /**
+             * Severity
+             * @default error
+             */
+            severity: string;
+        };
+        /** EpisodeOut */
+        EpisodeOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /**
+             * Series Id
+             * Format: uuid
+             */
+            series_id: string;
+            /** Series Code */
+            series_code: string;
+            /** Number */
+            number: number;
+            /** Title */
+            title: string;
+            /** Concept */
+            concept: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Script Versions */
+            script_versions?: components["schemas"]["ScriptVersionOut"][];
+            /** Storyboards */
+            storyboards?: components["schemas"]["StoryboardOut"][];
+            /** Versions */
+            versions?: components["schemas"]["EpisodeVersionSummary"][];
+        };
+        /** EpisodeSceneOut */
+        EpisodeSceneOut: {
+            /** Shot Id */
+            shot_id: string;
+            /**
+             * Scene Id
+             * Format: uuid
+             */
+            scene_id: string;
+            /** Scene Code */
+            scene_code: string;
+            /** Versions */
+            versions: number;
+        };
+        /** EpisodeVersionOut */
+        EpisodeVersionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /** Status */
+            status: string;
+            /** Digest */
+            digest: string;
+            /**
+             * Script Version Id
+             * Format: uuid
+             */
+            script_version_id: string;
+            /**
+             * Storyboard Id
+             * Format: uuid
+             */
+            storyboard_id: string;
+            /** Duration S */
+            duration_s: number;
+            /** Notes */
+            notes: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Locked At */
+            locked_at: string | null;
+            /**
+             * Episode Id
+             * Format: uuid
+             */
+            episode_id: string;
+            /** Episode Code */
+            episode_code: string;
+            /** Manifest */
+            manifest: {
+                [key: string]: unknown;
+            };
+            /** Shots */
+            shots: components["schemas"]["VersionShotOut"][];
+            /** Closure */
+            closure: components["schemas"]["ClosureOut"][];
+            /** Audio */
+            audio: components["schemas"]["AudioUseOut"][];
+            /** Progress */
+            progress: {
+                [key: string]: unknown;
+            };
+            /** Issues */
+            issues?: components["schemas"]["EpisodeIssue"][];
+            /** New Scene Versions */
+            new_scene_versions?: number | null;
+        };
+        /** EpisodeVersionSummary */
+        EpisodeVersionSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /** Status */
+            status: string;
+            /** Digest */
+            digest: string;
+            /**
+             * Script Version Id
+             * Format: uuid
+             */
+            script_version_id: string;
+            /**
+             * Storyboard Id
+             * Format: uuid
+             */
+            storyboard_id: string;
+            /** Duration S */
+            duration_s: number;
+            /** Notes */
+            notes: string;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Locked At */
+            locked_at: string | null;
+        };
         /** Fabric */
         Fabric: {
             /** Roughness */
@@ -3853,6 +4580,21 @@ export interface components {
         GenerateBody: {
             previews?: components["schemas"]["PreviewSettings"];
         };
+        /** GenerateScriptBody */
+        GenerateScriptBody: {
+            /**
+             * Concept
+             * @description defaults to the episode's concept
+             */
+            concept?: string | null;
+            /**
+             * Target Duration S
+             * @default 60
+             */
+            target_duration_s: number;
+            /** Provider */
+            provider?: string | null;
+        };
         /** GeneratorDef */
         GeneratorDef: {
             /** Id */
@@ -4028,6 +4770,58 @@ export interface components {
             roles: string[];
             /** Permissions */
             permissions: string[];
+        };
+        /** MemberBody */
+        MemberBody: {
+            /**
+             * Character
+             * @description CHAR-001 or the character's id
+             */
+            character: string;
+            /**
+             * Key
+             * @description instance key in every scene, e.g. ali
+             */
+            key: string;
+            /**
+             * Role
+             * @default main
+             * @enum {string}
+             */
+            role: "main" | "supporting";
+            /** @description default version; else recommended / newest */
+            character_version?: components["schemas"]["Pin"] | null;
+            outfit_version?: components["schemas"]["Pin"] | null;
+            voice?: components["schemas"]["VoiceProfile"];
+        };
+        /** MemberOut */
+        MemberOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Character Id
+             * Format: uuid
+             */
+            character_id: string;
+            /** Character Code */
+            character_code: string;
+            /** Character Name */
+            character_name: string;
+            /** Key */
+            key: string;
+            /** Role */
+            role: string;
+            /** Default Character Version Id */
+            default_character_version_id: string | null;
+            /** Default Outfit Version Id */
+            default_outfit_version_id: string | null;
+            /** Voice */
+            voice: {
+                [key: string]: unknown;
+            };
         };
         /** OutfitCreate */
         OutfitCreate: {
@@ -4421,6 +5215,13 @@ export interface components {
             /** Next Cursor */
             next_cursor?: string | null;
         };
+        /** Page[EpisodeOut] */
+        Page_EpisodeOut_: {
+            /** Items */
+            items: components["schemas"]["EpisodeOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
         /** Page[JobOut] */
         Page_JobOut_: {
             /** Items */
@@ -4442,10 +5243,24 @@ export interface components {
             /** Next Cursor */
             next_cursor?: string | null;
         };
+        /** Page[RenderOut] */
+        Page_RenderOut_: {
+            /** Items */
+            items: components["schemas"]["RenderOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
         /** Page[SceneOut] */
         Page_SceneOut_: {
             /** Items */
             items: components["schemas"]["SceneOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** Page[SeriesOut] */
+        Page_SeriesOut_: {
+            /** Items */
+            items: components["schemas"]["SeriesOut"][];
             /** Next Cursor */
             next_cursor?: string | null;
         };
@@ -4459,6 +5274,16 @@ export interface components {
             default: number;
             /** Description */
             description: string;
+        };
+        /**
+         * Pin
+         * @description An exact asset version: display code and ``major.minor`` label.
+         */
+        Pin: {
+            /** Code */
+            code: string;
+            /** Version */
+            version: string;
         };
         /**
          * Placement
@@ -4837,6 +5662,123 @@ export interface components {
             /** Default */
             default: number;
         };
+        /** RenderCreate */
+        RenderCreate: {
+            /**
+             * Episode Version Id
+             * Format: uuid
+             */
+            episode_version_id: string;
+            /**
+             * Settings
+             * @description RenderSettings over the version's
+             */
+            settings?: {
+                [key: string]: unknown;
+            };
+        };
+        /** RenderLog */
+        RenderLog: {
+            /**
+             * Job Id
+             * Format: uuid
+             */
+            job_id: string;
+            /** Type */
+            type: string;
+            /** Shot Id */
+            shot_id: string | null;
+            /** Status */
+            status: string;
+            /** Url */
+            url: string | null;
+        };
+        /** RenderOut */
+        RenderOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /**
+             * Episode Id
+             * Format: uuid
+             */
+            episode_id: string;
+            /**
+             * Episode Version Id
+             * Format: uuid
+             */
+            episode_version_id: string;
+            /** Status */
+            status: string;
+            /** Progress */
+            progress: {
+                [key: string]: unknown;
+            };
+            /** Settings */
+            settings: {
+                [key: string]: unknown;
+            };
+            /** Asset Versions */
+            asset_versions: string[];
+            /** Blender Version */
+            blender_version: string | null;
+            /** Output Location */
+            output_location: string | null;
+            /** Error */
+            error: {
+                [key: string]: unknown;
+            } | null;
+            /** Cancel Requested */
+            cancel_requested: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Started At */
+            started_at: string | null;
+            /** Finished At */
+            finished_at: string | null;
+            /** Shots */
+            shots: components["schemas"]["RenderShotOut"][];
+            export_job: components["schemas"]["JobOut"] | null;
+            /** Outputs */
+            outputs: components["schemas"]["RenderOutputOut"][];
+            /** Video Url */
+            video_url?: string | null;
+        };
+        /** RenderOutputOut */
+        RenderOutputOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Shot Id */
+            shot_id: string | null;
+            /** Scene Version Id */
+            scene_version_id: string | null;
+            /** Storage Key */
+            storage_key: string;
+            /** Sha256 */
+            sha256: string | null;
+            /** Size Bytes */
+            size_bytes: number | null;
+            /** Frame Count */
+            frame_count: number | null;
+            /** Meta */
+            meta: {
+                [key: string]: unknown;
+            };
+            /** Url */
+            url?: string | null;
+        };
         /** RenderSettings */
         RenderSettings: {
             /**
@@ -4856,6 +5798,21 @@ export interface components {
              * @default 24
              */
             fps: number;
+        };
+        /** RenderShotOut */
+        RenderShotOut: {
+            /** Position */
+            position: number;
+            /** Shot Id */
+            shot_id: string;
+            /**
+             * Scene Version Id
+             * Format: uuid
+             */
+            scene_version_id: string;
+            job: components["schemas"]["JobOut"];
+            /** Frames */
+            frames: number | null;
         };
         /** ResolvedAccessory */
         ResolvedAccessory: {
@@ -5668,6 +6625,155 @@ export interface components {
             /** Thumbnail Url */
             thumbnail_url?: string | null;
         };
+        /** ScriptBody */
+        ScriptBody: {
+            /**
+             * Spec
+             * @description ScriptSpecification (script/1)
+             */
+            spec: {
+                [key: string]: unknown;
+            };
+            /** Based On Id */
+            based_on_id?: string | null;
+            /**
+             * Ai Generation Id
+             * @description when this keeps an AI suggestion (as is or edited): its generation log
+             */
+            ai_generation_id?: string | null;
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
+        /** ScriptCheck */
+        ScriptCheck: {
+            /** Ok */
+            ok: boolean;
+            /** Issues */
+            issues: components["schemas"]["EpisodeIssue"][];
+        };
+        /** ScriptSaved */
+        ScriptSaved: {
+            version: components["schemas"]["ScriptVersionOut"];
+            /** Issues */
+            issues: components["schemas"]["EpisodeIssue"][];
+        };
+        /** ScriptVersionOut */
+        ScriptVersionOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /** Source */
+            source: string;
+            /** Ai Generation Id */
+            ai_generation_id: string | null;
+            /** Based On Id */
+            based_on_id: string | null;
+            /** Digest */
+            digest: string;
+            /** Notes */
+            notes: string;
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** SeriesAssetOut */
+        SeriesAssetOut: {
+            /**
+             * Asset Version Id
+             * Format: uuid
+             */
+            asset_version_id: string;
+            /** Kind */
+            kind: string;
+            /** Display */
+            display: string;
+        };
+        /** SeriesCreate */
+        SeriesCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
+             * Settings
+             * @description SeriesSettings: style profile, render
+             */
+            settings?: {
+                [key: string]: unknown;
+            };
+            /** Members */
+            members?: components["schemas"]["MemberBody"][];
+            /**
+             * Assets
+             * @description asset collection: exact published version ids
+             */
+            assets?: string[];
+        };
+        /** SeriesOut */
+        SeriesOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Style Profile Ref */
+            style_profile_ref: string;
+            /** Settings */
+            settings: {
+                [key: string]: unknown;
+            };
+            /** Members */
+            members: components["schemas"]["MemberOut"][];
+            /** Assets */
+            assets: components["schemas"]["SeriesAssetOut"][];
+            /** Episodes */
+            episodes: number;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+        };
+        /** SeriesPatch */
+        SeriesPatch: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Settings */
+            settings?: {
+                [key: string]: unknown;
+            } | null;
+        };
         /** SetCreate */
         SetCreate: {
             /** Name */
@@ -5759,6 +6865,85 @@ export interface components {
              */
             notes: string;
         };
+        /** ShotJobs */
+        ShotJobs: {
+            version: components["schemas"]["EpisodeVersionOut"];
+            /** Jobs */
+            jobs: components["schemas"]["JobOut"][];
+        };
+        /** StoryboardBody */
+        StoryboardBody: {
+            /**
+             * Script Version Id
+             * Format: uuid
+             */
+            script_version_id: string;
+            /**
+             * Source
+             * @description rule: plan it from the script; manual: the shots given; ai: keep an AI suggestion
+             * @default rule
+             * @enum {string}
+             */
+            source: "rule" | "manual" | "ai";
+            /**
+             * Spec
+             * @description StoryboardSpecification, for manual and ai
+             */
+            spec?: {
+                [key: string]: unknown;
+            } | null;
+            /** Based On Id */
+            based_on_id?: string | null;
+            /** Ai Generation Id */
+            ai_generation_id?: string | null;
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
+        /** StoryboardOut */
+        StoryboardOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Number */
+            number: number;
+            /**
+             * Script Version Id
+             * Format: uuid
+             */
+            script_version_id: string;
+            /** Source */
+            source: string;
+            /** Ai Generation Id */
+            ai_generation_id: string | null;
+            /** Based On Id */
+            based_on_id: string | null;
+            /** Digest */
+            digest: string;
+            /** Duration S */
+            duration_s: number;
+            /** Notes */
+            notes: string;
+            /** Shots */
+            shots: {
+                [key: string]: unknown;
+            }[];
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+        };
+        /** StoryboardSaved */
+        StoryboardSaved: {
+            storyboard: components["schemas"]["StoryboardOut"];
+            /** Issues */
+            issues: components["schemas"]["EpisodeIssue"][];
+        };
         /** StyleProfile */
         StyleProfile: {
             /** Id */
@@ -5816,6 +7001,16 @@ export interface components {
              * @default cartoon_humanoid@1.0
              */
             rig_profile: string;
+        };
+        /** SuggestShotsBody */
+        SuggestShotsBody: {
+            /**
+             * Script Version Id
+             * Format: uuid
+             */
+            script_version_id: string;
+            /** Provider */
+            provider?: string | null;
         };
         /**
          * Surface
@@ -5894,6 +7089,54 @@ export interface components {
             resolved?: components["schemas"]["ResolvedCharacter"] | null;
             /** Digest */
             digest?: string | null;
+        };
+        /** VersionBody */
+        VersionBody: {
+            /**
+             * Storyboard Id
+             * Format: uuid
+             */
+            storyboard_id: string;
+            /**
+             * Cast
+             * @description overrides; every script character defaults to the series member
+             */
+            cast?: components["schemas"]["CastBody"][];
+            /**
+             * Environments
+             * @description overrides; else the series' pinned version, else recommended
+             */
+            environments?: components["schemas"]["Pin"][];
+            /** Action Animations */
+            action_animations?: {
+                [key: string]: string;
+            };
+            /** Music */
+            music?: components["schemas"]["AudioCue"][];
+            /** Sfx */
+            sfx?: components["schemas"]["AudioCue"][];
+            /**
+             * Dialogue Volume
+             * @default 1
+             */
+            dialogue_volume: number;
+            /**
+             * Render
+             * @description RenderSettings fields over the series'
+             */
+            render?: {
+                [key: string]: unknown;
+            };
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+            /**
+             * Allow Verified Fits
+             * @default false
+             */
+            allow_verified_fits: boolean;
         };
         /** VersionDetail */
         VersionDetail: {
@@ -5977,6 +7220,39 @@ export interface components {
             version: components["schemas"]["VersionDetail"];
             job: components["schemas"]["JobOut"];
         };
+        /** VersionShotOut */
+        VersionShotOut: {
+            /** Position */
+            position: number;
+            /** Shot Id */
+            shot_id: string;
+            /**
+             * Scene Id
+             * Format: uuid
+             */
+            scene_id: string;
+            /** Scene Code */
+            scene_code: string;
+            /**
+             * Scene Version Id
+             * Format: uuid
+             */
+            scene_version_id: string;
+            /** Scene Version */
+            scene_version: number;
+            /** Start S */
+            start_s: number;
+            /** Duration S */
+            duration_s: number;
+            /** Transition */
+            transition: {
+                [key: string]: unknown;
+            };
+            /** Build Status */
+            build_status: string;
+            /** Verify Status */
+            verify_status: string;
+        };
         /** VersionSummary */
         VersionSummary: {
             /**
@@ -6013,6 +7289,64 @@ export interface components {
             created_at?: string | null;
             /** Created By */
             created_by?: string | null;
+        };
+        /** VoiceLine */
+        VoiceLine: {
+            /** Shot Id */
+            shot_id: string;
+            /** Line */
+            line: number;
+            /** Character Id */
+            character_id: string;
+            /** Text */
+            text: string;
+            /** Audio */
+            audio: string;
+            /** Status */
+            status: string;
+            /** New */
+            new: boolean;
+            /** Job Id */
+            job_id: string | null;
+        };
+        /** VoiceOut */
+        VoiceOut: {
+            /** Lines */
+            lines: components["schemas"]["VoiceLine"][];
+            /** Jobs */
+            jobs: components["schemas"]["JobOut"][];
+        };
+        /**
+         * VoiceProfile
+         * @description How a character sounds (SRS 17). The provider is named, never assumed; the episode
+         *     freezes the profile with each line it synthesised.
+         */
+        VoiceProfile: {
+            /**
+             * Provider
+             * @default espeak-ng
+             */
+            provider: string;
+            /**
+             * Voice
+             * @default en-us
+             */
+            voice: string;
+            /**
+             * Rate Wpm
+             * @default 160
+             */
+            rate_wpm: number;
+            /**
+             * Pitch
+             * @default 50
+             */
+            pitch: number;
+            /**
+             * Variant
+             * @description espeak-ng: m1..m7, f1..f5, …
+             */
+            variant?: string | null;
         };
     };
     responses: never;
@@ -10299,6 +11633,8 @@ export interface operations {
             query?: {
                 status?: string | null;
                 q?: string | null;
+                /** @description dialogue | music | sfx */
+                kind?: string | null;
                 limit?: number;
             };
             header?: never;
@@ -10820,6 +12156,1024 @@ export interface operations {
                 };
             };
             /** @description redirect to the object */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_series_api_v1_series_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_SeriesOut_"];
+                };
+            };
+        };
+    };
+    create_series_api_v1_series_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_series_api_v1_series__ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_series_api_v1_series__ref__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SeriesPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    put_members_api_v1_series__ref__members_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MemberBody"][];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    add_assets_api_v1_series__ref__assets_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": string[];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SeriesOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_episodes_api_v1_episodes_get: {
+        parameters: {
+            query?: {
+                series?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_EpisodeOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_episode_api_v1_episodes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["EpisodeCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_episode_api_v1_episodes__ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    validate_script_api_v1_episodes__ref__scripts_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScriptBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScriptCheck"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_script_api_v1_episodes__ref__scripts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ScriptBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ScriptSaved"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_script_api_v1_episodes__ref__scripts_generate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["GenerateScriptBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    save_storyboard_api_v1_episodes__ref__storyboards_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["StoryboardBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryboardSaved"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    suggest_shots_api_v1_episodes__ref__storyboards_suggest_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SuggestShotsBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["JobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_version_api_v1_episodes__ref__versions_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeVersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_scenes_api_v1_episodes__ref__scenes_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeSceneOut"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_scenes_api_v1_episodes__ref__scenes_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VersionBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeVersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_storyboard_api_v1_storyboards__sb_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryboardOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    voice_api_v1_storyboards__sb_id__voice_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    make_voiced_api_v1_storyboards__sb_id__voiced_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                sb_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StoryboardSaved"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_version_api_v1_episode_versions__vid__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                vid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeVersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    build_api_v1_episode_versions__vid__build_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                vid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BuildBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShotJobs"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    reopen_api_v1_episode_versions__vid__reopen_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                vid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["BuildBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ShotJobs"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    lock_api_v1_episode_versions__vid__lock_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                vid: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EpisodeVersionOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_renders_api_v1_render_jobs_get: {
+        parameters: {
+            query?: {
+                episode?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_RenderOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_render_api_v1_render_jobs_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RenderCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_render_api_v1_render_jobs__ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    cancel_render_api_v1_render_jobs__ref__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    retry_render_api_v1_render_jobs__ref__retry_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenderOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    render_logs_api_v1_render_jobs__ref__logs_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["RenderLog"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    render_video_api_v1_render_jobs__ref__video_get: {
+        parameters: {
+            query?: {
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect */
             302: {
                 headers: {
                     [name: string]: unknown;
