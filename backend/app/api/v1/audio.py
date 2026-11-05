@@ -6,7 +6,7 @@ from __future__ import annotations
 
 import uuid
 from datetime import datetime
-from typing import Any
+from typing import Any, Literal
 
 from fastapi import APIRouter, Depends, Header, Query, Response, status
 from fastapi.responses import RedirectResponse
@@ -31,6 +31,8 @@ router = APIRouter(prefix="/audio-clips", tags=["dialogue audio"])
 class AudioCreate(BaseModel):
     model_config = ConfigDict(extra="forbid")
     upload_id: uuid.UUID = Field(description="an upload of kind audio")
+    kind: Literal["dialogue", "music", "sfx"] = Field(
+        default="dialogue", description="dialogue gets mouth cues; music and effects are normalised for the mix")
     name: str | None = Field(default=None, max_length=120)
     dialog_text: str | None = Field(default=None, max_length=2000,
                                     description="the transcript; the analyser uses it to choose mouth shapes")
@@ -84,7 +86,7 @@ def create(body: AudioCreate, response: Response, session: Session = Depends(get
             raise ApiError(409, "idempotency_conflict", "that key was used for another request")
         response.status_code = status.HTTP_200_OK
         return AudioJobOut(clip=AudioOut.model_validate(clip), job=job_out(replay))
-    clip = svc.create_clip(session, body.upload_id, body.name, body.dialog_text, who.user_id)
+    clip = svc.create_clip(session, body.upload_id, body.name, body.dialog_text, who.user_id, kind=body.kind)
     audit(session, who, "audio.created", "audio_clip", clip.id, code=clip.code, upload_id=str(body.upload_id))
     params: dict[str, Any] = {"audio_id": str(clip.id), "dialog_text": clip.dialog_text}
 
@@ -97,11 +99,14 @@ def create(body: AudioCreate, response: Response, session: Session = Depends(get
 
 @router.get("", response_model=Page[AudioOut], summary="Dialogue clips, newest first")
 def list_clips(status_: str | None = Query(default=None, alias="status"), q: str | None = None,
+               kind: str | None = Query(default=None, description="dialogue | music | sfx"),
                limit: int = Query(default=50, ge=1, le=200), session: Session = Depends(get_session),
                _: Principal = Depends(require("asset.read"))) -> Page[AudioOut]:
     stmt = select(AudioClip).order_by(AudioClip.id.desc()).limit(limit)
     if status_:
         stmt = stmt.where(AudioClip.status == status_)
+    if kind:
+        stmt = stmt.where(AudioClip.kind == kind)
     if q:
         stmt = stmt.where(AudioClip.name.ilike(f"%{q}%") | AudioClip.code.ilike(f"%{q}%")
                           | AudioClip.dialog_text.ilike(f"%{q}%"))

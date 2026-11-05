@@ -119,6 +119,26 @@ services:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
 
+  # Episode rendering (render_scene): one shot per Blender process, CPU Cycles. Its own
+  # queue so a long render never holds up builds and fits on worker-blender.
+  worker-render:
+    image: studio-worker:dev
+    environment:
+      <<: *backend-env
+      STUDIO_S3_ACCESS_KEY: dev-worker
+      STUDIO_S3_SECRET_KEY: dev-worker-secret
+    command: ["celery", "-A", "studio_workers.tasks", "worker", "-Q", "render", "--concurrency", "1",
+              "--hostname", "render@%h"]
+    volumes: [work:/work]
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    mem_limit: 6g
+    depends_on:
+      migrate: {condition: service_completed_successfully}
+      redis: {condition: service_healthy}
+
   # Publishing (publish_character). The only service with the publisher storage identity,
   # which alone can write the library bucket (and can only read the work bucket). It runs
   # Blender too: every publish re-validates the exact character.blend in a fresh process.
@@ -162,8 +182,9 @@ services:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}
 
-  # Media jobs (lipsync): ffmpeg normalises dialogue recordings and Rhubarb Lip Sync finds
-  # the mouth cues. No Blender, no provider keys. STUDIO_RHUBARB_BINARY= (empty) switches to
+  # Media jobs: lipsync (ffmpeg normalises recordings, Rhubarb Lip Sync finds the mouth
+  # cues), synthesize_speech (espeak-ng) and export_episode (FFmpeg: H.264 + AAC MP4).
+  # No Blender, no provider keys. STUDIO_RHUBARB_BINARY= (empty) switches to
   # the built-in phonetic analyser.
   worker-media:
     build: {context: .., dockerfile: infra/docker/worker.Dockerfile, target: media, args: *build-args}
@@ -178,7 +199,7 @@ services:
     tmpfs: [/tmp]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
-    mem_limit: 1g
+    mem_limit: 2g
     depends_on:
       migrate: {condition: service_completed_successfully}
       redis: {condition: service_healthy}

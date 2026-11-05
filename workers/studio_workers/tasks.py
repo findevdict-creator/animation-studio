@@ -3,7 +3,8 @@
     celery -A studio_workers.tasks worker -Q blender --concurrency 1
     celery -A studio_workers.tasks worker -Q ai --concurrency 4
     celery -A studio_workers.tasks worker -Q publish --concurrency 1   # publisher storage identity
-    celery -A studio_workers.tasks worker -Q media --concurrency 2     # ffmpeg + lip sync, no Blender
+    celery -A studio_workers.tasks worker -Q render --concurrency 1    # episode shots (Blender, Cycles)
+    celery -A studio_workers.tasks worker -Q media --concurrency 2     # ffmpeg, lip sync, speech, export
     celery -A studio_workers.tasks beat        # runs the outbox sweeper
 """
 

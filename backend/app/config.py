@@ -47,12 +47,17 @@ class Settings(BaseSettings):
                                                                               "generate_accessory": 900,
                                                                               "publish_accessory": 900,
                                                                               "assemble_scene": 1800,
-                                                                              "verify_scene": 1200})
+                                                                              "verify_scene": 1200,
+                                                                              # a 30 s shot at 1080p on CPU Cycles
+                                                                              "render_scene": 5 * 3600,
+                                                                              "export_episode": 3600})
     default_job_timeout_s: int = 1800
     keep_failed_workspaces: bool = True
     # Media worker (lipsync): ffmpeg normalises recordings; Rhubarb Lip Sync finds the mouth
     # cues when its binary is set, otherwise the built-in phonetic analyser does
     ffmpeg_binary: str = "ffmpeg"
+    ffprobe_binary: str = "ffprobe"
+    espeak_binary: str = "espeak-ng"
     rhubarb_binary: str | None = Field(default=None, description="path to the rhubarb executable; unset: built-in analyser")
     worker_host: str | None = None
 

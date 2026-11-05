@@ -5,7 +5,8 @@
 # with STUDIO_BLENDER_MODE=wheel. BLENDER_SOURCE=binary downloads the official Linux build,
 # checks its SHA-256 and runs jobs with the blender executable; use it for GPU render workers.
 #
-# --target media builds the media worker (lip sync): ffmpeg and Rhubarb Lip Sync 1.14.0
+# --target media builds the media worker (lip sync, speech, export): ffmpeg, espeak-ng and
+# Rhubarb Lip Sync 1.14.0
 # (MIT), checked against its SHA-256, no Blender. WITH_RHUBARB=0 leaves Rhubarb out; the
 # worker then uses the built-in phonetic analyser (set STUDIO_RHUBARB_BINARY empty).
 ARG BLENDER_SOURCE=wheel
@@ -51,7 +52,7 @@ FROM common AS media
 ARG WITH_RHUBARB=1
 ARG RHUBARB_VERSION=1.14.0
 ARG RHUBARB_SHA256=a9a9074862cff47b2d59b8bf399a678a3b0b74f9452ad6ad94cb292913dd8667
-RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
+RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg espeak-ng \
     && if [ "${WITH_RHUBARB}" = "1" ]; then apt-get install -y --no-install-recommends curl unzip ca-certificates; fi \
     && rm -rf /var/lib/apt/lists/*
 RUN set -eux; if [ "${WITH_RHUBARB}" = "1" ]; then \
