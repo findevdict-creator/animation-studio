@@ -1,0 +1,449 @@
+{
+  "fps": 24,
+  "name": "Ali and Maya at home",
+  "props": [
+    {
+      "z": 0.0,
+      "at": [
+        0.3,
+        -1.4
+      ],
+      "on": null,
+      "key": "ball",
+      "pin": {
+        "code": "PROP-005",
+        "kind": "prop",
+        "name": "Red ball 072625",
+        "path": "assets/prop/PROP-005/1.0",
+        "files": {
+          "prop.blend": "5835fc2a134b1f224560a12ed6f014ee40ab5a43e812a7ff16e9a77f586a26e5"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa9a-0e80-76cc-b960-4b09f8c1fd43"
+      },
+      "item": "PROPD-BALL@0.1",
+      "size": [
+        0.24,
+        0.24,
+        0.24
+      ],
+      "rotation_deg": 0.0
+    },
+    {
+      "z": 0.0,
+      "at": [
+        -1.3,
+        -1.2
+      ],
+      "on": null,
+      "key": "car",
+      "pin": {
+        "code": "PROP-008",
+        "kind": "prop",
+        "name": "Toy car 072644",
+        "path": "assets/prop/PROP-008/1.0",
+        "files": {
+          "prop.blend": "c096a1ea603791aafaa957d991e2fee299867a73fd420d6cb4774a1bb7dffb44"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa9a-59d1-721e-9063-64ab2968f675"
+      },
+      "item": "PROPD-TOY_CAR@0.1",
+      "size": [
+        0.3,
+        0.16,
+        0.13
+      ],
+      "rotation_deg": 30.0
+    },
+    {
+      "z": 0.4752,
+      "at": [
+        -0.5,
+        0.6
+      ],
+      "on": "table_1",
+      "key": "books",
+      "pin": {
+        "code": "PROP-006",
+        "kind": "prop",
+        "name": "Stack of books 072631",
+        "path": "assets/prop/PROP-006/1.0",
+        "files": {
+          "prop.blend": "fc53799793952c32c76bbfa988bf37fb6d8afff86fb6d57d58ba923ea8d6e2c3"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa9a-2768-7e09-b617-9b63901ab253"
+      },
+      "item": "PROPD-BOOKS@0.1",
+      "size": [
+        0.26,
+        0.2,
+        0.14
+      ],
+      "rotation_deg": 20.0
+    },
+    {
+      "z": 0.4752,
+      "at": [
+        0.0,
+        0.6
+      ],
+      "on": "table_1",
+      "key": "apple",
+      "pin": {
+        "code": "PROP-007",
+        "kind": "prop",
+        "name": "Apple 072638",
+        "path": "assets/prop/PROP-007/1.0",
+        "files": {
+          "prop.blend": "df9227984b04c091cfa69cf243b6bb69b8511514606602ca529e8b817034721f"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa9a-4034-7b06-9205-19a40ebd6d60"
+      },
+      "item": "PROPD-APPLE@0.1",
+      "size": [
+        0.08,
+        0.08,
+        0.09
+      ],
+      "rotation_deg": 0.0
+    }
+  ],
+  "camera": {
+    "mark": "wide",
+    "focus": null,
+    "preset": "wide",
+    "angle_deg": 20.0
+  },
+  "layout": {
+    "kind": "room",
+    "size": [
+      6.0,
+      5.0,
+      2.7
+    ],
+    "tops": [
+      [
+        "table_1",
+        -0.3,
+        0.7,
+        1.056,
+        0.66,
+        0.0,
+        0.4752
+      ]
+    ],
+    "marks": [
+      {
+        "at": [
+          -0.6,
+          -0.8,
+          0.0
+        ],
+        "item": null,
+        "kind": "spawn",
+        "name": "rug",
+        "facing_deg": -20.0
+      },
+      {
+        "at": [
+          1.2,
+          -0.3,
+          0.0
+        ],
+        "item": null,
+        "kind": "spawn",
+        "name": "window",
+        "facing_deg": 30.0
+      },
+      {
+        "at": [
+          -0.3,
+          1.8,
+          0.425
+        ],
+        "item": "sofa_1",
+        "kind": "seat",
+        "name": "sofa_seat",
+        "facing_deg": 0.0
+      },
+      {
+        "at": [
+          -1.92,
+          2.05,
+          0.0
+        ],
+        "item": null,
+        "kind": "spawn",
+        "name": "door",
+        "facing_deg": 0.0
+      }
+    ],
+    "seats": [
+      [
+        "sofa_1",
+        -0.3,
+        1.8,
+        1.9,
+        0.85,
+        0.0,
+        0.425
+      ]
+    ],
+    "solids": [
+      [
+        "sofa_1",
+        -0.3,
+        1.8,
+        1.9,
+        0.85,
+        0.0
+      ],
+      [
+        "table_1",
+        -0.3,
+        0.7,
+        1.056,
+        0.66,
+        0.0
+      ],
+      [
+        "lamp_1",
+        2.16,
+        1.9,
+        0.4,
+        0.4,
+        0.0
+      ],
+      [
+        "bookshelf_1",
+        -2.58,
+        1.0,
+        0.9,
+        0.32,
+        90.0
+      ]
+    ],
+    "cameras": [
+      {
+        "at": [
+          0.0,
+          -3.5,
+          1.7
+        ],
+        "name": "wide",
+        "lens_mm": 24.0,
+        "look_at": [
+          0.0,
+          0.25,
+          0.9
+        ]
+      },
+      {
+        "at": [
+          0.0,
+          -2.15,
+          1.1
+        ],
+        "name": "front",
+        "lens_mm": 35.0,
+        "look_at": [
+          0.0,
+          0.0,
+          0.85
+        ]
+      }
+    ],
+    "lighting": "indoor_day"
+  },
+  "lighting": "evening",
+  "frame_end": 48,
+  "instances": [
+    {
+      "key": "ali",
+      "blink": true,
+      "state": {},
+      "outfit": {
+        "code": "OUTFIT-011",
+        "kind": "outfit",
+        "name": "School day 072429",
+        "path": "assets/outfit/OUTFIT-011/1.0",
+        "files": {
+          "outfit.blend": "43e25bdc49193bb20cb2231470cdcd3b368736385183bb013973c0caabbf46da"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa98-49bb-75e4-99f6-a3a70c556471"
+      },
+      "dialogue": [
+        {
+          "text": "Want to play with my car?",
+          "audio": null,
+          "end_frame": 40,
+          "start_frame": 8
+        }
+      ],
+      "character": {
+        "code": "CHAR-016",
+        "kind": "character",
+        "name": "Ali 072346",
+        "path": "assets/character/CHAR-016/1.0",
+        "files": {
+          "character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+          "character.blend": "60f00ec4f84b72d9aa56f49b7acf8358d4ca0b3413a82292c4f5ca11665bf76f"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa97-a2e8-7d86-a5b4-c3a3929a45e2"
+      },
+      "transform": {
+        "scale": 1.0,
+        "location": [
+          -0.6,
+          -0.8,
+          0.0
+        ],
+        "rotation_deg": [
+          0.0,
+          0.0,
+          -20.0
+        ]
+      },
+      "animations": [
+        {
+          "key": "wave",
+          "pin": null,
+          "clip": "CLIP-WAVE@0.1",
+          "loops": true,
+          "speed": 1.0,
+          "compat": null,
+          "frames": 36,
+          "repeat": 1,
+          "source": "catalog",
+          "travel": false,
+          "influence": 1.0,
+          "start_frame": 1
+        }
+      ],
+      "accessories": [],
+      "expressions": [
+        {
+          "frame": 1,
+          "weight": 1.0,
+          "expression": "happy"
+        }
+      ],
+      "fit_profile": "child_average",
+      "rig_profile": "cartoon_humanoid@1.0",
+      "outfit_compatibility": {
+        "status": "approved",
+        "override": false,
+        "checked_at": "2026-11-05T07:25:01.560563+00:00",
+        "fit_profile": "child_average",
+        "compatibility_id": "01a1aa98-90fd-789a-9b04-7b32ff4c9308"
+      }
+    },
+    {
+      "key": "maya",
+      "blink": true,
+      "state": {},
+      "outfit": {
+        "code": "OUTFIT-012",
+        "kind": "outfit",
+        "name": "Winter walk 072546",
+        "path": "assets/outfit/OUTFIT-012/1.0",
+        "files": {
+          "outfit.blend": "b5524874b53d73a97cd0d590585cfdbe141fdca2ddc0250704ed927bd5c3ea85"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa99-7782-72c4-871b-5aaa8d5230b9"
+      },
+      "dialogue": [],
+      "character": {
+        "code": "CHAR-017",
+        "kind": "character",
+        "name": "Maya 072508",
+        "path": "assets/character/CHAR-017/1.0",
+        "files": {
+          "character.json": "e20a1d998b5eac7cbb4d37deb203a24e6ee22698bcbd52b559c96cb9f0a3a22f",
+          "character.blend": "874fa70dfb3f35ed84116192af98e0c6852b187bfd448b4909c273d2dd2403db"
+        },
+        "status": "published",
+        "version": "1.0",
+        "version_id": "01a1aa98-e0c0-759d-8d33-8614fc605f28"
+      },
+      "transform": {
+        "scale": 1.0,
+        "location": [
+          1.3,
+          -0.3,
+          0.0
+        ],
+        "rotation_deg": [
+          0.0,
+          0.0,
+          30.0
+        ]
+      },
+      "animations": [
+        {
+          "key": "idle",
+          "pin": null,
+          "clip": "CLIP-IDLE@0.1",
+          "loops": true,
+          "speed": 1.0,
+          "compat": null,
+          "frames": 48,
+          "repeat": 1,
+          "source": "catalog",
+          "travel": false,
+          "influence": 1.0,
+          "start_frame": 1
+        }
+      ],
+      "accessories": [],
+      "expressions": [
+        {
+          "frame": 1,
+          "weight": 1.0,
+          "expression": "neutral"
+        },
+        {
+          "frame": 30,
+          "weight": 1.0,
+          "expression": "excited"
+        }
+      ],
+      "fit_profile": "child_slim",
+      "rig_profile": "cartoon_humanoid@1.0",
+      "outfit_compatibility": {
+        "status": "approved",
+        "override": false,
+        "checked_at": "2026-11-05T07:26:18.315319+00:00",
+        "fit_profile": "child_slim",
+        "compatibility_id": "01a1aa99-bec5-7193-b875-6bb798b5d6af"
+      }
+    }
+  ],
+  "environment": {
+    "code": "ENV-001",
+    "kind": "environment",
+    "name": "Home 072653",
+    "path": "assets/environment/ENV-001/1.0",
+    "files": {
+      "environment.blend": "91c5d951298d82bdc9a9fe2578b0ecb911efdec65883202297d561deb26790d7"
+    },
+    "status": "published",
+    "version": "1.0",
+    "version_id": "01a1aa9a-7b02-7eff-ad58-eceb5b63ca95"
+  },
+  "frame_start": 1,
+  "manifest_digest": "aa335676cb75ee47a4c152d614c306704fc6b7b6259c29f2aa4e5c6b6f197a19"
+}

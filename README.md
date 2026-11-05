@@ -6,7 +6,7 @@ then assembled into scenes and episodes.
 
 The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md);
 the phase demonstrations are in [docs/demos/](docs/demos/) ([Phase 1](docs/demos/phase-1.md),
-[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md), [Phase 6](docs/demos/phase-6.md)).
+[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md), [Phase 6](docs/demos/phase-6.md), [Phase 7](docs/demos/phase-7.md)).
 
 ## Branches
 
@@ -45,6 +45,12 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-28-lipsync` | Dialogue clips (migration 0010), `/audio-clips` API, media worker (ffmpeg, Rhubarb or built-in analyser), scene dialogue audio staged and verified |
 | `v2-29-animation-web` | Web animation library, dialogue audio page, library animations and recordings in the scene editor |
 | `v2-30-phase6-acceptance` | Phase 6 acceptance script and demonstration record; Rhubarb 1.14.0 as the default analyser; the scene camera frames the whole scene |
+| `v2-31-environment-spec` | Environment and prop contracts: prop catalog, environment templates, lighting presets, layout validation (overlap, inside, door and marks reachable), scene set fields and placement checks |
+| `v2-32-environment-engine` | Environment engine: procedural props, rooms and outdoor sets, lighting rigs, camera marks, `generate_prop`, `generate_environment`, `publish_prop` and `publish_environment` jobs with layout checks measured in Blender |
+| `v2-33-environment-library` | Prop and environment library: tables and guards (migration 0011), `/props`, `/environments` and catalog APIs, publisher manifests |
+| `v2-34-scene-environments` | Scenes in a set: environment and prop pins, characters at marks, props on tops, lighting override, camera marks, preview video, reopen checks for the set |
+| `v2-35-environment-web` | Web prop and environment libraries with a live layout check and plan, set controls in the scene editor |
+| `v2-36-phase7-acceptance` | Phase 7 acceptance script and demonstration record |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the

@@ -1,0 +1,388 @@
+{
+  "scene": "Ali and Maya at home",
+  "manifest_digest": "aa335676cb75ee47a4c152d614c306704fc6b7b6259c29f2aa4e5c6b6f197a19",
+  "scene_blend_sha256": "f1a695a2bf9bdf7a5a2b91de141b4c0a58cc5f8a8181fad698ffc2b5c9ec6503",
+  "opened_from": "scene/scene.blend",
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "libraries_resolve",
+      "ok": true,
+      "missing": [],
+      "libraries": [
+        {
+          "stored": "//../assets/character/CHAR-016/1.0/character.blend",
+          "workspace_path": "assets/character/CHAR-016/1.0/character.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/character/CHAR-017/1.0/character.blend",
+          "workspace_path": "assets/character/CHAR-017/1.0/character.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/environment/ENV-001/1.0/environment.blend",
+          "workspace_path": "assets/environment/ENV-001/1.0/environment.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/prop/PROP-005/1.0/prop.blend",
+          "workspace_path": "assets/prop/PROP-005/1.0/prop.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/prop/PROP-008/1.0/prop.blend",
+          "workspace_path": "assets/prop/PROP-008/1.0/prop.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/prop/PROP-006/1.0/prop.blend",
+          "workspace_path": "assets/prop/PROP-006/1.0/prop.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/prop/PROP-007/1.0/prop.blend",
+          "workspace_path": "assets/prop/PROP-007/1.0/prop.blend",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "manifest_digest",
+      "ok": true
+    },
+    {
+      "name": "frame_range",
+      "ok": true
+    },
+    {
+      "name": "ali:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "ali:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Ali"
+      ]
+    },
+    {
+      "name": "ali:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-016/1.0/character.blend",
+      "pin": "CHAR-016@1.0"
+    },
+    {
+      "name": "ali:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-016/1.0/character.blend",
+      "head": "//../assets/character/CHAR-016/1.0/character.blend"
+    },
+    {
+      "name": "ali:outfit_present",
+      "ok": true,
+      "source": "OUTFIT-011@1.0#43e25bdc49193bb20cb2231470cdcd3b368736385183bb013973c0caabbf46da"
+    },
+    {
+      "name": "ali:outfit_bound_to_this_rig",
+      "ok": true,
+      "pieces": [
+        "footwear_sneakers",
+        "lower_shorts",
+        "upper_tshirt"
+      ]
+    },
+    {
+      "name": "ali:body_mask_present",
+      "ok": true
+    },
+    {
+      "name": "ali:placement",
+      "ok": true,
+      "location": [
+        -0.6,
+        -0.8,
+        0.0
+      ]
+    },
+    {
+      "name": "ali:expressions_play",
+      "ok": true,
+      "keys": 1,
+      "mismatches": []
+    },
+    {
+      "name": "ali:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_wave",
+          "ali:wave",
+          1.0
+        ]
+      ],
+      "found": [
+        [
+          "00_wave",
+          "ali:wave",
+          1.0
+        ],
+        [
+          "face",
+          "ali:face",
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "ali:dialogue_mouth_moves",
+      "ok": true,
+      "frame": 8,
+      "viseme": "vis_AI",
+      "prop": 1.0,
+      "audio": null,
+      "measured": 1.0
+    },
+    {
+      "name": "maya:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "maya:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Maya"
+      ]
+    },
+    {
+      "name": "maya:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-017/1.0/character.blend",
+      "pin": "CHAR-017@1.0"
+    },
+    {
+      "name": "maya:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-017/1.0/character.blend",
+      "head": "//../assets/character/CHAR-017/1.0/character.blend"
+    },
+    {
+      "name": "maya:outfit_present",
+      "ok": true,
+      "source": "OUTFIT-012@1.0#b5524874b53d73a97cd0d590585cfdbe141fdca2ddc0250704ed927bd5c3ea85"
+    },
+    {
+      "name": "maya:outfit_bound_to_this_rig",
+      "ok": true,
+      "pieces": [
+        "footwear_boots",
+        "lower_trousers",
+        "upper_sweater"
+      ]
+    },
+    {
+      "name": "maya:body_mask_present",
+      "ok": true
+    },
+    {
+      "name": "maya:placement",
+      "ok": true,
+      "location": [
+        1.3,
+        -0.3,
+        0.0
+      ]
+    },
+    {
+      "name": "maya:expressions_play",
+      "ok": true,
+      "keys": 2,
+      "mismatches": []
+    },
+    {
+      "name": "maya:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_idle",
+          "maya:idle",
+          1.0
+        ]
+      ],
+      "found": [
+        [
+          "00_idle",
+          "maya:idle",
+          1.0
+        ],
+        [
+          "face",
+          "maya:face",
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "set:environment_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/environment/ENV-001/1.0/environment.blend"
+    },
+    {
+      "name": "set:lighting",
+      "ok": true,
+      "world": "evening",
+      "rigs": [
+        "evening"
+      ],
+      "expected": "evening"
+    },
+    {
+      "name": "set:camera_mark",
+      "ok": true,
+      "camera": "CAM_wide"
+    },
+    {
+      "name": "prop:ball:linked_from_pin",
+      "ok": true,
+      "library": "/work/01a1aa9f-3f03-7aee-8c98-4c7827c585d6/attempt-1/scene/../assets/prop/PROP-005/1.0/prop.blend"
+    },
+    {
+      "name": "prop:ball:grounded",
+      "ok": true,
+      "bottom_z": 0.0,
+      "expected": 0.0,
+      "on": null
+    },
+    {
+      "name": "prop:ball:inside",
+      "ok": true,
+      "overshoot_m": -0.9794
+    },
+    {
+      "name": "prop:ball:clear",
+      "ok": true,
+      "overlaps": []
+    },
+    {
+      "name": "prop:car:linked_from_pin",
+      "ok": true,
+      "library": "/work/01a1aa9f-3f03-7aee-8c98-4c7827c585d6/attempt-1/scene/../assets/prop/PROP-008/1.0/prop.blend"
+    },
+    {
+      "name": "prop:car:grounded",
+      "ok": true,
+      "bottom_z": 0.0,
+      "expected": 0.0,
+      "on": null
+    },
+    {
+      "name": "prop:car:inside",
+      "ok": true,
+      "overshoot_m": -1.171
+    },
+    {
+      "name": "prop:car:clear",
+      "ok": true,
+      "overlaps": []
+    },
+    {
+      "name": "prop:books:linked_from_pin",
+      "ok": true,
+      "library": "/work/01a1aa9f-3f03-7aee-8c98-4c7827c585d6/attempt-1/scene/../assets/prop/PROP-006/1.0/prop.blend"
+    },
+    {
+      "name": "prop:books:grounded",
+      "ok": true,
+      "bottom_z": 0.4761,
+      "expected": 0.4752,
+      "on": "table_1"
+    },
+    {
+      "name": "prop:apple:linked_from_pin",
+      "ok": true,
+      "library": "/work/01a1aa9f-3f03-7aee-8c98-4c7827c585d6/attempt-1/scene/../assets/prop/PROP-007/1.0/prop.blend"
+    },
+    {
+      "name": "prop:apple:grounded",
+      "ok": true,
+      "bottom_z": 0.4752,
+      "expected": 0.4752,
+      "on": "table_1"
+    },
+    {
+      "name": "path:ali",
+      "ok": true,
+      "frames": 13,
+      "blocked": [],
+      "start": [
+        -0.6,
+        -0.8
+      ],
+      "end": [
+        -0.6,
+        -0.8
+      ]
+    },
+    {
+      "name": "path:maya",
+      "ok": true,
+      "frames": 13,
+      "blocked": [],
+      "start": [
+        1.3,
+        -0.3
+      ],
+      "end": [
+        1.3,
+        -0.3
+      ]
+    },
+    {
+      "name": "renders",
+      "ok": true,
+      "frames": [
+        1,
+        16,
+        32,
+        48
+      ]
+    },
+    {
+      "name": "sources_unchanged",
+      "ok": true,
+      "changed": [],
+      "files": {
+        "assets/character/CHAR-016/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+        "assets/character/CHAR-016/1.0/character.blend": "60f00ec4f84b72d9aa56f49b7acf8358d4ca0b3413a82292c4f5ca11665bf76f",
+        "assets/character/CHAR-017/1.0/character.json": "e20a1d998b5eac7cbb4d37deb203a24e6ee22698bcbd52b559c96cb9f0a3a22f",
+        "assets/character/CHAR-017/1.0/character.blend": "874fa70dfb3f35ed84116192af98e0c6852b187bfd448b4909c273d2dd2403db",
+        "assets/environment/ENV-001/1.0/environment.blend": "91c5d951298d82bdc9a9fe2578b0ecb911efdec65883202297d561deb26790d7",
+        "assets/outfit/OUTFIT-011/1.0/outfit.blend": "43e25bdc49193bb20cb2231470cdcd3b368736385183bb013973c0caabbf46da",
+        "assets/outfit/OUTFIT-012/1.0/outfit.blend": "b5524874b53d73a97cd0d590585cfdbe141fdca2ddc0250704ed927bd5c3ea85",
+        "assets/prop/PROP-005/1.0/prop.blend": "5835fc2a134b1f224560a12ed6f014ee40ab5a43e812a7ff16e9a77f586a26e5",
+        "assets/prop/PROP-006/1.0/prop.blend": "fc53799793952c32c76bbfa988bf37fb6d8afff86fb6d57d58ba923ea8d6e2c3",
+        "assets/prop/PROP-007/1.0/prop.blend": "df9227984b04c091cfa69cf243b6bb69b8511514606602ca529e8b817034721f",
+        "assets/prop/PROP-008/1.0/prop.blend": "c096a1ea603791aafaa957d991e2fee299867a73fd420d6cb4774a1bb7dffb44"
+      }
+    }
+  ],
+  "sources": {
+    "before": {
+      "assets/character/CHAR-016/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "assets/character/CHAR-016/1.0/character.blend": "60f00ec4f84b72d9aa56f49b7acf8358d4ca0b3413a82292c4f5ca11665bf76f",
+      "assets/character/CHAR-017/1.0/character.json": "e20a1d998b5eac7cbb4d37deb203a24e6ee22698bcbd52b559c96cb9f0a3a22f",
+      "assets/character/CHAR-017/1.0/character.blend": "874fa70dfb3f35ed84116192af98e0c6852b187bfd448b4909c273d2dd2403db",
+      "assets/environment/ENV-001/1.0/environment.blend": "91c5d951298d82bdc9a9fe2578b0ecb911efdec65883202297d561deb26790d7",
+      "assets/outfit/OUTFIT-011/1.0/outfit.blend": "43e25bdc49193bb20cb2231470cdcd3b368736385183bb013973c0caabbf46da",
+      "assets/outfit/OUTFIT-012/1.0/outfit.blend": "b5524874b53d73a97cd0d590585cfdbe141fdca2ddc0250704ed927bd5c3ea85",
+      "assets/prop/PROP-005/1.0/prop.blend": "5835fc2a134b1f224560a12ed6f014ee40ab5a43e812a7ff16e9a77f586a26e5",
+      "assets/prop/PROP-006/1.0/prop.blend": "fc53799793952c32c76bbfa988bf37fb6d8afff86fb6d57d58ba923ea8d6e2c3",
+      "assets/prop/PROP-007/1.0/prop.blend": "df9227984b04c091cfa69cf243b6bb69b8511514606602ca529e8b817034721f",
+      "assets/prop/PROP-008/1.0/prop.blend": "c096a1ea603791aafaa957d991e2fee299867a73fd420d6cb4774a1bb7dffb44"
+    },
+    "unchanged": true
+  },
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0"
+}

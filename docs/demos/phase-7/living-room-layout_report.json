@@ -1,0 +1,593 @@
+{
+  "environment": "Home",
+  "spec_digest": "2e2e0753ef3d1d631d35eeafac93d4a57c3809870b99cfc89d6f40c978d3cf74",
+  "environment_blend_sha256": "91c5d951298d82bdc9a9fe2578b0ecb911efdec65883202297d561deb26790d7",
+  "template": "ENVD-LIVING_ROOM@0.1",
+  "size": [
+    6.0,
+    5.0,
+    2.7
+  ],
+  "lighting": "indoor_day",
+  "file": {
+    "collections": [
+      "ENV_living_room",
+      "LIGHTS_living_room"
+    ],
+    "objects": 22,
+    "meshes": 10,
+    "armatures": [],
+    "lights": 6,
+    "cameras": 2,
+    "materials": 18
+  },
+  "build": {
+    "walls": [
+      {
+        "wall": "north",
+        "openings": 1,
+        "cutaway": false
+      },
+      {
+        "wall": "south",
+        "openings": 0,
+        "cutaway": true
+      },
+      {
+        "wall": "east",
+        "openings": 1,
+        "cutaway": false
+      },
+      {
+        "wall": "west",
+        "openings": 0,
+        "cutaway": false
+      }
+    ],
+    "dressing": [
+      "sofa_1",
+      "table_1",
+      "lamp_1",
+      "bookshelf_1",
+      "ball_1"
+    ],
+    "marks": [
+      "rug",
+      "window",
+      "sofa_seat",
+      "door"
+    ],
+    "cameras": [
+      "wide",
+      "front"
+    ],
+    "lights": [
+      "living_room_sun",
+      "living_room_fill",
+      "living_room_ceiling_0_0",
+      "living_room_ceiling_0_1",
+      "living_room_ceiling_1_0",
+      "living_room_ceiling_1_1"
+    ]
+  },
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "dressing_size:sofa_1",
+      "ok": true,
+      "detail": {
+        "measured": [
+          1.9,
+          0.85,
+          0.85
+        ],
+        "expected": [
+          1.9,
+          0.85,
+          0.85
+        ]
+      }
+    },
+    {
+      "name": "grounded:sofa_1",
+      "ok": true,
+      "detail": {
+        "bottom_z": 0.0,
+        "expected": 0.0,
+        "on": null
+      }
+    },
+    {
+      "name": "inside:sofa_1",
+      "ok": true,
+      "detail": {
+        "overshoot_m": -0.275
+      }
+    },
+    {
+      "name": "dressing_size:table_1",
+      "ok": true,
+      "detail": {
+        "measured": [
+          1.056,
+          0.66,
+          0.4752
+        ],
+        "expected": [
+          1.056,
+          0.66,
+          0.4752
+        ]
+      }
+    },
+    {
+      "name": "grounded:table_1",
+      "ok": true,
+      "detail": {
+        "bottom_z": 0.0,
+        "expected": 0.0,
+        "on": null
+      }
+    },
+    {
+      "name": "inside:table_1",
+      "ok": true,
+      "detail": {
+        "overshoot_m": -1.47
+      }
+    },
+    {
+      "name": "dressing_size:lamp_1",
+      "ok": true,
+      "detail": {
+        "measured": [
+          0.4,
+          0.4,
+          1.6
+        ],
+        "expected": [
+          0.4,
+          0.4,
+          1.6
+        ]
+      }
+    },
+    {
+      "name": "grounded:lamp_1",
+      "ok": true,
+      "detail": {
+        "bottom_z": 0.0,
+        "expected": 0.0,
+        "on": null
+      }
+    },
+    {
+      "name": "inside:lamp_1",
+      "ok": true,
+      "detail": {
+        "overshoot_m": -0.4
+      }
+    },
+    {
+      "name": "dressing_size:bookshelf_1",
+      "ok": true,
+      "detail": {
+        "measured": [
+          0.9,
+          0.32,
+          1.8
+        ],
+        "expected": [
+          0.9,
+          0.32,
+          1.8
+        ]
+      }
+    },
+    {
+      "name": "grounded:bookshelf_1",
+      "ok": true,
+      "detail": {
+        "bottom_z": 0.0,
+        "expected": 0.0,
+        "on": null
+      }
+    },
+    {
+      "name": "inside:bookshelf_1",
+      "ok": true,
+      "detail": {
+        "overshoot_m": -0.26
+      }
+    },
+    {
+      "name": "dressing_size:ball_1",
+      "ok": true,
+      "detail": {
+        "measured": [
+          0.2412,
+          0.2412,
+          0.24
+        ],
+        "expected": [
+          0.24,
+          0.24,
+          0.24
+        ]
+      }
+    },
+    {
+      "name": "grounded:ball_1",
+      "ok": true,
+      "detail": {
+        "bottom_z": 0.0,
+        "expected": 0.0,
+        "on": null
+      }
+    },
+    {
+      "name": "inside:ball_1",
+      "ok": true,
+      "detail": {
+        "overshoot_m": -1.3794
+      }
+    },
+    {
+      "name": "no_overlap:sofa_1+table_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:sofa_1+lamp_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:sofa_1+bookshelf_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:sofa_1+ball_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:table_1+lamp_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:table_1+bookshelf_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:table_1+ball_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:lamp_1+bookshelf_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:lamp_1+ball_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "no_overlap:bookshelf_1+ball_1",
+      "ok": true,
+      "detail": {
+        "triangle_hits": 0,
+        "footprints_apart": true
+      }
+    },
+    {
+      "name": "mark:rug",
+      "ok": true,
+      "detail": {
+        "free_floor": true,
+        "first_hit_below": "FLOOR"
+      }
+    },
+    {
+      "name": "mark:window",
+      "ok": true,
+      "detail": {
+        "free_floor": true,
+        "first_hit_below": "FLOOR"
+      }
+    },
+    {
+      "name": "mark:sofa_seat",
+      "ok": true,
+      "detail": {
+        "kind": "seat",
+        "item": "sofa_1"
+      }
+    },
+    {
+      "name": "mark:door",
+      "ok": true,
+      "detail": {
+        "free_floor": true,
+        "first_hit_below": "FLOOR"
+      }
+    },
+    {
+      "name": "door:0",
+      "ok": true,
+      "detail": {
+        "free_floor": true,
+        "wall": "north",
+        "hit": null
+      }
+    },
+    {
+      "name": "camera:wide",
+      "ok": true,
+      "detail": {
+        "distance_m": 3.834,
+        "first_hit": null,
+        "hit_m": null
+      }
+    },
+    {
+      "name": "camera:front",
+      "ok": true,
+      "detail": {
+        "distance_m": 2.164,
+        "first_hit": null,
+        "hit_m": null
+      }
+    },
+    {
+      "name": "lights",
+      "ok": true,
+      "detail": {
+        "lights": [
+          "living_room_sun",
+          "living_room_fill",
+          "living_room_ceiling_0_0",
+          "living_room_ceiling_0_1",
+          "living_room_ceiling_1_0",
+          "living_room_ceiling_1_1"
+        ],
+        "preset": "indoor_day"
+      }
+    },
+    {
+      "name": "built_from_spec",
+      "ok": true,
+      "detail": {
+        "stamped": "2e2e0753ef3d1d631d35eeafac93d4a57c3809870b99cfc89d6f40c978d3cf74",
+        "spec": "2e2e0753ef3d1d631d35eeafac93d4a57c3809870b99cfc89d6f40c978d3cf74"
+      }
+    },
+    {
+      "name": "linked_not_copied",
+      "ok": true,
+      "detail": "/work/01a1aa9a-7b2e-7730-8c7a-6907f0c9b98d/attempt-1/out/environment.blend"
+    }
+  ],
+  "measured": {
+    "sofa_1": {
+      "size": [
+        1.9,
+        0.85,
+        0.85
+      ],
+      "bottom_z": 0.0
+    },
+    "table_1": {
+      "size": [
+        1.056,
+        0.66,
+        0.4752
+      ],
+      "bottom_z": 0.0
+    },
+    "lamp_1": {
+      "size": [
+        0.4,
+        0.4,
+        1.6
+      ],
+      "bottom_z": 0.0
+    },
+    "bookshelf_1": {
+      "size": [
+        0.9,
+        0.32,
+        1.8
+      ],
+      "bottom_z": 0.0
+    },
+    "ball_1": {
+      "size": [
+        0.2412,
+        0.2412,
+        0.24
+      ],
+      "bottom_z": 0.0
+    }
+  },
+  "layout": {
+    "kind": "room",
+    "size": [
+      6.0,
+      5.0,
+      2.7
+    ],
+    "lighting": "indoor_day",
+    "solids": [
+      [
+        "sofa_1",
+        -0.3,
+        1.8,
+        1.9,
+        0.85,
+        0.0
+      ],
+      [
+        "table_1",
+        -0.3,
+        0.7,
+        1.056,
+        0.66,
+        0.0
+      ],
+      [
+        "lamp_1",
+        2.16,
+        1.9,
+        0.4,
+        0.4,
+        0.0
+      ],
+      [
+        "bookshelf_1",
+        -2.58,
+        1.0,
+        0.9,
+        0.32,
+        90.0
+      ]
+    ],
+    "tops": [
+      [
+        "table_1",
+        -0.3,
+        0.7,
+        1.056,
+        0.66,
+        0.0,
+        0.4752
+      ]
+    ],
+    "seats": [
+      [
+        "sofa_1",
+        -0.3,
+        1.8,
+        1.9,
+        0.85,
+        0.0,
+        0.425
+      ]
+    ],
+    "marks": [
+      {
+        "name": "rug",
+        "kind": "spawn",
+        "at": [
+          -0.6,
+          -0.8,
+          0.0
+        ],
+        "facing_deg": -20.0,
+        "item": null
+      },
+      {
+        "name": "window",
+        "kind": "spawn",
+        "at": [
+          1.2,
+          -0.3,
+          0.0
+        ],
+        "facing_deg": 30.0,
+        "item": null
+      },
+      {
+        "name": "sofa_seat",
+        "kind": "seat",
+        "at": [
+          -0.3,
+          1.8,
+          0.425
+        ],
+        "facing_deg": 0.0,
+        "item": "sofa_1"
+      },
+      {
+        "name": "door",
+        "kind": "spawn",
+        "at": [
+          -1.92,
+          2.05,
+          0.0
+        ],
+        "facing_deg": 0.0,
+        "item": null
+      }
+    ],
+    "cameras": [
+      {
+        "name": "wide",
+        "at": [
+          0.0,
+          -3.5,
+          1.7
+        ],
+        "look_at": [
+          0.0,
+          0.25,
+          0.9
+        ],
+        "lens_mm": 24.0
+      },
+      {
+        "name": "front",
+        "at": [
+          0.0,
+          -2.15,
+          1.1
+        ],
+        "look_at": [
+          0.0,
+          0.0,
+          0.85
+        ],
+        "lens_mm": 35.0
+      }
+    ]
+  },
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0",
+  "glb": {
+    "bytes": 753780,
+    "meshes": 10
+  }
+}
