@@ -12,9 +12,8 @@ import uuid
 from collections.abc import Callable
 from typing import Any
 
-from sqlalchemy.orm import Session
-
 from app.assets import registry
+from sqlalchemy.orm import Session
 from studio_contracts.ids import AssetKind
 
 Uploaded = dict[str, Any]  # path, role, mime_type, storage_key, sha256, size_bytes
@@ -97,5 +96,29 @@ def _fit_outfit(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], d
                               uuid.UUID(params["character_version_id"]), uploaded, data)
 
 
-OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character,
+def _generate_accessory(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                        blender_version: str | None) -> dict[str, Any]:
+    """The build goes onto its accessory draft; without a draft the job creates the accessory."""
+    from app.assets import accessories
+    from app.models.accessories import AccessoryVersion
+    from app.models.jobs import Job
+
+    job = session.get(Job, job_id)
+    draft_id = job.params.get("draft_version_id") if job else None
+    if draft_id:
+        version = session.get(AccessoryVersion, uuid.UUID(draft_id), with_for_update=True, populate_existing=True)
+        if version is None:
+            return {"attached": False, "reason": "the draft was discarded"}
+    else:
+        spec = job.params["spec"]
+        _, version = accessories.create_accessory(session, name=spec["name"], description=spec.get("description", ""),
+                                                  tags=[], spec=spec, created_by=job.requested_by)
+        accessories.begin_generate(version, job_id)
+    recorded = accessories.attach_build(session, version, job_id, uploaded, data, blender_version)
+    return {"accessory_id": str(version.accessory_id), "asset_version_id": str(version.id),
+            "display_code": version.entry.display_code, "check_ok": bool((data.get("check") or {}).get("ok")),
+            **recorded}
+
+
+OUTCOMES: dict[str, Outcome] = {"generate_accessory": _generate_accessory, "blender_smoke": _blender_smoke, "generate_character": _generate_character,
                                 "generate_outfit": _generate_outfit, "fit_outfit": _fit_outfit}

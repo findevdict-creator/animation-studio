@@ -92,7 +92,7 @@ class GenerateCharacterParams(Model):
         default=None, description="the character draft the build is for; without one a new character is created")
 
     @model_validator(mode="after")
-    def _spec_is_valid(self) -> "GenerateCharacterParams":
+    def _spec_is_valid(self) -> GenerateCharacterParams:
         from studio_contracts.character import CharacterSpecification, validate_spec
 
         spec = CharacterSpecification.model_validate(self.spec)
@@ -121,7 +121,7 @@ class GenerateOutfitParams(Model):
         default=None, description="the outfit draft the build is for; without one a new outfit is created")
 
     @model_validator(mode="after")
-    def _spec_is_valid(self) -> "GenerateOutfitParams":
+    def _spec_is_valid(self) -> GenerateOutfitParams:
         from studio_contracts.outfit import OutfitSpecification, validate_outfit
 
         spec = OutfitSpecification.model_validate(self.spec)
@@ -161,6 +161,44 @@ class PublishOutfitParams(Model):
     bump: Literal["minor", "major"] = "minor"
 
 
+class AccessoryPreviewSettings(Model):
+    resolution: int = Field(default=384, ge=64, le=2048)
+    samples: int = Field(default=12, ge=1, le=256)
+    glb: bool = True
+
+
+class GenerateAccessoryParams(Model):
+    """Blender: a validated AccessorySpecification to an accessory built on the reference body
+    of its reference fit profile, attached back onto that body and put through the attach check."""
+
+    spec: dict[str, Any]
+    previews: AccessoryPreviewSettings = Field(default_factory=AccessoryPreviewSettings)
+    draft_version_id: UUID | None = Field(
+        default=None, description="the accessory draft the build is for; without one a new accessory is created")
+
+    @model_validator(mode="after")
+    def _spec_is_valid(self) -> GenerateAccessoryParams:
+        from studio_contracts.accessory import (
+            AccessorySpecification,
+            validate_accessory,
+        )
+
+        spec = AccessorySpecification.model_validate(self.spec)
+        errors = [i for i in validate_accessory(spec) if i.severity == "error"]
+        if errors:
+            raise ValueError("; ".join(f"{i.path}: {i.message}" for i in errors))
+        self.spec = spec.model_dump(mode="json")
+        return self
+
+
+class PublishAccessoryParams(Model):
+    """Publisher: an approved accessory version in review to an immutable library version. Its
+    Blender process re-checks the exact ``accessory.blend`` (contents, digest stamp, attach check)."""
+
+    version_id: UUID
+    bump: Literal["minor", "major"] = "minor"
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
@@ -170,6 +208,8 @@ class JobType(StrEnum):
     generate_outfit = "generate_outfit"
     fit_outfit = "fit_outfit"
     publish_outfit = "publish_outfit"
+    generate_accessory = "generate_accessory"
+    publish_accessory = "publish_accessory"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -181,12 +221,15 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.generate_outfit: GenerateOutfitParams,
     JobType.fit_outfit: FitOutfitParams,
     JobType.publish_outfit: PublishOutfitParams,
+    JobType.generate_accessory: GenerateAccessoryParams,
+    JobType.publish_accessory: PublishAccessoryParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
                                     JobType.generate_character: Queue.blender, JobType.publish_character: Queue.publish,
                                     JobType.generate_outfit: Queue.blender, JobType.fit_outfit: Queue.blender,
-                                    JobType.publish_outfit: Queue.publish}
+                                    JobType.publish_outfit: Queue.publish,
+                                    JobType.generate_accessory: Queue.blender, JobType.publish_accessory: Queue.publish}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
@@ -194,7 +237,8 @@ RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpre
                                    # resumable: the version number is claimed by a write-once marker
                                    JobType.publish_character: True,
                                    JobType.generate_outfit: True, JobType.fit_outfit: True,
-                                   JobType.publish_outfit: True}
+                                   JobType.publish_outfit: True,
+                                   JobType.generate_accessory: True, JobType.publish_accessory: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
@@ -202,7 +246,9 @@ JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: 
                                                    JobType.publish_character: ("asset.publish",),
                                                    JobType.generate_outfit: ("asset.create",),
                                                    JobType.fit_outfit: ("asset.create",),
-                                                   JobType.publish_outfit: ("asset.publish",)}
+                                                   JobType.publish_outfit: ("asset.publish",),
+                                                   JobType.generate_accessory: ("asset.create",),
+                                                   JobType.publish_accessory: ("asset.publish",)}
 
 
 class InputFile(Model):

@@ -1,5 +1,5 @@
 """The publisher (queue ``publish``, architecture 6.3): an approved asset version in review
-becomes an immutable library version. Characters and outfits go through the same steps;
+becomes an immutable library version. Characters, outfits and accessories go through the same steps;
 what differs per kind (which file Blender re-checks, the manifest, the service module) is
 in ``KINDS``.
 
@@ -24,27 +24,36 @@ import json
 import logging
 import shutil
 import uuid
-from pathlib import Path
 from dataclasses import dataclass
+from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+import studio_contracts
+from app.assets import accessories as accessory_svc
 from app.assets import characters as svc
 from app.assets import outfits as outfit_svc
 from app.config import Settings
 from app.core.errors import ApiError
 from app.core.storage import ChecksumMismatch, ObjectExists, Storage, sha256_file
 from app.jobs import service
+from app.models.accessories import AccessoryVersion
 from app.models.audit import AuditLog
 from app.models.characters import CharacterVersion
 from app.models.outfits import OutfitVersion
-from app.models.jobs import Job
-from studio_contracts.jobs import (JOB_QUEUES, InputFile, JobEnvelope, JobStatus, JobType,
-                                   PublishCharacterParams, PublishOutfitParams)
+from studio_contracts.jobs import (
+    JOB_QUEUES,
+    InputFile,
+    JobEnvelope,
+    JobStatus,
+    JobType,
+    PublishAccessoryParams,
+    PublishCharacterParams,
+    PublishOutfitParams,
+)
 from studio_contracts.rig_profile import CARTOON_HUMANOID_V1
-from studio_workers.supervisor import RunOutcome, Supervisor, _read_result
 
-import studio_contracts
+from studio_workers.supervisor import RunOutcome, Supervisor, _read_result
 
 log = logging.getLogger("studio.worker.publisher")
 CLAIM = "version.claim.json"
@@ -66,26 +75,34 @@ def _canonical(doc: dict[str, Any]) -> bytes:
 
 @dataclass(frozen=True)
 class Kind:
-    name: str  # character | outfit
+    name: str  # character | outfit | accessory
     job_type: JobType
     params: type
     model: type
     blend: str  # the file Blender re-checks
+    sha_key: str  # where the re-check report names the SHA-256 of that file
+    stamp: str  # the digest stamp in the file that must equal the version's spec digest
 
     @property
     def svc(self) -> ModuleType:  # looked up on every call, so tests can patch the module
-        return svc if self.name == "character" else outfit_svc
+        return {"character": svc, "outfit": outfit_svc, "accessory": accessory_svc}[self.name]
 
     @property
     def owner_field(self) -> str:
         return f"{self.name}_id"
 
+    def get_owner(self, session, owner_id):
+        return getattr(self.svc, f"get_{self.name}")(session, owner_id, lock=True)
+
 
 KINDS: dict[str, Kind] = {
     JobType.publish_character.value: Kind("character", JobType.publish_character, PublishCharacterParams,
-                                          CharacterVersion, "character.blend"),
+                                          CharacterVersion, "character.blend", "blend_sha256", "studio_spec_digest"),
     JobType.publish_outfit.value: Kind("outfit", JobType.publish_outfit, PublishOutfitParams, OutfitVersion,
-                                       "outfit.blend"),
+                                       "outfit.blend", "outfit_blend_sha256", "studio_outfit_digest"),
+    JobType.publish_accessory.value: Kind("accessory", JobType.publish_accessory, PublishAccessoryParams,
+                                          AccessoryVersion, "accessory.blend", "accessory_blend_sha256",
+                                          "studio_accessory_digest"),
 }
 
 
@@ -200,8 +217,8 @@ class PublisherRunner(Supervisor):
         files.append(self._put(prefix + "publish_validation.json", report_path, "application/json", "report",
                                report["blender_version"], adopt=True))
 
-        manifest_doc = (self._manifest if kind.name == "character" else self._outfit_manifest)(
-            snap, major, minor, files, report)
+        manifest_doc = {"character": self._manifest, "outfit": self._outfit_manifest,
+                        "accessory": self._accessory_manifest}[kind.name](snap, major, minor, files, report)
         manifest_path = workspace / "library" / "manifest.json"
         manifest_path.write_bytes(_canonical(manifest_doc))
         manifest = self._put(prefix + "manifest.json", manifest_path, "application/json", "manifest", None,
@@ -215,7 +232,7 @@ class PublisherRunner(Supervisor):
         with self.sessions.begin() as s:
             ksvc = kind.svc
             owner_id = uuid.UUID(snap[kind.owner_field])
-            owner = (ksvc.get_character if kind.name == "character" else ksvc.get_outfit)(s, owner_id, lock=True)
+            owner = kind.get_owner(s, owner_id)
             version = ksvc.get_version(s, owner.id, uuid.UUID(snap["version_id"]), lock=True)
             try:
                 ksvc.complete_publish(s, version, major=major, minor=minor, files=[*files, manifest],
@@ -232,6 +249,8 @@ class PublisherRunner(Supervisor):
     def _snapshot(self, kind: Kind, version_id: uuid.UUID) -> dict[str, Any]:
         if kind.name == "outfit":
             return self._outfit_snapshot(version_id)
+        if kind.name == "accessory":
+            return self._accessory_snapshot(version_id)
         with self.sessions() as s:
             v = s.get(CharacterVersion, version_id)
             if v is None:
@@ -269,7 +288,7 @@ class PublisherRunner(Supervisor):
         if blend is None:
             raise PublishRefused(f"the version has no {kind.blend}")
         params = {"version_id": snap["version_id"]}
-        if kind.name == "outfit":
+        if kind.name in ("outfit", "accessory"):
             params["spec"] = snap["spec"]
         envelope = JobEnvelope(job_id=job_id, type=kind.job_type, attempt=attempt, params=params,
                                inputs=[InputFile(path=f"inputs/{kind.blend}", sha256=blend["sha256"])],
@@ -287,11 +306,9 @@ class PublisherRunner(Supervisor):
         report, stamps = result.data["report"], result.data["stamps"]
         if not report["ok"]:
             raise PublishRefused(f"{kind.blend} failed re-validation: {report['failed']}")
-        sha_key = "blend_sha256" if kind.name == "character" else "outfit_blend_sha256"
-        if report.get(sha_key) != blend["sha256"]:
+        if report.get(kind.sha_key) != blend["sha256"]:
             raise PublishRefused(f"the validated file is not the draft's {kind.blend}")
-        stamp = "studio_spec_digest" if kind.name == "character" else "studio_outfit_digest"
-        if stamps.get(stamp) != snap["built_digest"] or snap["built_digest"] != snap["spec_digest"]:
+        if stamps.get(kind.stamp) != snap["built_digest"] or snap["built_digest"] != snap["spec_digest"]:
             raise PublishRefused(f"{kind.blend} was not built from the version's specification")
         return report
 
@@ -303,7 +320,7 @@ class PublisherRunner(Supervisor):
             major, minor, reasons = ksvc.next_number(s, v, params.bump)
             if reasons and params.bump == "minor":
                 log.info("publish %s: major bump forced (%s changed)", snap["version_id"], ", ".join(reasons))
-            prefix_of = lambda M, m: ksvc.library_prefix(v, M, m)  # noqa: E731
+            prefix_of = lambda M, m: ksvc.library_prefix(v, M, m)
         claim = workspace / "library" / CLAIM
         claim.write_bytes(_canonical({"version_id": snap["version_id"], kind.owner_field: snap[kind.owner_field]}))
         sha = sha256_file(claim)
@@ -441,6 +458,69 @@ class PublisherRunner(Supervisor):
             "primary_fit_profile": snap["primary_fit_profile"], "slots": snap["slots"],
             "pieces": pieces,
             "spec_digest": snap["spec_digest"], "verified_fits": snap["fits"],
+            "blender_version": snap["blender_version"], "engine_version": draft.get("engine_version"),
+            "validation": {"build": {"ok": draft.get("ok"), "checks": len(draft.get("checks", []))},
+                           "publish": {"ok": report["ok"], "checks": len(report.get("checks", [])),
+                                       "blender_version": report.get("blender_version")}},
+            "approved_by": snap["reviewed_by"], "approved_at": snap["reviewed_at"],
+        }
+
+    # -------------------------------------------------------------- accessories
+    def _accessory_snapshot(self, version_id: uuid.UUID) -> dict[str, Any]:
+        with self.sessions() as s:
+            v = s.get(AccessoryVersion, version_id)
+            if v is None:
+                raise PublishRefused(f"accessory version {version_id} does not exist")
+            if v.status in ("published", "deprecated"):
+                return {"already": {"asset_version_id": str(v.id), "accessory_id": str(v.accessory_id),
+                                    "version": v.version_label, "manifest_key": v.manifest_key,
+                                    "manifest_sha256": v.manifest_sha256, "already_published": True}}
+            try:
+                accessory_svc.check_publishable(v)
+            except ApiError as exc:
+                raise PublishRefused(exc.detail) from exc
+            problems = accessory_svc.readiness(v)
+            if problems:
+                raise PublishRefused("; ".join(problems))
+            based_on = s.get(AccessoryVersion, v.based_on_version_id) if v.based_on_version_id else None
+            return {
+                "version_id": str(v.id), "accessory_id": str(v.accessory_id), "code": v.entry.display_code,
+                "name": v.spec.get("name"), "spec": v.spec, "spec_digest": v.spec_digest,
+                "built_digest": v.built_digest, "category": v.accessory.category, "item_ref": v.item_ref,
+                "style_profile_ref": v.style_profile_ref, "rig_profile_ref": v.rig_profile_ref,
+                "catalog_ref": v.catalog_ref, "attach_point": v.attach_point, "attach_points": list(v.attach_points),
+                "fit_profiles": list(v.fit_profiles), "conflicts_with_slots": list(v.conflicts_with_slots),
+                "blender_version": v.blender_version, "draft_report": v.check_report,
+                "reviewed_by": str(v.reviewed_by) if v.reviewed_by else None,
+                "reviewed_at": v.reviewed_at.isoformat() if v.reviewed_at else None, "review_notes": v.review_notes,
+                "based_on": ({"version_id": str(based_on.id), "version": based_on.version_label}
+                             if based_on else None),
+                "files": [{"name": f.storage_key.rsplit("/", 1)[-1], "role": f.role, "storage_key": f.storage_key,
+                           "sha256": f.sha256, "size_bytes": f.size_bytes, "mime_type": f.mime_type}
+                          for f in sorted(v.entry.files, key=lambda f: f.storage_key)],
+            }
+
+    @staticmethod
+    def _accessory_manifest(snap: dict[str, Any], major: int, minor: int, files: list[dict[str, Any]],
+                            report: dict[str, Any]) -> dict[str, Any]:
+        """AssetVersionManifest for an accessory, with the compatibility metadata a scene
+        checks before it pins the version."""
+        draft = snap["draft_report"] or {}
+        return {
+            "manifest_version": "asset_manifest/1",
+            "kind": "accessory", "code": snap["code"], "accessory_id": snap["accessory_id"],
+            "version": f"{major}.{minor}", "version_id": snap["version_id"], "name": snap["name"],
+            "based_on": snap["based_on"], "category": snap["category"], "item": snap["item_ref"],
+            "files": [{"role": f["role"], "key": f["storage_key"].rsplit("/", 1)[-1], "sha256": f["sha256"],
+                       "size": f["size_bytes"], "mime": f["mime_type"]}
+                      for f in sorted(files, key=lambda f: f["storage_key"])],
+            "dependencies": [{"kind": "rig_profile", "ref": snap["rig_profile_ref"]},
+                             {"kind": "style_profile", "ref": snap["style_profile_ref"]},
+                             {"kind": "accessory_catalog", "ref": snap["catalog_ref"]}],
+            "compatibility": {"rig_profile": snap["rig_profile_ref"], "attach_point": snap["attach_point"],
+                              "attach_points": snap["attach_points"], "fit_profiles": snap["fit_profiles"],
+                              "conflicts_with_slots": snap["conflicts_with_slots"]},
+            "spec_digest": snap["spec_digest"],
             "blender_version": snap["blender_version"], "engine_version": draft.get("engine_version"),
             "validation": {"build": {"ok": draft.get("ok"), "checks": len(draft.get("checks", []))},
                            "publish": {"ok": report["ok"], "checks": len(report.get("checks", [])),
