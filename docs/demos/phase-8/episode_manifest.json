@@ -1,0 +1,109 @@
+{
+  "sfx": [],
+  "cast": [
+    {
+      "key": "ali",
+      "voice": {
+        "pitch": 55,
+        "voice": "en-us",
+        "variant": "m3",
+        "provider": "espeak-ng",
+        "rate_wpm": 165
+      },
+      "outfit": {
+        "code": "OUTFIT-011",
+        "version": "1.0"
+      },
+      "character": {
+        "code": "CHAR-016",
+        "version": "1.0"
+      },
+      "accessories": []
+    },
+    {
+      "key": "maya",
+      "voice": {
+        "pitch": 72,
+        "voice": "en-us",
+        "variant": "f3",
+        "provider": "espeak-ng",
+        "rate_wpm": 160
+      },
+      "outfit": {
+        "code": "OUTFIT-012",
+        "version": "1.0"
+      },
+      "character": {
+        "code": "CHAR-017",
+        "version": "1.0"
+      },
+      "accessories": []
+    }
+  ],
+  "music": [
+    {
+      "audio": "AUDIO-008",
+      "volume": 0.25,
+      "start_s": 0.0,
+      "fade_in_s": 0.5,
+      "fade_out_s": 1.0
+    }
+  ],
+  "shots": [
+    {
+      "scene": "SCENE-018",
+      "shot_id": "SH-001",
+      "version": 1,
+      "transition_in": {
+        "kind": "cut",
+        "duration_s": 0.0
+      }
+    },
+    {
+      "scene": "SCENE-019",
+      "shot_id": "SH-002",
+      "version": 1,
+      "transition_in": {
+        "kind": "cut",
+        "duration_s": 0.0
+      }
+    },
+    {
+      "scene": "SCENE-020",
+      "shot_id": "SH-003",
+      "version": 1,
+      "transition_in": {
+        "kind": "dissolve",
+        "duration_s": 0.4
+      }
+    }
+  ],
+  "title": "The Toy Car",
+  "render": {
+    "crf": 18,
+    "fps": 24,
+    "look": "None",
+    "gamma": 1.0,
+    "width": 1920,
+    "engine": "cycles",
+    "height": 1080,
+    "samples": 4,
+    "exposure": 0.0,
+    "audio_codec": "aac",
+    "video_codec": "h264",
+    "frame_format": "PNG",
+    "view_transform": "Standard",
+    "audio_bitrate_k": 192
+  },
+  "storyboard": 3,
+  "environments": [
+    {
+      "code": "ENV-001",
+      "version": "1.0"
+    }
+  ],
+  "schema_version": "episode/1",
+  "script_version": 1,
+  "dialogue_volume": 1.0,
+  "action_animations": {}
+}

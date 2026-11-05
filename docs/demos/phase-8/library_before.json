@@ -1,0 +1,127 @@
+{
+  "ali": {
+    "status": "published",
+    "rows": {
+      "character.blend": "60f00ec4f84b72d9aa56f49b7acf8358d4ca0b3413a82292c4f5ca11665bf76f",
+      "character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "expressions.png": "22293ed6587c0ac44dcc233133a42512cd15d97432c7a62112371d3af89c9277",
+      "manifest.json": "262fd4fb41b6fad5db24daaf1a08bb0e3d24c35ee44721023162566f4dbf4c4e",
+      "preview.glb": "0d034f8f5cbade348527f292f848714b9a0a52e82b13dea8edb55407f3506c0c",
+      "publish_validation.json": "b6bbf49224fcc708d221b41a0d8660df06283317b0881fcb21ec748877a2aad6",
+      "thumbnail.png": "31b76cd93ac29a8b4c0e1b0eb055c4818c677a9896c0a1d80f9d6ea7c4df7632",
+      "turntable.mp4": "c34af02849d6476c26d551b18162fdc7d32544063fdddb5e557eaf5cb06b458c",
+      "turntable_sheet.png": "e8dcbd20c75952dfed20e7589ca93c71ddd82db0dc785410333513ee42d72a98",
+      "validation.json": "384af00488c83c6607c3e74f38cf52a97ba99a8402a8710dfd18e405c4cc8021"
+    },
+    "stored": {
+      "character.blend": "60f00ec4f84b72d9aa56f49b7acf8358d4ca0b3413a82292c4f5ca11665bf76f",
+      "character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "expressions.png": "22293ed6587c0ac44dcc233133a42512cd15d97432c7a62112371d3af89c9277",
+      "manifest.json": "262fd4fb41b6fad5db24daaf1a08bb0e3d24c35ee44721023162566f4dbf4c4e",
+      "preview.glb": "0d034f8f5cbade348527f292f848714b9a0a52e82b13dea8edb55407f3506c0c",
+      "publish_validation.json": "b6bbf49224fcc708d221b41a0d8660df06283317b0881fcb21ec748877a2aad6",
+      "thumbnail.png": "31b76cd93ac29a8b4c0e1b0eb055c4818c677a9896c0a1d80f9d6ea7c4df7632",
+      "turntable.mp4": "c34af02849d6476c26d551b18162fdc7d32544063fdddb5e557eaf5cb06b458c",
+      "turntable_sheet.png": "e8dcbd20c75952dfed20e7589ca93c71ddd82db0dc785410333513ee42d72a98",
+      "validation.json": "384af00488c83c6607c3e74f38cf52a97ba99a8402a8710dfd18e405c4cc8021"
+    }
+  },
+  "maya": {
+    "status": "published",
+    "rows": {
+      "character.blend": "874fa70dfb3f35ed84116192af98e0c6852b187bfd448b4909c273d2dd2403db",
+      "character.json": "e20a1d998b5eac7cbb4d37deb203a24e6ee22698bcbd52b559c96cb9f0a3a22f",
+      "expressions.png": "2ffc34a92ed1333fcc153d1efc90fd600e0580cb99cc538365b9efc812ba37ac",
+      "manifest.json": "00f2d4c2648a8a55e1a9b6d404d22e455ff91ddb07849d781cd63ac5263c6290",
+      "preview.glb": "633e3d75b04c35ef079216302a02100b5b9ca82490aa9759a644cf38ed10b78a",
+      "publish_validation.json": "a38c06c7c000dbe3918b02309a4f47c7798b0036963ae8b2b4b578054f5b51a7",
+      "thumbnail.png": "def3ba6900609ef96cbc1344ce1f431b62f8b32f0c99a4cfe48a3567f552eb1e",
+      "turntable.mp4": "5fdb2b7ad892873f43f3d834410dd6c359b34ac25067d319b95cbbfb088ac1f0",
+      "turntable_sheet.png": "909732184dc002f4c4e963eb5fbf9858dc84d2a0f42644db391621bb32236ae4",
+      "validation.json": "90997c1291f904b4c209140f907ea72f67f36e0a87fcaa9280dd5de843af2343"
+    },
+    "stored": {
+      "character.blend": "874fa70dfb3f35ed84116192af98e0c6852b187bfd448b4909c273d2dd2403db",
+      "character.json": "e20a1d998b5eac7cbb4d37deb203a24e6ee22698bcbd52b559c96cb9f0a3a22f",
+      "expressions.png": "2ffc34a92ed1333fcc153d1efc90fd600e0580cb99cc538365b9efc812ba37ac",
+      "manifest.json": "00f2d4c2648a8a55e1a9b6d404d22e455ff91ddb07849d781cd63ac5263c6290",
+      "preview.glb": "633e3d75b04c35ef079216302a02100b5b9ca82490aa9759a644cf38ed10b78a",
+      "publish_validation.json": "a38c06c7c000dbe3918b02309a4f47c7798b0036963ae8b2b4b578054f5b51a7",
+      "thumbnail.png": "def3ba6900609ef96cbc1344ce1f431b62f8b32f0c99a4cfe48a3567f552eb1e",
+      "turntable.mp4": "5fdb2b7ad892873f43f3d834410dd6c359b34ac25067d319b95cbbfb088ac1f0",
+      "turntable_sheet.png": "909732184dc002f4c4e963eb5fbf9858dc84d2a0f42644db391621bb32236ae4",
+      "validation.json": "90997c1291f904b4c209140f907ea72f67f36e0a87fcaa9280dd5de843af2343"
+    }
+  },
+  "ali_outfit": {
+    "status": "published",
+    "rows": {
+      "fit_report.json": "ef0bdb6bcfe653b54634f030ee62f9262a8ed864af7e7b0b65266798f0f515ea",
+      "manifest.json": "8b2ee3973e2cb60a11a5cbb10ecdb56b4278c56051a5471c807b8ff867d2577f",
+      "outfit.blend": "43e25bdc49193bb20cb2231470cdcd3b368736385183bb013973c0caabbf46da",
+      "outfit.json": "a1c58f653e1f4f2c57a4094fee65bff75d6f3747902e4c2e221f7e90c01a6448",
+      "poses.png": "0ed2e123923cfca9a7d554883ef251935cfca657fa54586b12aac5ecc60ae8b2",
+      "preview.glb": "072efc15409d92df768d35fe798b51fe162464ca6990b436c6e4c3f2b3106b62",
+      "publish_validation.json": "ffb4356ad4964d10cb0c102018a9ca3a4d765deab7bc53862f718fd00922c579",
+      "thumbnail.png": "3f7845a036d5a992f3d771e5dc61e6e5c0c9a41506b7e3159c3ebaa2b6d95309"
+    },
+    "stored": {
+      "fit_report.json": "ef0bdb6bcfe653b54634f030ee62f9262a8ed864af7e7b0b65266798f0f515ea",
+      "manifest.json": "8b2ee3973e2cb60a11a5cbb10ecdb56b4278c56051a5471c807b8ff867d2577f",
+      "outfit.blend": "43e25bdc49193bb20cb2231470cdcd3b368736385183bb013973c0caabbf46da",
+      "outfit.json": "a1c58f653e1f4f2c57a4094fee65bff75d6f3747902e4c2e221f7e90c01a6448",
+      "poses.png": "0ed2e123923cfca9a7d554883ef251935cfca657fa54586b12aac5ecc60ae8b2",
+      "preview.glb": "072efc15409d92df768d35fe798b51fe162464ca6990b436c6e4c3f2b3106b62",
+      "publish_validation.json": "ffb4356ad4964d10cb0c102018a9ca3a4d765deab7bc53862f718fd00922c579",
+      "thumbnail.png": "3f7845a036d5a992f3d771e5dc61e6e5c0c9a41506b7e3159c3ebaa2b6d95309"
+    }
+  },
+  "maya_outfit": {
+    "status": "published",
+    "rows": {
+      "fit_report.json": "ac30e29005b7f90fe34c4e6eceff93ef1814093576dacdac2deea63aa8d00732",
+      "manifest.json": "3b6883a3d776b549dffa6b1101af76c37c8068e4f7efd4a3bd3bf692e4081414",
+      "outfit.blend": "b5524874b53d73a97cd0d590585cfdbe141fdca2ddc0250704ed927bd5c3ea85",
+      "outfit.json": "6f908587ada5fdcc5c92fde5832937607a5fbf30713d6e94a69e3c5db159effb",
+      "poses.png": "04395fefa7cc4044f1e8bcb74760fda22d9c5b43a181d6b10e947c8c6179b2ac",
+      "preview.glb": "41d17b1060eaff6480d4b0259db2cbd67654f4c2d5675a1ba1338eafcd0b35b0",
+      "publish_validation.json": "a59c0b4fe677297953631f166c4987538f7c36f6135e9146f5ea8a88c8526ba5",
+      "thumbnail.png": "c361dd77889ef81f7f8d29cd67d28d14379c90ec0565185d720ce9a676d56149"
+    },
+    "stored": {
+      "fit_report.json": "ac30e29005b7f90fe34c4e6eceff93ef1814093576dacdac2deea63aa8d00732",
+      "manifest.json": "3b6883a3d776b549dffa6b1101af76c37c8068e4f7efd4a3bd3bf692e4081414",
+      "outfit.blend": "b5524874b53d73a97cd0d590585cfdbe141fdca2ddc0250704ed927bd5c3ea85",
+      "outfit.json": "6f908587ada5fdcc5c92fde5832937607a5fbf30713d6e94a69e3c5db159effb",
+      "poses.png": "04395fefa7cc4044f1e8bcb74760fda22d9c5b43a181d6b10e947c8c6179b2ac",
+      "preview.glb": "41d17b1060eaff6480d4b0259db2cbd67654f4c2d5675a1ba1338eafcd0b35b0",
+      "publish_validation.json": "a59c0b4fe677297953631f166c4987538f7c36f6135e9146f5ea8a88c8526ba5",
+      "thumbnail.png": "c361dd77889ef81f7f8d29cd67d28d14379c90ec0565185d720ce9a676d56149"
+    }
+  },
+  "env": {
+    "status": "published",
+    "rows": {
+      "environment.blend": "91c5d951298d82bdc9a9fe2578b0ecb911efdec65883202297d561deb26790d7",
+      "environment.json": "eb2707752f420443a585bfcd5c540b02c339b9029072d83bd30b24893c6274f6",
+      "layout_report.json": "54e77fbadff6a42ebee27d9b20bcfe418126f38aee10403a380cf75db87b3c66",
+      "manifest.json": "6b37fca63b91c78dbf4b572c86a1ac6f07abd41edde03b61b6702dcea942a11f",
+      "plan.png": "a9e4663813898f6329a316a4436751b457d9d7d9a1dcf2bc2d500dff4d306a27",
+      "preview.glb": "9af559da4739ba8b66187edb4bc2290f37852f1bfe60f8310425b52630b02b63",
+      "publish_validation.json": "ec34fe6b5eed3ec4b4a71cdd6f2b662f5701b6de3ab2589ac9d7363eab7280a5",
+      "thumbnail.png": "d636ee6a8afe41834ea30e2c07554c5ff774e1e62d7f2cbadd2236ca43747b91",
+      "wide.png": "caa038d8870ad9e3c43811d1b0128e9b4e1a64062bef67fef535fdefe09fec15"
+    },
+    "stored": {
+      "environment.blend": "91c5d951298d82bdc9a9fe2578b0ecb911efdec65883202297d561deb26790d7",
+      "environment.json": "eb2707752f420443a585bfcd5c540b02c339b9029072d83bd30b24893c6274f6",
+      "layout_report.json": "54e77fbadff6a42ebee27d9b20bcfe418126f38aee10403a380cf75db87b3c66",
+      "manifest.json": "6b37fca63b91c78dbf4b572c86a1ac6f07abd41edde03b61b6702dcea942a11f",
+      "plan.png": "a9e4663813898f6329a316a4436751b457d9d7d9a1dcf2bc2d500dff4d306a27",
+      "preview.glb": "9af559da4739ba8b66187edb4bc2290f37852f1bfe60f8310425b52630b02b63",
+      "publish_validation.json": "ec34fe6b5eed3ec4b4a71cdd6f2b662f5701b6de3ab2589ac9d7363eab7280a5",
+      "thumbnail.png": "d636ee6a8afe41834ea30e2c07554c5ff774e1e62d7f2cbadd2236ca43747b91",
+      "wide.png": "caa038d8870ad9e3c43811d1b0128e9b4e1a64062bef67fef535fdefe09fec15"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "series": "SERIES-004",
+  "episode": "EP-004",
+  "version": "01a1ab54-8ed1-7e50-bae7-6b90a10c6167",
+  "renders": [
+    "RENDER-004",
+    "RENDER-005"
+  ],
+  "pins": [
+    "CHAR-016@1.0",
+    "CHAR-017@1.0",
+    "ENV-001@1.0",
+    "OUTFIT-011@1.0",
+    "OUTFIT-012@1.0"
+  ],
+  "duration_s": 7.53,
+  "stills": [
+    "SH-001-0030.png",
+    "SH-002-0036.png",
+    "SH-003-0029.png"
+  ],
+  "elapsed_s": 7438
+}
