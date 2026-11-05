@@ -1095,6 +1095,353 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/animation-generators": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The procedural generators an animation can be made from */
+        get: operations["list_generators_api_v1_animation_generators_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/bone-maps": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Motion-capture skeletons a BVH take can be retargeted from */
+        get: operations["list_bone_maps_api_v1_bone_maps_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/spec/validate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Validate an animation specification against the generators, bone maps and its style
+         * @description Always 200: an invalid spec is a normal answer here, listing every issue.
+         */
+        post: operations["validate_api_v1_animations_spec_validate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Gallery: search and filter animations */
+        get: operations["gallery_api_v1_animations_get"];
+        put?: never;
+        /** Create an animation and its first draft from a specification */
+        post: operations["create_api_v1_animations_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Detail */
+        get: operations["detail_api_v1_animations__animation_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /** Name, description, tags, recommended version */
+        patch: operations["patch_identity_api_v1_animations__animation_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/versions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version history, newest first */
+        get: operations["history_api_v1_animations__animation_id__versions_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/versions/{version_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Version Detail */
+        get: operations["version_detail_api_v1_animations__animation_id__versions__version_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/versions/{version_id}/files/{name}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A version file: 302 to a presigned URL */
+        get: operations["version_file_api_v1_animations__animation_id__versions__version_id__files__name__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/versions/{version_id}/review": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve, or reject back to draft with notes */
+        post: operations["review_api_v1_animations__animation_id__versions__version_id__review_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/versions/{version_id}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Publish an approved version (job on the publisher queue) */
+        post: operations["publish_api_v1_animations__animation_id__versions__version_id__publish_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/versions/{version_id}/deprecate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Hide a published version from pickers; scenes that pin it still load it */
+        post: operations["deprecate_api_v1_animations__animation_id__versions__version_id__deprecate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/drafts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** New draft, optionally copying the spec of an existing (e.g. published) version */
+        post: operations["create_draft_api_v1_animations__animation_id__drafts_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/drafts/{draft_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** Discard a draft */
+        delete: operations["discard_api_v1_animations__animation_id__drafts__draft_id__delete"];
+        options?: never;
+        head?: never;
+        /** Edit a draft's spec */
+        patch: operations["edit_draft_api_v1_animations__animation_id__drafts__draft_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/drafts/{draft_id}/generate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Build the draft in Blender and play-check it on the reference bodies (job) */
+        post: operations["generate_api_v1_animations__animation_id__drafts__draft_id__generate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/animations/{animation_id}/drafts/{draft_id}/submit": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Send a built draft whose play check passed to review */
+        post: operations["submit_api_v1_animations__animation_id__drafts__draft_id__submit_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Upload a BVH take or a dialogue recording (the raw file as the request body) */
+        post: operations["upload_api_v1_uploads_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/uploads/{upload_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Upload */
+        get: operations["get_upload_api_v1_uploads__upload_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audio-clips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Dialogue clips, newest first */
+        get: operations["list_clips_api_v1_audio_clips_get"];
+        put?: never;
+        /** Make a dialogue clip from an audio upload and find its mouth cues */
+        post: operations["create_api_v1_audio_clips_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audio-clips/{ref}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A clip by id or code (AUDIO-001) */
+        get: operations["get_api_v1_audio_clips__ref__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audio-clips/{ref}/dialogue.wav": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The normalised recording: 302 to a presigned URL */
+        get: operations["wav_api_v1_audio_clips__ref__dialogue_wav_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/animation-clips": {
         parameters: {
             query?: never;
@@ -1675,6 +2022,330 @@ export interface components {
             /** Body Types */
             body_types: string[];
         };
+        /** AnimationCreate */
+        AnimationCreate: {
+            /** Name */
+            name: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
+            /** Tags */
+            tags?: string[];
+            /**
+             * Spec
+             * @description AnimationSpecification; its name defaults to the animation's
+             */
+            spec: {
+                [key: string]: unknown;
+            };
+        };
+        /** AnimationDetail */
+        AnimationDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Category */
+            category: string;
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+            /**
+             * Versions
+             * @default []
+             */
+            versions: components["schemas"]["AnimationVersionSummary"][];
+        };
+        /** AnimationDraftCreate */
+        AnimationDraftCreate: {
+            /** Based On Version Id */
+            based_on_version_id?: string | null;
+            /** Spec */
+            spec?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /** AnimationDraftPatch */
+        AnimationDraftPatch: {
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+        };
+        /** AnimationGenerateBody */
+        AnimationGenerateBody: {
+            previews?: components["schemas"]["AnimationPreviewSettings"];
+        };
+        /** AnimationOut */
+        AnimationOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Description */
+            description: string;
+            /** Tags */
+            tags: string[];
+            /** Category */
+            category: string;
+            /** Lifecycle */
+            lifecycle: string;
+            /** Recommended Version Id */
+            recommended_version_id: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
+            /** Recommended Version */
+            recommended_version?: string | null;
+            /** Latest Published */
+            latest_published?: string | null;
+            /** Counts */
+            counts?: {
+                [key: string]: number;
+            };
+            /** Thumbnail Url */
+            thumbnail_url?: string | null;
+        };
+        /** AnimationPatch */
+        AnimationPatch: {
+            /** Name */
+            name?: string | null;
+            /** Description */
+            description?: string | null;
+            /** Tags */
+            tags?: string[] | null;
+            /** Recommended Version Id */
+            recommended_version_id?: string | null;
+        };
+        /** AnimationPreviewSettings */
+        AnimationPreviewSettings: {
+            /**
+             * Tile
+             * @default 256
+             */
+            tile: number;
+            /**
+             * Samples
+             * @default 8
+             */
+            samples: number;
+        };
+        /** AnimationPublishBody */
+        AnimationPublishBody: {
+            /**
+             * Bump
+             * @description major is forced when compatibility narrows (rig, style, controls, loop or travel, fit profiles)
+             * @default minor
+             * @enum {string}
+             */
+            bump: "minor" | "major";
+        };
+        /** AnimationReviewBody */
+        AnimationReviewBody: {
+            /**
+             * Decision
+             * @enum {string}
+             */
+            decision: "approve" | "reject";
+            /**
+             * Notes
+             * @default
+             */
+            notes: string;
+        };
+        /** AnimationValidationOut */
+        AnimationValidationOut: {
+            /** Valid */
+            valid: boolean;
+            /** Issues */
+            issues: components["schemas"]["Issue"][];
+            resolved?: components["schemas"]["ResolvedAnimation"] | null;
+            /** Digest */
+            digest?: string | null;
+        };
+        /** AnimationVersionDetail */
+        AnimationVersionDetail: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Animation Id
+             * Format: uuid
+             */
+            animation_id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Source Kind */
+            source_kind: string;
+            /** Generator Ref */
+            generator_ref: string | null;
+            /** Fit Profiles */
+            fit_profiles: string[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Check Ok */
+            check_ok?: boolean | null;
+            /** Spec */
+            spec: {
+                [key: string]: unknown;
+            };
+            /** Style Profile Ref */
+            style_profile_ref: string | null;
+            /** Rig Profile Ref */
+            rig_profile_ref: string | null;
+            /** Source Upload Key */
+            source_upload_key: string | null;
+            /** Source Sha256 */
+            source_sha256: string | null;
+            /** Licence */
+            licence: string | null;
+            /** Compat */
+            compat: {
+                [key: string]: unknown;
+            } | null;
+            /** Blender Version */
+            blender_version: string | null;
+            /** Check Report */
+            check_report: {
+                [key: string]: unknown;
+            } | null;
+            /** Generate Job Id */
+            generate_job_id: string | null;
+            /** Review Notes */
+            review_notes: string;
+            /** Reviewed By */
+            reviewed_by: string | null;
+            /** Reviewed At */
+            reviewed_at: string | null;
+            /** Manifest Key */
+            manifest_key: string | null;
+            /** Manifest Sha256 */
+            manifest_sha256: string | null;
+            /** Published By */
+            published_by: string | null;
+            /**
+             * Files
+             * @default []
+             */
+            files: components["schemas"]["FileOut"][];
+            /**
+             * Ready For Review
+             * @description what blocks submit; empty when ready
+             */
+            ready_for_review?: string[];
+        };
+        /** AnimationVersionJobOut */
+        AnimationVersionJobOut: {
+            version: components["schemas"]["AnimationVersionDetail"];
+            job: components["schemas"]["JobOut"];
+        };
+        /** AnimationVersionSummary */
+        AnimationVersionSummary: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Animation Id
+             * Format: uuid
+             */
+            animation_id: string;
+            /** Status */
+            status: string;
+            /** Version Label */
+            version_label: string | null;
+            /** Based On Version Id */
+            based_on_version_id: string | null;
+            /** Spec Digest */
+            spec_digest: string;
+            /** Built Digest */
+            built_digest: string | null;
+            /** Source Kind */
+            source_kind: string;
+            /** Generator Ref */
+            generator_ref: string | null;
+            /** Fit Profiles */
+            fit_profiles: string[];
+            /** Review Decision */
+            review_decision: string | null;
+            /** Published At */
+            published_at: string | null;
+            /** Deprecated At */
+            deprecated_at: string | null;
+            /** Created At */
+            created_at?: string | null;
+            /** Created By */
+            created_by?: string | null;
+            /** Check Ok */
+            check_ok?: boolean | null;
+        };
         /** AssetFileOut */
         AssetFileOut: {
             /**
@@ -1735,6 +2406,77 @@ export interface components {
             /** Files */
             files: components["schemas"]["AssetFileOut"][];
         };
+        /** AudioCreate */
+        AudioCreate: {
+            /**
+             * Upload Id
+             * Format: uuid
+             * @description an upload of kind audio
+             */
+            upload_id: string;
+            /** Name */
+            name?: string | null;
+            /**
+             * Dialog Text
+             * @description the transcript; the analyser uses it to choose mouth shapes
+             */
+            dialog_text?: string | null;
+        };
+        /** AudioJobOut */
+        AudioJobOut: {
+            clip: components["schemas"]["AudioOut"];
+            job: components["schemas"]["JobOut"];
+        };
+        /** AudioOut */
+        AudioOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /**
+             * Upload Id
+             * Format: uuid
+             */
+            upload_id: string;
+            /** Dialog Text */
+            dialog_text: string | null;
+            /**
+             * Status
+             * @description analysing | ready | failed
+             */
+            status: string;
+            /** Job Id */
+            job_id: string | null;
+            /** Wav Sha256 */
+            wav_sha256: string | null;
+            /** Duration S */
+            duration_s: number | null;
+            /**
+             * Analyser
+             * @description rhubarb-<version>, or studio-phonetic-1.0 (built-in fallback)
+             */
+            analyser: string | null;
+            /** Recognizer */
+            recognizer: string | null;
+            /** Cues */
+            cues: components["schemas"]["CueOut"][] | null;
+            /** Error */
+            error: string | null;
+            /** Created By */
+            created_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /** Finished At */
+            finished_at: string | null;
+        };
         /**
          * BodyType
          * @description Multipliers on the age profile's base girths.
@@ -1746,6 +2488,69 @@ export interface components {
             belly: number;
             /** Limb */
             limb: number;
+        };
+        /**
+         * BoneMap
+         * @description Source skeleton bone -> rig-profile control. ``root`` is the source's hip bone: its
+         *     translation becomes the torso's (and, for travelling clips, the root's) motion.
+         */
+        BoneMap: {
+            /** Id */
+            id: string;
+            /** Label */
+            label: string;
+            /** Target Rig Profile */
+            target_rig_profile: string;
+            /** Root */
+            root: string;
+            /** Bones */
+            bones: {
+                [key: string]: string;
+            };
+            /**
+             * Passthrough
+             * @default []
+             */
+            passthrough: string[];
+        };
+        /** BvhSource */
+        BvhSource: {
+            /**
+             * Kind
+             * @default bvh
+             * @constant
+             */
+            kind: "bvh";
+            /** Upload Key */
+            upload_key: string;
+            /** Sha256 */
+            sha256: string;
+            /**
+             * Skeleton
+             * @description bone map: cmu or mixamo
+             */
+            skeleton: string;
+            /** Frame Start */
+            frame_start?: number | null;
+            /** Frame End */
+            frame_end?: number | null;
+            /**
+             * Loops
+             * @default false
+             */
+            loops: boolean;
+            /**
+             * Travels
+             * @default false
+             */
+            travels: boolean;
+            /** Licence */
+            licence: string;
+            /**
+             * Source Name
+             * @default
+             */
+            source_name: string;
         };
         /** CharacterCreate */
         CharacterCreate: {
@@ -1909,6 +2714,17 @@ export interface components {
             poses: string[];
             /** Fit Profiles */
             fit_profiles: string[];
+        };
+        /** CueOut */
+        CueOut: {
+            /** Start S */
+            start_s: number;
+            /** End S */
+            end_s: number;
+            /** Viseme */
+            viseme: string;
+            /** Shape */
+            shape: string;
         };
         /** DownloadOut */
         DownloadOut: {
@@ -2198,6 +3014,40 @@ export interface components {
         /** GenerateBody */
         GenerateBody: {
             previews?: components["schemas"]["PreviewSettings"];
+        };
+        /** GeneratorDef */
+        GeneratorDef: {
+            /** Id */
+            id: string;
+            /** Version */
+            version: string;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /**
+             * Category
+             * @enum {string}
+             */
+            category: "locomotion" | "idle" | "gesture" | "talk" | "expression";
+            /** Frames */
+            frames: number;
+            /** Loops */
+            loops: boolean;
+            /**
+             * Travels
+             * @default false
+             */
+            travels: boolean;
+            /** Params */
+            params?: {
+                [key: string]: components["schemas"]["ParamDef"];
+            };
+            /**
+             * Needs Expression
+             * @default false
+             */
+            needs_expression: boolean;
         };
         /** HTTPValidationError */
         HTTPValidationError: {
@@ -2680,6 +3530,20 @@ export interface components {
             /** Next Cursor */
             next_cursor?: string | null;
         };
+        /** Page[AnimationOut] */
+        Page_AnimationOut_: {
+            /** Items */
+            items: components["schemas"]["AnimationOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /** Page[AudioOut] */
+        Page_AudioOut_: {
+            /** Items */
+            items: components["schemas"]["AudioOut"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
         /** Page[CharacterOut] */
         Page_CharacterOut_: {
             /** Items */
@@ -2844,6 +3708,48 @@ export interface components {
             conflicts_with_slots: string[];
             /** Clearance */
             clearance: number;
+            /** Seed */
+            seed: number;
+        };
+        /** ResolvedAnimation */
+        ResolvedAnimation: {
+            /** Name */
+            name: string;
+            /** Style Profile */
+            style_profile: string;
+            /** Rig Profile */
+            rig_profile: string;
+            /** Category */
+            category: string;
+            /**
+             * Source Kind
+             * @enum {string}
+             */
+            source_kind: "generator" | "bvh";
+            /** Generator */
+            generator: string | null;
+            /** Key */
+            key: string;
+            /** Params */
+            params: {
+                [key: string]: number;
+            };
+            /** Expression */
+            expression: string | null;
+            /** Frames */
+            frames: number | null;
+            /** Loops */
+            loops: boolean;
+            /** Travels */
+            travels: boolean;
+            bvh: components["schemas"]["BvhSource"] | null;
+            bone_map: components["schemas"]["BoneMap"] | null;
+            /** Fit Profiles */
+            fit_profiles: string[];
+            /** Reference Fit Profile */
+            reference_fit_profile: string;
+            /** Tags */
+            tags: string[];
             /** Seed */
             seed: number;
         };
@@ -3035,6 +3941,24 @@ export interface components {
             head_deform_bone: string;
             /** Rotation Mode */
             rotation_mode: string;
+            /**
+             * Ik Fk Switches
+             * @default [
+             *       "upper_arm_parent.L",
+             *       "upper_arm_parent.R",
+             *       "thigh_parent.L",
+             *       "thigh_parent.R"
+             *     ]
+             */
+            ik_fk_switches: string[];
+            /**
+             * Animation Controls
+             * @default [
+             *       "toe_ik.L",
+             *       "toe_ik.R"
+             *     ]
+             */
+            animation_controls: string[];
         };
         /** SceneAccessoryPin */
         SceneAccessoryPin: {
@@ -3475,6 +4399,33 @@ export interface components {
              * @default 0
              */
             subsurface: number;
+        };
+        /** UploadOut */
+        UploadOut: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Kind */
+            kind: string;
+            /** Name */
+            name: string;
+            /** Storage Key */
+            storage_key: string;
+            /** Sha256 */
+            sha256: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Mime Type */
+            mime_type: string;
+            /** Uploaded By */
+            uploaded_by: string | null;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
         };
         /** ValidationError */
         ValidationError: {
@@ -6055,6 +7006,806 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["AccessoryVersionDetail"];
                 };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_generators_api_v1_animation_generators_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GeneratorDef"][];
+                };
+            };
+        };
+    };
+    list_bone_maps_api_v1_bone_maps_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BoneMap"][];
+                };
+            };
+        };
+    };
+    validate_api_v1_animations_spec_validate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": {
+                    [key: string]: unknown;
+                };
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationValidationOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    gallery_api_v1_animations_get: {
+        parameters: {
+            query?: {
+                q?: string | null;
+                tag?: string[];
+                category?: string | null;
+                status?: string | null;
+                /** @description generator or bvh */
+                source_kind?: string | null;
+                /** @description declared for this profile (or for all) */
+                fit_profile?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AnimationOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_api_v1_animations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnimationCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    detail_api_v1_animations__animation_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    patch_identity_api_v1_animations__animation_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnimationPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    history_api_v1_animations__animation_id__versions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionSummary"][];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    version_detail_api_v1_animations__animation_id__versions__version_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    version_file_api_v1_animations__animation_id__versions__version_id__files__name__get: {
+        parameters: {
+            query?: {
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                animation_id: string;
+                version_id: string;
+                name: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect to the object */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    review_api_v1_animations__animation_id__versions__version_id__review_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnimationReviewBody"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    publish_api_v1_animations__animation_id__versions__version_id__publish_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                animation_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AnimationPublishBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    deprecate_api_v1_animations__animation_id__versions__version_id__deprecate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+                version_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_draft_api_v1_animations__animation_id__drafts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnimationDraftCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    discard_api_v1_animations__animation_id__drafts__draft_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    edit_draft_api_v1_animations__animation_id__drafts__draft_id__patch: {
+        parameters: {
+            query?: never;
+            header?: {
+                "if-match"?: string | null;
+            };
+            path: {
+                animation_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AnimationDraftPatch"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    generate_api_v1_animations__animation_id__drafts__draft_id__generate_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path: {
+                animation_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["AnimationGenerateBody"] | null;
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    submit_api_v1_animations__animation_id__drafts__draft_id__submit_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                animation_id: string;
+                draft_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AnimationVersionDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    upload_api_v1_uploads_post: {
+        parameters: {
+            query: {
+                kind: "bvh" | "audio";
+                name: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_upload_api_v1_uploads__upload_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                upload_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UploadOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    list_clips_api_v1_audio_clips_get: {
+        parameters: {
+            query?: {
+                status?: string | null;
+                q?: string | null;
+                limit?: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Page_AudioOut_"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    create_api_v1_audio_clips_post: {
+        parameters: {
+            query?: never;
+            header?: {
+                "idempotency-key"?: string | null;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AudioCreate"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            202: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudioJobOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_api_v1_audio_clips__ref__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AudioOut"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    wav_api_v1_audio_clips__ref__dialogue_wav_get: {
+        parameters: {
+            query?: {
+                redirect?: boolean;
+            };
+            header?: never;
+            path: {
+                ref: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DownloadOut"];
+                };
+            };
+            /** @description redirect to the object */
+            302: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description Validation Error */
             422: {

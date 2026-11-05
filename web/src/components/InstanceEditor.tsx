@@ -2,7 +2,7 @@
 // versions it pins (pickers offer published versions, and outfits from the character's
 // wardrobe), and everything scene-specific: placement, expressions, clips, dialogue, state.
 // The server checks every pin again when the version is saved.
-import { useAccessories, useAccessory, useCharacter, useClips, useGallery, useWardrobe } from "../api/hooks";
+import { useAccessories, useAccessory, useAnimations, useAudioClips, useCharacter, useClips, useGallery, useWardrobe } from "../api/hooks";
 import { Field, StatusChip } from "./bits";
 
 export const EXPRESSIONS = ["neutral", "happy", "sad", "angry", "surprised", "fearful", "confused", "excited", "laughing", "crying"];
@@ -14,8 +14,8 @@ export type Instance = {
   transform?: { location?: number[]; rotation_deg?: number[]; scale?: number };
   expressions?: { frame: number; expression: string; weight?: number }[];
   blink?: boolean;
-  animations?: { clip: string; start_frame: number; repeat?: number; speed?: number; influence?: number }[];
-  dialogue?: { start_frame: number; end_frame: number; text: string }[];
+  animations?: { clip: string; start_frame: number; repeat?: number; speed?: number; influence?: number; travel?: boolean }[];
+  dialogue?: { start_frame: number; end_frame: number; text: string; audio?: string | null }[];
   state?: Record<string, string | number | boolean>;
 };
 
@@ -103,6 +103,10 @@ export function InstanceEditor({ inst, frameEnd, onChange, onRemove }: {
   inst: Instance; frameEnd: number; onChange: (i: Instance) => void; onRemove: () => void;
 }) {
   const clips = useClips();
+  const library = useAnimations({ status: "published" });
+  const audio = useAudioClips({ status: "ready" });
+  const published = (library.data?.items ?? []).filter((a) => a.latest_published);
+  const isLibrary = (clip: string) => clip.startsWith("ANIM-");
   const t = inst.transform ?? {};
   const loc = t.location ?? [0, 0, 0];
   const rot = t.rotation_deg ?? [0, 0, 0];
@@ -162,11 +166,22 @@ export function InstanceEditor({ inst, frameEnd, onChange, onRemove }: {
       {list("animations").map((a, i) => (
         <div className="row" key={i}>
           <select value={a.clip} aria-label="clip" onChange={(e) => put("animations", i, { ...a, clip: e.target.value })}>
-            {(clips.data ?? []).map((c) => <option key={c.id} value={`${c.id}@${c.version}`}>{c.label}</option>)}
-            {!clips.data?.some((c) => `${c.id}@${c.version}` === a.clip) && <option value={a.clip}>{a.clip}</option>}
+            <optgroup label="Animation library">
+              {published.map((x) => <option key={x.id} value={`${x.code}@${x.latest_published}`}>{x.name} ({x.code}@{x.latest_published}, {x.category})</option>)}
+            </optgroup>
+            <optgroup label="Stand-in clips">
+              {(clips.data ?? []).map((c) => <option key={c.id} value={`${c.id}@${c.version}`}>{c.label}</option>)}
+            </optgroup>
+            {!clips.data?.some((c) => `${c.id}@${c.version}` === a.clip) && !published.some((x) => `${x.code}@${x.latest_published}` === a.clip)
+              && <option value={a.clip}>{a.clip}</option>}
           </select>
           <Field label="start"><input type="number" min={0} value={a.start_frame} onChange={(e) => put("animations", i, { ...a, start_frame: num(e.target.value) })} /></Field>
           <Field label="repeat"><input type="number" min={1} max={100} value={a.repeat ?? 1} onChange={(e) => put("animations", i, { ...a, repeat: num(e.target.value, 1) })} /></Field>
+          {isLibrary(a.clip) && (
+            <label className="inline" title="a walk moves the character forward along its facing; untick to walk on the spot">
+              <input type="checkbox" checked={a.travel ?? true} onChange={(e) => put("animations", i, { ...a, travel: e.target.checked })} /> travel
+            </label>
+          )}
           <button type="button" onClick={() => put("animations", i, null)} aria-label="remove clip">✕</button>
         </div>
       ))}
@@ -178,6 +193,15 @@ export function InstanceEditor({ inst, frameEnd, onChange, onRemove }: {
           <input type="number" aria-label="from frame" value={d.start_frame} onChange={(e) => put("dialogue", i, { ...d, start_frame: num(e.target.value) })} />
           <input type="number" aria-label="to frame" value={d.end_frame} onChange={(e) => put("dialogue", i, { ...d, end_frame: num(e.target.value) })} />
           <input className="grow" aria-label="line" maxLength={500} value={d.text} onChange={(e) => put("dialogue", i, { ...d, text: e.target.value })} />
+          <select value={d.audio ?? ""} aria-label="recording" title="with a recording the mouth follows it (lip sync); without, it flaps"
+            onChange={(e) => {
+              const clip = audio.data?.items.find((c) => c.code === e.target.value);
+              put("dialogue", i, { ...d, audio: e.target.value || null, ...(clip?.dialog_text && !d.text.trim() ? { text: clip.dialog_text.slice(0, 500) } : {}) });
+            }}>
+            <option value="">no recording</option>
+            {(audio.data?.items ?? []).map((c) => <option key={c.id} value={c.code}>{c.code} · {c.duration_s?.toFixed(1)} s · {(c.dialog_text ?? c.name).slice(0, 40)}</option>)}
+            {d.audio && !audio.data?.items.some((c) => c.code === d.audio) && <option value={d.audio}>{d.audio}</option>}
+          </select>
           <button type="button" onClick={() => put("dialogue", i, null)} aria-label="remove line">✕</button>
         </div>
       ))}

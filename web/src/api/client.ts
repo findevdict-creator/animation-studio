@@ -34,6 +34,16 @@ export type SceneVersionDetail = S["SceneVersionDetail"];
 export type SceneVersionJobOut = S["SceneVersionJobOut"];
 export type SceneValidationOut = S["SceneValidationOut"];
 export type ClipDef = S["ClipDef"];
+export type AnimationOut = S["AnimationOut"];
+export type AnimationDetail = S["AnimationDetail"];
+export type AnimationVersionSummary = S["AnimationVersionSummary"];
+export type AnimationVersionDetail = S["AnimationVersionDetail"];
+export type AnimationVersionJobOut = S["AnimationVersionJobOut"];
+export type GeneratorDef = S["GeneratorDef"];
+export type BoneMap = S["BoneMap"];
+export type UploadOut = S["UploadOut"];
+export type AudioOut = S["AudioOut"];
+export type AudioJobOut = S["AudioJobOut"];
 
 export const API = "/api/v1";
 
@@ -68,4 +78,16 @@ export async function outfitFileUrl(outfitId: string, versionId: string, name: s
 export async function accessoryFileUrl(accessoryId: string, versionId: string, name: string): Promise<string> {
   const r = await api<{ url: string }>(`/accessories/${accessoryId}/versions/${versionId}/files/${name}?redirect=false`);
   return r.url;
+}
+
+export async function animationFileUrl(animationId: string, versionId: string, name: string): Promise<string> {
+  const r = await api<{ url: string }>(`/animations/${animationId}/versions/${versionId}/files/${name}?redirect=false`);
+  return r.url;
+}
+
+/** A BVH take or a dialogue recording, sent as the raw request body. */
+export function upload(kind: "bvh" | "audio", file: File): Promise<UploadOut> {
+  const name = file.name.replace(/[^A-Za-z0-9._-]/g, "_").slice(-120);
+  return api<UploadOut>(`/uploads?kind=${kind}&name=${encodeURIComponent(name)}`, {
+    method: "POST", body: file, headers: { "Content-Type": file.type || "application/octet-stream" } });
 }

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
-  AccessoryDef, AccessoryDetail, AccessoryOut, AccessoryVersionDetail, ClipDef, SceneDetail, SceneOut,
+  AccessoryDef, AccessoryDetail, AccessoryOut, AccessoryVersionDetail, AnimationDetail, AnimationOut,
+  AnimationVersionDetail, AudioOut, BoneMap, ClipDef, GeneratorDef, SceneDetail, SceneOut,
   SceneVersionDetail,
   api, CharacterDetail, CharacterOut, Conventions, FitDetail, FitOut, Garment, JobOut, Me, OutfitDetail, OutfitOut,
   OutfitVersionDetail, VersionDetail, VersionJobOut,
@@ -156,6 +157,59 @@ export function useAccessoryAction<TBody, TOut = unknown>(aid: string, run: (bod
     },
   });
 }
+
+// ---------------------------------------------------------------- animations
+export interface AnimationFilter { q?: string; category?: string; status?: string; source_kind?: string; fit_profile?: string }
+
+export const useAnimations = (f: AnimationFilter) =>
+  useQuery({
+    queryKey: ["animations", f],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      for (const [k, v] of Object.entries(f)) if (v) p.set(k, v);
+      return api<{ items: AnimationOut[]; next_cursor: string | null }>(`/animations?${p}`);
+    },
+  });
+
+export const useAnimation = (id: string) =>
+  useQuery({ queryKey: ["animation", id], queryFn: () => api<AnimationDetail>(`/animations/${id}`) });
+
+export const useAnimationVersion = (aid: string, vid: string | undefined) =>
+  useQuery({
+    queryKey: ["animation-version", aid, vid],
+    queryFn: () => api<AnimationVersionDetail>(`/animations/${aid}/versions/${vid}`),
+    enabled: !!vid,
+  });
+
+export const useGenerators = () =>
+  useQuery({ queryKey: ["animation-generators"], queryFn: () => api<GeneratorDef[]>("/animation-generators"), staleTime: Infinity });
+
+export const useBoneMaps = () =>
+  useQuery({ queryKey: ["bone-maps"], queryFn: () => api<BoneMap[]>("/bone-maps"), staleTime: Infinity });
+
+/** Every mutation on an animation refreshes its detail, versions and the gallery. */
+export function useAnimationAction<TBody, TOut = unknown>(aid: string, run: (body: TBody) => Promise<TOut>) {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: run,
+    onSuccess: () => {
+      for (const key of [["animation", aid], ["animation-version", aid], ["animations"]]) qc.invalidateQueries({ queryKey: key });
+    },
+  });
+}
+
+// ---------------------------------------------------------------- dialogue audio
+export const useAudioClips = (f: { status?: string; q?: string } = {}) =>
+  useQuery({
+    queryKey: ["audio-clips", f],
+    queryFn: () => {
+      const p = new URLSearchParams();
+      for (const [k, v] of Object.entries(f)) if (v) p.set(k, v);
+      return api<{ items: AudioOut[]; next_cursor: string | null }>(`/audio-clips?${p}`);
+    },
+    // poll while a clip is being analysed
+    refetchInterval: (q) => (q.state.data?.items.some((c) => c.status === "analysing") ? 2000 : false),
+  });
 
 // ---------------------------------------------------------------- scenes
 export const useScenes = (f: { q?: string; uses_version_id?: string }) =>

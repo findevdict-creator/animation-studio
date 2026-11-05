@@ -129,3 +129,13 @@ label.inline { display: inline-flex; gap: 6px; align-items: center; font-weight:
 li.warning { color: var(--review); }
 .hint { font-size: 13px; color: var(--muted, #666); }
 @media (max-width: 640px) { .row input[type="number"] { width: 4.5em; } }
+
+/* Phase 6: animation library and dialogue audio */
+.chip-ready { background: var(--published-bg); color: var(--published); }
+.chip-analysing { background: var(--review-bg); color: var(--review); }
+.cue-strip { position: relative; height: 22px; min-width: 220px; background: var(--deprecated-bg); border-radius: 4px; overflow: hidden; }
+.cue-strip .cue { position: absolute; top: 0; bottom: 0; font-size: 10px; line-height: 22px; text-align: center; overflow: hidden;
+  background: var(--accent); color: var(--accent-ink); border-right: 1px solid var(--bg, #fff); }
+.cue-strip .cue-rest { background: transparent; }
+.cue-strip .cue-MBP { opacity: 0.55; }
+.hint { font-size: 13px; opacity: 0.8; margin: 4px 0 8px; }

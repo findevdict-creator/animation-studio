@@ -4,6 +4,10 @@ import { useMe } from "./api/hooks";
 import { currentUser, userManager } from "./auth";
 import { AccessoryGalleryPage } from "./pages/AccessoryGalleryPage";
 import { AccessoryPage } from "./pages/AccessoryPage";
+import { AnimationGalleryPage } from "./pages/AnimationGalleryPage";
+import { AnimationPage } from "./pages/AnimationPage";
+import { AudioPage } from "./pages/AudioPage";
+import { NewAnimationPage } from "./pages/NewAnimationPage";
 import { CharacterPage } from "./pages/CharacterPage";
 import { GalleryPage } from "./pages/GalleryPage";
 import { NewCharacterPage } from "./pages/NewCharacterPage";
@@ -36,6 +40,8 @@ function Shell({ children }: { children: React.ReactNode }) {
         <Link to="/characters">Characters</Link>
         <Link to="/outfits">Outfits</Link>
         <Link to="/accessories">Accessories</Link>
+        <Link to="/animations">Animations</Link>
+        <Link to="/audio">Dialogue audio</Link>
         <Link to="/scenes">Scenes</Link>
         <span className="spacer" />
         {me.data && <span className="who">{me.data.name} · {me.data.roles.join(", ")}</span>}
@@ -72,6 +78,10 @@ export function App() {
       <Route path="/accessories" element={<Shell><AccessoryGalleryPage /></Shell>} />
       <Route path="/accessories/new" element={<Shell><NewAccessoryPage /></Shell>} />
       <Route path="/accessories/:id" element={<Shell><AccessoryPage /></Shell>} />
+      <Route path="/animations" element={<Shell><AnimationGalleryPage /></Shell>} />
+      <Route path="/animations/new" element={<Shell><NewAnimationPage /></Shell>} />
+      <Route path="/animations/:id" element={<Shell><AnimationPage /></Shell>} />
+      <Route path="/audio" element={<Shell><AudioPage /></Shell>} />
       <Route path="/scenes" element={<Shell><SceneListPage /></Shell>} />
       <Route path="/scenes/new" element={<Shell><SceneEditorPage /></Shell>} />
       <Route path="/scenes/:id" element={<Shell><ScenePage /></Shell>} />
