@@ -63,15 +63,9 @@ def setup_scene(opts: RenderOptions):
     import bpy
 
     scene = bpy.context.scene
-    scene.render.engine = "CYCLES"
-    scene.cycles.device = "CPU"
-    scene.cycles.samples = opts.samples
-    scene.cycles.use_adaptive_sampling = True
-    try:
-        scene.cycles.use_denoising = True
-        scene.cycles.denoiser = "OPENIMAGEDENOISE"
-    except (TypeError, AttributeError):
-        scene.cycles.use_denoising = False
+    from cartoon_engine.core.device import use_cycles_device
+
+    use_cycles_device(scene, samples=opts.samples)
     scene.render.film_transparent = False
     scene.render.fps = opts.fps
     scene.view_settings.view_transform = "Standard"

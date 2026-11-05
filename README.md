@@ -91,7 +91,8 @@ http://localhost:5173 (it proxies `/api` to the API).
 Dev users `admin`, `creator`, `director`, `reviewer`, each with password `dev-<name>`. The
 worker image installs Blender as the `bpy` 5.2.3 wheel by default; build with
 `--build-arg BLENDER_SOURCE=binary --build-arg BLENDER_SHA256=<sha>` for the official
-binary (needed for GPU rendering later).
+binary (the wheel renders on an NVIDIA GPU too; see "Rendering on an NVIDIA GPU" in
+[docs/RUNNING.md](docs/RUNNING.md)).
 
 ## Development
 

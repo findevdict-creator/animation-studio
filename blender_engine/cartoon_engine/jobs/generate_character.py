@@ -22,6 +22,7 @@ from studio_contracts.rig_profile import CARTOON_HUMANOID_V1
 import cartoon_engine
 from cartoon_engine.core import blend_io
 from cartoon_engine.core.context import JobContext, write_json
+from cartoon_engine.core.device import choose
 
 
 def _stamp(obj, rc, digest: str) -> None:
@@ -142,6 +143,6 @@ def run(ctx: JobContext) -> dict[str, Any]:
         "rig_profile": rc.rig_profile, "fit_profile": rc.fit_profile, "height_m": rc.height_m,
         "validation": {"ok": report.ok, "checks": len(report.checks)}, "report": report_doc,
         "blend_sha256": blend_sha, "rig": rig_stats, "vertices": counts,
-        "render": {"engine": "CYCLES", "device": "CPU", "resolution": opts.resolution, "samples": opts.samples},
+        "render": {"engine": "CYCLES", "device": choose().backend, "resolution": opts.resolution, "samples": opts.samples},
         "timings_s": timings, **data,
     }

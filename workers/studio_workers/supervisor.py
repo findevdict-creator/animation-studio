@@ -43,6 +43,12 @@ PROGRESS_EVERY_S = 0.5
 CANCEL_CHECK_EVERY_S = 1.0
 KILL_GRACE_S = 5.0
 SAFE_ENV = ("PATH", "LANG", "LC_ALL", "TZ", "SYSTEMROOT")
+#: GPU and render settings Blender needs to find and use the GPU; none of them is a secret.
+#: LD_LIBRARY_PATH carries /usr/lib/wsl/lib on Docker Desktop (Windows), where libcuda lives.
+GPU_ENV = ("LD_LIBRARY_PATH", "NVIDIA_VISIBLE_DEVICES", "NVIDIA_DRIVER_CAPABILITIES", "CUDA_VISIBLE_DEVICES",
+           "CUDA_CACHE_PATH", "OPTIX_CACHE_PATH", "MESA_SHADER_CACHE_DIR", "GALLIUM_DRIVER",
+           "MESA_D3D12_DEFAULT_ADAPTER_NAME", "__EGL_VENDOR_LIBRARY_FILENAMES",
+           "STUDIO_CYCLES_DEVICE", "STUDIO_GPU_MIN_SAMPLES")
 
 
 @dataclass
@@ -71,7 +77,7 @@ def blender_command(settings: Settings, job_json: Path) -> list[str]:
 
 
 def child_env(workspace: Path) -> dict[str, str]:
-    env = {k: os.environ[k] for k in SAFE_ENV if k in os.environ}
+    env = {k: os.environ[k] for k in (*SAFE_ENV, *GPU_ENV) if k in os.environ}
     env.update(HOME=str(workspace), TMPDIR=str(workspace / "tmp"), PYTHONNOUSERSITE="1")
     return env
 

@@ -1,7 +1,8 @@
 """Shots in Blender (Phase 8): a scene from a camera mark with a push-in and a framed scene
 with a pan are assembled with their camera keyed, reopened and checked, and rendered to PNG
 frames with the series' render settings by ``render_scene``; the same frames come out of a
-second render of the same stored file. Eevee is refused clearly on a worker without a GPU."""
+second render of the same stored file. Cycles records the device it chose; Eevee renders where
+libEGL loads (Mesa's software EGL in the worker image) and is refused clearly where it does not."""
 
 import hashlib
 import importlib.util
@@ -102,6 +103,9 @@ def test_a_push_in_on_a_camera_mark_is_keyed_reopened_and_rendered(built, tmp_pa
     assert res["status"] == "succeeded", proc.stdout[-4000:] + str(res.get("error"))
     data = res["data"]
     assert data["frames"] == 3 and data["in_force"]["engine"] == "CYCLES" and data["in_force"]["resolution"] == [160, 90]
+    assert data["in_force"]["device"] in ("OPTIX", "CUDA", "CPU") and data["in_force"]["samples_requested"] == 1
+    if data["in_force"]["device"] == "CPU":
+        assert data["in_force"]["samples"] == 1  # the CPU keeps the requested samples
     outs = [o for o in res["outputs"] if o["role"] == "frame"]
     assert [o["path"] for o in outs] == ["frames/frame_0001.png", "frames/frame_0002.png", "frames/frame_0003.png"]
     first = {f["frame"]: f["sha256"] for f in data["report"]["frames"]}
@@ -126,8 +130,15 @@ def test_a_pan_and_render_refusals(built, tmp_path):
     (a, b) = move["rotation_deg"]
     assert b[2] - a[2] == pytest.approx(-8.0, abs=0.01)
 
-    _, _, res = render(src, rs, inputs, tmp_path / "eevee", frame_start=1, frame_end=1, settings={"engine": "eevee"})
-    assert res["status"] == "failed" and "Eevee" in res["error"]
+    from cartoon_engine.jobs.render_scene import eevee_possible
+
+    w, proc, res = render(src, rs, inputs, tmp_path / "eevee", frame_start=1, frame_end=1, settings={"engine": "eevee"})
+    if eevee_possible():
+        assert res["status"] == "succeeded", proc.stdout[-4000:] + str(res.get("error"))
+        assert res["data"]["in_force"]["engine"].startswith("BLENDER_EEVEE") and res["data"]["in_force"]["renderer"]
+        assert (w / "out" / "frames" / "frame_0001.png").is_file()
+    else:
+        assert res["status"] == "failed" and "Eevee" in res["error"]
     _, _, res = render(src, rs, inputs, tmp_path / "fps", settings={"fps": 30})
     assert res["status"] == "failed" and "fps" in res["error"]
     _, _, res = render(src, rs, inputs, tmp_path / "range", frame_start=5, frame_end=99)

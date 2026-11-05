@@ -116,7 +116,8 @@ Use the codes the Phase 7 script printed. On an empty library they are the ones 
 
 ## Rendering speed and your GPU
 
-Episode renders use Cycles **on the CPU**. These are measured times on a 4-core machine (a faster CPU will be quicker):
+Without a GPU, episode renders use Cycles **on the CPU**. These are measured times on a
+4-core machine (a faster CPU will be quicker):
 
 | Size | Samples | Seconds per frame | 7.5 s episode (181 frames) |
 | --- | --- | --- | --- |
@@ -125,17 +126,100 @@ Episode renders use Cycles **on the CPU**. These are measured times on a 4-core 
 
 For quick tries, set the series' render size to 640×360.
 
-**An NVIDIA GPU is not used yet.** The workers set Cycles to the CPU, and the worker image
-has no GPU libraries. Eevee is accepted as a render setting, but it needs a GPU or EGL context
-inside the worker, which the default image does not have. Using the GPU needs:
+### Rendering on an NVIDIA GPU
 
-* the NVIDIA Container Toolkit on Linux, or Docker Desktop with WSL 2 on Windows;
-* a GPU reservation on `worker-render` in compose;
-* Cycles set to CUDA or OptiX;
-* the EGL libraries in the image, for Eevee.
+The workers use an NVIDIA GPU when Docker gives them one. Start the stack with the GPU file
+added (`infra/compose.gpu.yaml`); without it, everything runs on the CPU as before.
 
-None of this has been built or tested, because the build machine has no GPU. Until it is
-done, the studio runs fine on a GPU machine, but it renders on the CPU.
+**Windows (Docker Desktop + WSL 2).**
+
+1. Install the current NVIDIA Game Ready or Studio driver for Windows. Do **not** install a
+   Linux driver inside WSL; the Windows driver serves WSL too.
+2. In PowerShell: `wsl --update`, then restart Docker Desktop.
+3. Docker Desktop → Settings → General: "Use the WSL 2 based engine" is on.
+4. Check that Docker sees the GPU (prints your card in a table):
+   ```
+   docker run --rm --gpus all ubuntu nvidia-smi
+   ```
+
+**Linux.** Install the NVIDIA driver and the
+[NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html), then:
+
+```
+sudo nvidia-ctk runtime configure --runtime=docker
+sudo systemctl restart docker
+docker run --rm --gpus all ubuntu nvidia-smi
+```
+
+**Start the studio on the GPU** (rebuild once, because the worker image gained the EGL
+libraries for Eevee):
+
+```
+docker compose -f infra/compose.yaml -f infra/compose.gpu.yaml up -d --build
+```
+
+Use the same two `-f` files for every later `up`, `logs` or `exec` command; a plain
+`docker compose -f infra/compose.yaml up -d` puts the workers back on the CPU.
+
+**Check the GPU inside the worker:**
+
+```
+docker compose -f infra/compose.yaml -f infra/compose.gpu.yaml exec worker-render nvidia-smi
+docker compose -f infra/compose.yaml -f infra/compose.gpu.yaml exec worker-render python -m cartoon_engine.gpu_check --require-gpu
+```
+
+`gpu_check` prints the Cycles device the studio will use (`OPTIX (NVIDIA GeForce …)`, or
+`CUDA` on cards without RT cores), renders a test scene on the GPU and on the CPU with both
+times, and renders it with Eevee, naming the renderer (`NVIDIA …` is the GPU; `llvmpipe` means
+software). The very first GPU render compiles kernels and can take a minute or two; they are
+cached on the work volume after that.
+
+**What changes on a GPU.**
+
+* Cycles picks OptiX, then CUDA, then falls back to the CPU, from what Blender sees. Each job
+  log has a `[studio] cycles device: …` line, the render progress says "cycles on OPTIX (…)",
+  and `render_report.json` records `device` and the samples used under `in_force`.
+* Final episode frames get at least 64 samples (instead of the series' 4–12), denoised on the
+  GPU, with the scene kept loaded between frames. Series asking for more keep their number.
+  Previews (characters, outfits, sets, scene previews) keep their low samples, just faster.
+* Eevee works. Choose it as the series' render engine for fast drafts. On the CPU stack it
+  also works now, but in software and slowly.
+
+Settings, in `infra/.env` or the shell before `up`:
+
+| Variable | Default | |
+| --- | --- | --- |
+| `STUDIO_CYCLES_DEVICE` | `auto` | `optix`, `cuda` or `cpu` to force one (a missing GPU still falls back to the CPU) |
+| `STUDIO_GPU_MIN_SAMPLES` | `64` | samples a final GPU frame gets at least; `0` keeps the series' number |
+| `NVIDIA_VISIBLE_DEVICES` | `all` | e.g. `0` to use only the first GPU |
+
+**Compare with your CPU baseline.** The Phase 8 script prints "seconds per frame" for each
+shot (also in `<out>/render-1/render_reports.json`). Run it once on the GPU stack and compare
+with your CPU run. To keep the samples equal for a fair comparison, set
+`STUDIO_GPU_MIN_SAMPLES=0` for that run:
+
+```
+# GPU, same 4 samples as the CPU run
+STUDIO_GPU_MIN_SAMPLES=0 docker compose -f infra/compose.yaml -f infra/compose.gpu.yaml up -d
+python3 scripts/phase8_acceptance.py --out phase8-gpu --width 640 --height 360 \
+  --ali CHAR-001 --maya CHAR-002 --ali-outfit OUTFIT-001 --maya-outfit OUTFIT-002 --env ENV-001
+```
+
+In PowerShell set the variable first with `$env:STUDIO_GPU_MIN_SAMPLES="0"`, then run
+`docker compose …` on its own line, and remove it again with
+`Remove-Item Env:STUDIO_GPU_MIN_SAMPLES` before going back to the GPU defaults.
+
+**If the GPU is not found.** `gpu_check` prints what it tried for OptiX and CUDA.
+
+* `nvidia-smi` fails inside the container: Docker is not passing the GPU. Recheck the
+  `docker run --rm --gpus all ubuntu nvidia-smi` step above, and that you started with both
+  `-f` files.
+* `nvidia-smi` works but Cycles says "no device": update the NVIDIA driver (Blender 5.2 needs
+  a recent one), then `docker compose … up -d --force-recreate worker-render worker-blender`.
+* OptiX fails but CUDA works: set `STUDIO_CYCLES_DEVICE=cuda`.
+* Eevee says `llvmpipe` on Windows: Docker Desktop passes CUDA through WSL 2, but not always
+  the NVIDIA EGL driver. Eevee then runs in software; use Cycles on the GPU instead, which is
+  the fast path there.
 
 ## On Windows
 

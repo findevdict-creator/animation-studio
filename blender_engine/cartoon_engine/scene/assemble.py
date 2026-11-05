@@ -281,14 +281,9 @@ def _fit_box(scene, cam, lo: np.ndarray, hi: np.ndarray, border: float = 0.04) -
 def render_frames(scene, out_dir: Path, frames: list[int], res: tuple[int, int], samples: int) -> list[Path]:
     from cartoon_engine.character import previews as P
 
-    scene.render.engine = "CYCLES"
-    scene.cycles.device = "CPU"
-    scene.cycles.samples = samples
-    try:
-        scene.cycles.use_denoising = True
-        scene.cycles.denoiser = "OPENIMAGEDENOISE"
-    except (TypeError, AttributeError):
-        scene.cycles.use_denoising = False
+    from cartoon_engine.core.device import use_cycles_device
+
+    use_cycles_device(scene, samples=samples)
     scene.view_settings.view_transform = "Standard"
     paths = []
     for f in frames:

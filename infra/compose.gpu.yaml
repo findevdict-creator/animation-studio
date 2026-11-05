@@ -1,0 +1,53 @@
+# NVIDIA GPU for the Blender workers. Add it on top of the main file:
+#
+#   docker compose -f infra/compose.yaml -f infra/compose.gpu.yaml up -d --build
+#
+# Needs Docker Desktop with the WSL 2 backend and a current NVIDIA driver (Windows), or the
+# NVIDIA Container Toolkit (Linux). Without this file the stack runs exactly as before, on the
+# CPU, so machines without a GPU just leave it out. Check with:
+#
+#   docker compose -f infra/compose.yaml -f infra/compose.gpu.yaml exec worker-render \
+#       python -m cartoon_engine.gpu_check --require-gpu
+#
+# What the workers do with the GPU (cartoon_engine/core/device.py):
+#   Cycles: OptiX, then CUDA, then the CPU, picked from what Blender sees; the device is in the
+#           job log ("[studio] cycles device: …"), the render progress and render_report.json.
+#   Final episode frames on a GPU get at least STUDIO_GPU_MIN_SAMPLES samples (0: off), GPU
+#           denoising, and keep the scene loaded between frames. Previews keep their samples.
+#   Eevee: the driver's EGL ("graphics" capability below) instead of Mesa's software one.
+
+x-gpu: &gpu
+  deploy:
+    resources:
+      reservations:
+        devices:
+          - driver: nvidia
+            count: all
+            capabilities: [gpu]
+
+x-gpu-env: &gpu-env
+  # compute: CUDA; utility: nvidia-smi; graphics: EGL for Eevee and libnvoptix for OptiX
+  NVIDIA_DRIVER_CAPABILITIES: compute,utility,graphics
+  NVIDIA_VISIBLE_DEVICES: ${NVIDIA_VISIBLE_DEVICES:-all}
+  # Docker Desktop (Windows) puts libcuda in /usr/lib/wsl/lib; harmless where it does not exist
+  LD_LIBRARY_PATH: /usr/lib/wsl/lib
+  STUDIO_CYCLES_DEVICE: ${STUDIO_CYCLES_DEVICE:-auto}
+  STUDIO_GPU_MIN_SAMPLES: ${STUDIO_GPU_MIN_SAMPLES:-64}
+  # kernel and shader caches on the work volume (the root filesystem is read-only), so only the
+  # first render after a rebuild pays for compiling them
+  OPTIX_CACHE_PATH: /work/.cache/optix
+  CUDA_CACHE_PATH: /work/.cache/nv
+  MESA_SHADER_CACHE_DIR: /work/.cache/mesa
+
+services:
+  # episode frames (render_scene)
+  worker-render:
+    <<: *gpu
+    environment:
+      <<: *gpu-env
+
+  # builds and their preview renders (characters, outfits, sets, scene previews)
+  worker-blender:
+    <<: *gpu
+    environment:
+      <<: *gpu-env

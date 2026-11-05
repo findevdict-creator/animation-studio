@@ -16,7 +16,7 @@ from app.jobs import service
 from app.models.assets import AssetFile, AssetVersion
 from app.models.jobs import Job
 from studio_contracts.jobs import JobStatus
-from studio_workers.supervisor import Supervisor, blender_command, child_env
+from studio_workers.supervisor import GPU_ENV, Supervisor, blender_command, child_env
 
 FAKE = [sys.executable, str(Path(__file__).with_name("fake_engine.py"))]
 
@@ -158,4 +158,14 @@ def test_binary_command_line(settings):
     cmd = blender_command(s, Path("/work/j/job.json"))
     assert cmd[:6] == ["/opt/blender/blender", "-b", "--factory-startup", "--disable-autoexec", "-noaudio", "--python-exit-code"]
     assert cmd[-2:] == ["--", "/work/j/job.json"] and cmd[-3].endswith("cartoon_engine/entrypoint.py")
-    assert set(child_env(Path("/w"))) <= {"PATH", "LANG", "LC_ALL", "TZ", "SYSTEMROOT", "HOME", "TMPDIR", "PYTHONNOUSERSITE"}
+    assert set(child_env(Path("/w"))) <= {"PATH", "LANG", "LC_ALL", "TZ", "SYSTEMROOT", "HOME", "TMPDIR", "PYTHONNOUSERSITE",
+                                         *GPU_ENV}
+
+
+def test_gpu_settings_reach_blender_and_secrets_do_not(monkeypatch):
+    monkeypatch.setenv("STUDIO_CYCLES_DEVICE", "optix")
+    monkeypatch.setenv("LD_LIBRARY_PATH", "/usr/lib/wsl/lib")
+    monkeypatch.setenv("STUDIO_S3_SECRET_KEY", "nope")
+    env = child_env(Path("/w"))
+    assert env["STUDIO_CYCLES_DEVICE"] == "optix" and env["LD_LIBRARY_PATH"] == "/usr/lib/wsl/lib"
+    assert "STUDIO_S3_SECRET_KEY" not in env and not any("KEY" in k or "SECRET" in k for k in GPU_ENV)

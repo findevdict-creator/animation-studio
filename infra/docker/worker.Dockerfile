@@ -3,7 +3,8 @@
 #
 # BLENDER_SOURCE=wheel (default) installs Blender as the bpy module from PyPI and runs jobs
 # with STUDIO_BLENDER_MODE=wheel. BLENDER_SOURCE=binary downloads the official Linux build,
-# checks its SHA-256 and runs jobs with the blender executable; use it for GPU render workers.
+# checks its SHA-256 and runs jobs with the blender executable. Both render on an NVIDIA GPU
+# (OptiX or CUDA) when the container gets one; see infra/compose.gpu.yaml.
 #
 # --target media builds the media worker (lip sync, speech, export): ffmpeg, espeak-ng and
 # Rhubarb Lip Sync 1.14.0
@@ -16,8 +17,14 @@ FROM ${PYTHON_BASE} AS common
 ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 PIP_NO_CACHE_DIR=1 PIP_DISABLE_PIP_VERSION_CHECK=1
 # Shared libraries bpy links against even when headless (from ldd on bpy 5.2.3; the X11
 # and GL client libraries are loaded, never used to open a display).
+# The EGL ones (libegl1, libegl-mesa0, libgl1-mesa-dri, libgbm1) give Eevee a headless
+# context: with an NVIDIA GPU passed in (infra/compose.gpu.yaml) libglvnd picks the driver's
+# EGL, otherwise Mesa's llvmpipe renders in software (works, slowly). Cycles needs none of
+# this: the bpy wheel carries its own CUDA and OptiX kernels and loads libcuda/libnvoptix from
+# the driver, which the NVIDIA runtime mounts into the container.
 RUN apt-get update && apt-get install -y --no-install-recommends \
       libgl1 libx11-6 libxext6 libxfixes3 libxi6 libxrender1 libxkbcommon0 libsm6 libice6 \
+      libegl1 libegl-mesa0 libgl1-mesa-dri libgbm1 \
     && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system studio && useradd --system --gid studio --home /work --shell /usr/sbin/nologin studio \
     && mkdir -p /work && chown studio:studio /work
