@@ -566,7 +566,8 @@ class OutputFile(Model):
     """A file the process wrote under ``out/``. The worker hashes and uploads it."""
 
     path: str  # relative to out/
-    role: Literal["blend", "spec", "thumbnail", "turntable", "glb", "texture", "manifest", "log", "report", "preview"]
+    role: Literal["blend", "spec", "thumbnail", "turntable", "glb", "texture", "manifest", "log", "report", "preview",
+                  "frame"]
     mime_type: str
 
 

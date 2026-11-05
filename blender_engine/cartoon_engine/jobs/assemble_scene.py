@@ -67,7 +67,10 @@ def run(ctx: JobContext) -> dict[str, Any]:
     built, scene = assemble(ws, rs, progress=lambda f, m: ctx.progress(0.05 + 0.5 * f, m))
     lap("assemble_s")
     ctx.progress(0.58, "camera and light")
-    stage_camera(scene, built, rs)
+    cam = stage_camera(scene, built, rs)
+    from cartoon_engine.scene.camera_moves import animate_camera
+
+    move = animate_camera(scene, cam or scene.camera, rs)
     blend = out / "scene.blend"
     ctx.progress(0.62, "saving scene.blend")
     blend_io.save(blend)
@@ -118,7 +121,7 @@ def run(ctx: JobContext) -> dict[str, Any]:
                                           "unchanged": ok_final},
            "preview_frames": frames, "video": video, "set": json.loads(scene.get("studio_set_report", "null")),
            "camera": {"name": scene.camera.name, "lens_mm": round(scene.camera.data.lens, 2),
-                      "kept_inside": json.loads(scene.camera.get("studio_kept_inside", "null"))},
+                      "kept_inside": json.loads(scene.camera.get("studio_kept_inside", "null")), "move": move},
            "ok": ok_final and libs["ok"] and not acc_failed, "failed": acc_failed,
            "blender_version": blend_io.blender_version(), "engine_version": cartoon_engine.__version__,
            "timings_s": timings}

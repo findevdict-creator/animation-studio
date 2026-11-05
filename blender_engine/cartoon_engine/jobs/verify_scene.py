@@ -329,6 +329,17 @@ def run(ctx: JobContext) -> dict[str, Any]:
 
         ctx.progress(0.66, "checking the set and the paths through it")
         checks.extend(set_checks(rs, scene, ws, root_paths(rs, scene) if rs.layout else {}))
+    if rs.camera.movement != "static":
+        from cartoon_engine.scene.camera_moves import camera_track
+
+        cam = scene.camera
+        a, b, yaw = camera_track(scene, cam, rs.frame_start, rs.frame_end)
+        moved = sum((x - y) ** 2 for x, y in zip(a, b, strict=True)) ** 0.5
+        want_push = rs.camera.movement in ("push_in", "pull_out")
+        checks.append({"name": "camera_move", "ok": bool(cam.get("studio_camera_move"))
+                       and (moved > 0.01 if want_push else abs(yaw) > 1.0),
+                       "movement": rs.camera.movement, "moved_m": round(moved, 4), "yaw_deg": round(yaw, 3),
+                       "camera": cam.name})
     ctx.progress(0.7, "rendering from the reopened file")
     tmp = ws / "tmp" / "frames"
     tmp.mkdir(parents=True, exist_ok=True)

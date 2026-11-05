@@ -92,8 +92,9 @@ class RenderSettings(Model):
     width: int = Field(default=1920, ge=64, le=3840)
     height: int = Field(default=1080, ge=36, le=2160)
     fps: Literal[24, 25, 30] = 24
-    engine: Literal["eevee", "cycles"] = "eevee"
-    samples: int = Field(default=16, ge=1, le=4096)
+    #: Cycles by default: Eevee needs a GPU or EGL, which the CPU workers do not have
+    engine: Literal["eevee", "cycles"] = "cycles"
+    samples: int = Field(default=12, ge=1, le=4096)
     view_transform: Literal["Standard", "Filmic", "AgX"] = "Standard"
     look: str = Field(default="None", max_length=40)
     exposure: float = Field(default=0.0, ge=-10, le=10)

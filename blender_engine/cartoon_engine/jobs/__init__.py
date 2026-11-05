@@ -26,6 +26,7 @@ def handlers() -> dict[str, Handler]:
         publish_character,
         publish_outfit,
         publish_set,
+        render_scene,
         verify_scene,
     )
 
@@ -36,4 +37,5 @@ def handlers() -> dict[str, Handler]:
             "fit_outfit": fit_outfit.run, "publish_outfit": publish_outfit.run,
             "generate_animation": generate_animation.run, "publish_animation": publish_animation.run,
             "generate_prop": generate_prop.run, "publish_prop": publish_set.run_prop,
-            "generate_environment": generate_environment.run, "publish_environment": publish_set.run_environment}
+            "generate_environment": generate_environment.run, "publish_environment": publish_set.run_environment,
+            "render_scene": render_scene.run}
