@@ -21,12 +21,20 @@ or a clip of the built-in Phase 5 stand-in catalog (``CLIP-*@0.1``), which is ke
 scene versions made with it still validate. Dialogue lines can carry a recording
 (``AUDIO-001``); the face track then keys the visemes found in it (lip sync) instead of
 the fixed mouth cycle of a text-only line.
+
+Phase 7 adds the set: an ``environment`` version (``ENV-002@1.0``) the scene happens in,
+``props`` (published prop versions placed on the floor or on a dressing item's top),
+characters started at the environment's named marks, a camera at one of its camera marks,
+and a lighting override. Where things stand is checked against the environment's layout
+(``check_layout``), the same footprints the environment was validated with; Blender then
+measures the assembled scene again.
 """
 
 from __future__ import annotations
 
 import hashlib
 import json
+import math
 import re
 from typing import Literal
 
@@ -34,6 +42,14 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from studio_contracts.audio import AUDIO_CODE_RE, MouthCue
 from studio_contracts.character import Issue
+from studio_contracts.environment import (
+    CHARACTER_RADIUS_M,
+    CLEARANCE_M,
+    LIGHTING,
+    Rect,
+    contains,
+    overlap,
+)
 from studio_contracts.ids import CODE_RE
 from studio_contracts.rig_profile import CARTOON_HUMANOID_V1, RigProfile
 
@@ -177,14 +193,31 @@ class CharacterInstance(Model):
     dialogue: list[DialogueLine] = Field(default_factory=list, max_length=50)
     #: scene-specific state that is not geometry (mood, props in hand, notes for the director)
     state: dict[str, StateValue] = Field(default_factory=dict, max_length=16)
+    #: start at this mark of the environment (its spot and facing, or a seat); ``transform``
+    #: then moves it from there and turns it from the mark's facing
+    mark: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9_]{0,31}$")
 
 
 class SceneCamera(Model):
+    """A framing preset around the cast, or (``mark``) one of the environment's camera marks."""
+
     preset: Literal["wide", "medium", "close"] = "wide"
+    mark: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9_]{0,31}$")
     #: around the vertical axis from the front (-Y), degrees
     angle_deg: float = Field(default=20.0, ge=-90.0, le=90.0)
     #: frame the instance with this key instead of the whole cast
     focus: str | None = Field(default=None, pattern=INSTANCE_KEY)
+
+
+class PropUse(Model):
+    """A published prop version placed in the scene: on the floor at ``at``, or on the top of
+    the environment's dressing item (or another scene prop) named by ``on``."""
+
+    key: str = Field(pattern=INSTANCE_KEY, description="unique in the scene, e.g. ball_1")
+    prop: Pin
+    at: tuple[float, float] = (0.0, 0.0)
+    rotation_deg: float = Field(default=0.0, ge=-360, le=360)
+    on: str | None = Field(default=None, pattern=r"^[a-z][a-z0-9_]{0,31}$")
 
 
 class SceneManifest(Model):
@@ -196,6 +229,11 @@ class SceneManifest(Model):
     frame_end: int = Field(default=72, ge=1, le=100_000)
     instances: list[CharacterInstance] = Field(min_length=1, max_length=8)
     camera: SceneCamera = Field(default_factory=SceneCamera)
+    #: the set; without one the scene is the Phase 5 stage (a floor disc and a three-point rig)
+    environment: Pin | None = None
+    props: list[PropUse] = Field(default_factory=list, max_length=40)
+    #: a lighting preset instead of the environment's own
+    lighting: str | None = None
 
     def digest(self) -> str:
         return hashlib.sha256(json.dumps(self.model_dump(mode="json"), sort_keys=True).encode()).hexdigest()
@@ -281,6 +319,31 @@ def validate_manifest(m: SceneManifest, rig: RigProfile = CARTOON_HUMANOID_V1) -
             if abs(v) > 50:
                 issues.append(Issue(path=f"{p}.transform.location.{axis}", code="out_of_range",
                                     message="instances are placed within 50 m of the origin"))
+    if m.environment is not None and not m.environment.code.startswith("ENV-"):
+        issues.append(Issue(path="environment.code", code="wrong_kind", message="an environment is ENV-NNN"))
+    for i, inst in enumerate(m.instances):
+        if inst.mark is not None and m.environment is None:
+            issues.append(Issue(path=f"instances[{i}].mark", code="no_environment",
+                                message="marks belong to an environment; the scene has none"))
+    if m.camera.mark is not None and m.environment is None:
+        issues.append(Issue(path="camera.mark", code="no_environment",
+                            message="camera marks belong to an environment; the scene has none"))
+    if m.lighting is not None and m.lighting not in LIGHTING:
+        issues.append(Issue(path="lighting", code="unknown_lighting", message=f"lighting is one of {sorted(LIGHTING)}"))
+    prop_keys: dict[str, int] = {}
+    for i, use in enumerate(m.props):
+        p = f"props[{i}]"
+        if not use.prop.code.startswith("PROP-"):
+            issues.append(Issue(path=f"{p}.prop.code", code="wrong_kind", message="a prop is PROP-NNN"))
+        if use.key in prop_keys or use.key in keys:
+            issues.append(Issue(path=f"{p}.key", code="duplicate", message=f"{use.key!r} is already used in the scene"))
+        prop_keys.setdefault(use.key, i)
+        if use.on == use.key:
+            issues.append(Issue(path=f"{p}.on", code="self", message="a prop cannot stand on itself"))
+        for axis, v in zip("xy", use.at, strict=True):
+            if abs(v) > 50:
+                issues.append(Issue(path=f"{p}.at.{axis}", code="out_of_range",
+                                    message="props are placed within 50 m of the origin"))
     if m.camera.focus is not None and m.camera.focus not in keys:
         issues.append(Issue(path="camera.focus", code="unknown_instance", message=f"no instance {m.camera.focus!r}"))
     # two instances on the same spot is almost always a mistake
@@ -295,8 +358,132 @@ def validate_manifest(m: SceneManifest, rig: RigProfile = CARTOON_HUMANOID_V1) -
 
 
 # ------------------------------------------------------------------ resolved (what Blender sees)
+# ------------------------------------------------------------------ layout (registry check)
+class PropFacts(_Frozen):
+    """What placing needs from a prop version (its resolved specification)."""
+
+    size: tuple[float, float, float]
+    solid: bool
+    rests_on: str
+    top_z: float | None = None
+
+
+def _start(inst: CharacterInstance, marks: dict[str, dict], seats: dict[str, list]) -> tuple[float, float, float]:
+    """Where an instance starts on the floor and which way it faces (degrees about Z)."""
+    loc, rot = inst.transform.location, inst.transform.rotation_deg[2]
+    if inst.mark is None or inst.mark not in marks:
+        return loc[0], loc[1], rot
+    mk = marks[inst.mark]
+    x, y, _ = mk["at"]
+    facing = mk["facing_deg"]
+    if mk["kind"] == "seat" and mk.get("item") in seats:
+        # no sit animation yet: stand just in front of the seat, facing away from it
+        _, cx, cy, _w, d, srot, _z = seats[mk["item"]]
+        a = math.radians(srot - 90)
+        x, y = cx + math.cos(a) * (d / 2 + CHARACTER_RADIUS_M + 0.05), cy + math.sin(a) * (d / 2 + CHARACTER_RADIUS_M + 0.05)
+        facing = srot
+    return x + loc[0], y + loc[1], facing + rot
+
+
+def start_transform(inst: CharacterInstance, layout: dict | None) -> Transform:
+    """The instance's transform in the scene: its mark's spot and facing, moved and turned by
+    its own transform. Without a mark (or an environment) it is its own transform."""
+    if layout is None or inst.mark is None:
+        return inst.transform
+    marks = {mk["name"]: mk for mk in layout.get("marks", [])}
+    seats = {s[0]: s for s in layout.get("seats", [])}
+    x, y, facing = _start(inst, marks, seats)
+    r = inst.transform.rotation_deg
+    return Transform(location=(round(x, 4), round(y, 4), inst.transform.location[2]),
+                     rotation_deg=(r[0], r[1], round(facing, 4)), scale=inst.transform.scale)
+
+
+def check_layout(m: SceneManifest, layout: dict | None, props: dict[str, PropFacts]) -> list[Issue]:
+    """Where things stand, against the environment's layout (``ResolvedEnvironment.layout``):
+    marks and camera marks exist; characters start on free floor inside the set; props stand
+    inside it, on the floor clear of solid dressing and of each other, or on a top. ``props``
+    maps each prop ref (``PROP-001@1.0``) to its facts; refs missing from it are skipped
+    (the registry check reports them). Paths through the set are measured in Blender."""
+    issues: list[Issue] = []
+    marks = {mk["name"]: mk for mk in (layout or {}).get("marks", [])}
+    cams = {c["name"] for c in (layout or {}).get("cameras", [])}
+    seats = {s[0]: s for s in (layout or {}).get("seats", [])}
+    solids: list[tuple[str, Rect]] = [(s[0], tuple(s[1:6])) for s in (layout or {}).get("solids", [])]
+    tops: dict[str, tuple[Rect, float]] = {t[0]: (tuple(t[1:6]), t[6]) for t in (layout or {}).get("tops", [])}
+    size = (layout or {}).get("size")
+    indoor = (layout or {}).get("kind") == "room"
+
+    def inside(r: Rect, margin: float) -> bool:
+        from studio_contracts.environment import inside_bounds
+        return size is None or inside_bounds(r, size[0], size[1], margin)
+
+    if layout is not None:
+        if m.camera.mark is not None and m.camera.mark not in cams:
+            issues.append(Issue(path="camera.mark", code="unknown_mark",
+                                message=f"the environment has camera marks {sorted(cams)}"))
+        for i, inst in enumerate(m.instances):
+            if inst.mark is not None and inst.mark not in marks:
+                issues.append(Issue(path=f"instances[{i}].mark", code="unknown_mark",
+                                    message=f"the environment has marks {sorted(marks)}"))
+            elif inst.mark is not None and marks[inst.mark]["kind"] == "seat":
+                issues.append(Issue(path=f"instances[{i}].mark", code="no_sit_animation", severity="warning",
+                                    message="there is no sit animation yet; the character stands in front of the seat"))
+
+    placed: list[tuple[str, Rect, bool]] = []  # scene props on the floor: key, footprint, solid
+    for i, use in enumerate(m.props):
+        f = props.get(use.prop.ref)
+        if f is None:
+            continue
+        p = f"props[{i}]"
+        rect: Rect = (use.at[0], use.at[1], f.size[0], f.size[1], use.rotation_deg)
+        if use.on is None:
+            if f.rests_on == "top":
+                issues.append(Issue(path=f"{p}.on", code="needs_surface",
+                                    message="this prop goes on top of something; name it with 'on'"))
+            if not inside(rect, CLEARANCE_M):
+                issues.append(Issue(path=f"{p}.at", code="outside", message="the prop is not inside the set"))
+            for name, other in solids:
+                if overlap(rect, other, CLEARANCE_M):
+                    issues.append(Issue(path=f"{p}.at", code="overlap", message=f"it overlaps the set's {name}"))
+            for name, other, solid in placed:
+                if (solid or f.solid) and overlap(rect, other, CLEARANCE_M):
+                    issues.append(Issue(path=f"{p}.at", code="overlap", message=f"it overlaps {name}"))
+            placed.append((use.key, rect, f.solid))
+            if f.top_z is not None:
+                tops[use.key] = (rect, f.top_z)
+    for i, use in enumerate(m.props):
+        if use.on is None or use.prop.ref not in props:
+            continue
+        base = tops.get(use.on)
+        if base is None:
+            issues.append(Issue(path=f"props[{i}].on", code="no_surface",
+                                message=f"no dressing item or scene prop {use.on!r} with a top"))
+        elif not contains(base[0], use.at[0], use.at[1]):
+            issues.append(Issue(path=f"props[{i}].at", code="off_surface", message=f"it is not on {use.on}'s top"))
+
+    for i, inst in enumerate(m.instances):
+        if inst.mark is not None and inst.mark not in marks:
+            continue
+        x, y, _ = _start(inst, marks, seats)
+        p = f"instances[{i}]"
+        if size is not None and (abs(x) > size[0] / 2 - CHARACTER_RADIUS_M or abs(y) > size[1] / 2 - CHARACTER_RADIUS_M):
+            issues.append(Issue(path=f"{p}.transform.location", code="outside",
+                                message=f"{inst.key} starts at ({x:.2f}, {y:.2f}), outside the "
+                                        f"{'room' if indoor else 'set'}"))
+            continue
+        for name, rect in solids:
+            if contains(rect, x, y, CHARACTER_RADIUS_M - 0.05):
+                issues.append(Issue(path=f"{p}.transform.location", code="blocked",
+                                    message=f"{inst.key} starts inside the set's {name}"))
+        for name, rect, solid in placed:
+            if solid and contains(rect, x, y, CHARACTER_RADIUS_M - 0.05):
+                issues.append(Issue(path=f"{p}.transform.location", code="blocked",
+                                    message=f"{inst.key} starts inside {name}"))
+    return issues
+
+
 class ResolvedPin(_Frozen):
-    kind: Literal["character", "outfit", "accessory", "animation"]
+    kind: Literal["character", "outfit", "accessory", "animation", "prop", "environment"]
     code: str
     version: str
     version_id: str
@@ -371,6 +558,18 @@ class ResolvedInstance(_Frozen):
     state: dict[str, StateValue]
 
 
+class ResolvedPropUse(_Frozen):
+    key: str
+    pin: ResolvedPin
+    item: str  # PROPD-CHAIR@0.1
+    size: tuple[float, float, float]
+    at: tuple[float, float]
+    #: height it stands at: 0 on the floor, the top it is on otherwise
+    z: float
+    rotation_deg: float
+    on: str | None
+
+
 class ResolvedScene(_Frozen):
     manifest_digest: str
     name: str
@@ -379,9 +578,18 @@ class ResolvedScene(_Frozen):
     frame_end: int
     camera: SceneCamera
     instances: tuple[ResolvedInstance, ...]
+    environment: ResolvedPin | None = None
+    #: the environment version's layout (``ResolvedEnvironment.layout``)
+    layout: dict | None = None
+    props: tuple[ResolvedPropUse, ...] = ()
+    #: the lighting preset in force: the manifest's override, else the environment's
+    lighting: str | None = None
 
     def pins(self) -> list[ResolvedPin]:
         seen: dict[str, ResolvedPin] = {}
+        for p in (self.environment, *(u.pin for u in self.props)):
+            if p is not None:
+                seen.setdefault(p.version_id, p)
         for inst in self.instances:
             for p in (inst.character, inst.outfit, *(a.pin for a in inst.accessories),
                       *(c.pin for c in inst.animations)):

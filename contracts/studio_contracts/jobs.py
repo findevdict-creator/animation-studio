@@ -229,6 +229,74 @@ class GenerateAnimationParams(Model):
         return self
 
 
+class SetPreviewSettings(Model):
+    resolution: int = Field(default=512, ge=64, le=2048)
+    samples: int = Field(default=12, ge=1, le=256)
+    glb: bool = True
+
+
+class GeneratePropParams(Model):
+    """Blender: a validated PropSpecification to one prop object, measured against the size
+    the contract computed and rendered for review."""
+
+    spec: dict[str, Any]
+    previews: SetPreviewSettings = Field(default_factory=SetPreviewSettings)
+    draft_version_id: UUID | None = Field(
+        default=None, description="the prop draft the build is for; without one a new prop is created")
+
+    @model_validator(mode="after")
+    def _spec_is_valid(self) -> GeneratePropParams:
+        from studio_contracts.environment import PropSpecification, validate_prop
+
+        spec = PropSpecification.model_validate(self.spec)
+        errors = [i for i in validate_prop(spec) if i.severity == "error"]
+        if errors:
+            raise ValueError("; ".join(f"{i.path}: {i.message}" for i in errors))
+        self.spec = spec.model_dump(mode="json")
+        return self
+
+
+class PublishPropParams(Model):
+    """Publisher: an approved prop version in review to an immutable library version; its
+    Blender process re-checks the exact ``prop.blend``."""
+
+    version_id: UUID
+    bump: Literal["minor", "major"] = "minor"
+
+
+class GenerateEnvironmentParams(Model):
+    """Blender: a validated EnvironmentSpecification to a set (shell, openings, dressing,
+    lighting rig, camera marks), with its layout measured again in Blender and a wide render
+    and top plan for review."""
+
+    spec: dict[str, Any]
+    previews: SetPreviewSettings = Field(default_factory=SetPreviewSettings)
+    draft_version_id: UUID | None = Field(
+        default=None, description="the environment draft the build is for; without one a new environment is created")
+
+    @model_validator(mode="after")
+    def _spec_is_valid(self) -> GenerateEnvironmentParams:
+        from studio_contracts.environment import (
+            EnvironmentSpecification,
+            validate_environment,
+        )
+
+        spec = EnvironmentSpecification.model_validate(self.spec)
+        errors = [i for i in validate_environment(spec) if i.severity == "error"]
+        if errors:
+            raise ValueError("; ".join(f"{i.path}: {i.message}" for i in errors))
+        self.spec = spec.model_dump(mode="json")
+        return self
+
+
+class PublishEnvironmentParams(Model):
+    """Publisher: an approved environment version in review to an immutable library version;
+    its Blender process re-checks the exact ``environment.blend``."""
+
+    version_id: UUID
+    bump: Literal["minor", "major"] = "minor"
+
+
 class PublishAnimationParams(Model):
     """Publisher: an approved animation version in review to an immutable library version. Its
     Blender process re-checks the exact ``animation.blend`` (contents, digest stamp, the
@@ -306,6 +374,10 @@ class JobType(StrEnum):
     generate_animation = "generate_animation"
     publish_animation = "publish_animation"
     lipsync = "lipsync"
+    generate_prop = "generate_prop"
+    publish_prop = "publish_prop"
+    generate_environment = "generate_environment"
+    publish_environment = "publish_environment"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -324,6 +396,10 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.generate_animation: GenerateAnimationParams,
     JobType.publish_animation: PublishAnimationParams,
     JobType.lipsync: LipSyncParams,
+    JobType.generate_prop: GeneratePropParams,
+    JobType.publish_prop: PublishPropParams,
+    JobType.generate_environment: GenerateEnvironmentParams,
+    JobType.publish_environment: PublishEnvironmentParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
@@ -333,7 +409,10 @@ JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobTyp
                                     JobType.generate_accessory: Queue.blender, JobType.publish_accessory: Queue.publish,
                                     JobType.assemble_scene: Queue.blender, JobType.verify_scene: Queue.blender,
                                     JobType.generate_animation: Queue.blender,
-                                    JobType.publish_animation: Queue.publish, JobType.lipsync: Queue.media}
+                                    JobType.publish_animation: Queue.publish, JobType.lipsync: Queue.media,
+                                    JobType.generate_prop: Queue.blender, JobType.publish_prop: Queue.publish,
+                                    JobType.generate_environment: Queue.blender,
+                                    JobType.publish_environment: Queue.publish}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
@@ -345,7 +424,9 @@ RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpre
                                    JobType.generate_accessory: True, JobType.publish_accessory: True,
                                    JobType.assemble_scene: True, JobType.verify_scene: True,
                                    JobType.generate_animation: True, JobType.publish_animation: True,
-                                   JobType.lipsync: True}
+                                   JobType.lipsync: True, JobType.generate_prop: True,
+                                   JobType.publish_prop: True, JobType.generate_environment: True,
+                                   JobType.publish_environment: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
@@ -360,7 +441,11 @@ JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: 
                                                    JobType.verify_scene: ("scene.edit",),
                                                    JobType.generate_animation: ("asset.create",),
                                                    JobType.publish_animation: ("asset.publish",),
-                                                   JobType.lipsync: ("scene.edit",)}
+                                                   JobType.lipsync: ("scene.edit",),
+                                                   JobType.generate_prop: ("asset.create",),
+                                                   JobType.publish_prop: ("asset.publish",),
+                                                   JobType.generate_environment: ("asset.create",),
+                                                   JobType.publish_environment: ("asset.publish",)}
 
 
 class InputFile(Model):
