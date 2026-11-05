@@ -104,7 +104,7 @@ four props and a living room, and assembles a scene with them. Note the codes it
 Then you can make an episode in the web app (Series → New series, cast Ali and Maya, add the
 living room, then New episode → Script → Storyboard → Episode versions → Render). Or run the
 Phase 8 script, which does all of that and renders the episode twice. At 640×360 it took
-25 minutes on an 8-core test machine:
+25 minutes on a 4-core test machine:
 
 ```
 python3 scripts/phase8_acceptance.py --out phase8-output --width 640 --height 360 \
@@ -116,7 +116,7 @@ Use the codes the Phase 7 script printed. On an empty library they are the ones 
 
 ## Rendering speed and your GPU
 
-Episode renders use Cycles **on the CPU**. These are measured times on an 8-core machine:
+Episode renders use Cycles **on the CPU**. These are measured times on a 4-core machine (a faster CPU will be quicker):
 
 | Size | Samples | Seconds per frame | 7.5 s episode (181 frames) |
 | --- | --- | --- | --- |
