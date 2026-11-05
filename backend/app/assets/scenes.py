@@ -38,6 +38,7 @@ from studio_contracts.rig_profile import BUILTIN_RIG_PROFILES
 from studio_contracts.scene import (
     Pin,
     ResolvedAccessoryUse,
+    ResolvedDialogueLine,
     ResolvedInstance,
     ResolvedPin,
     ResolvedScene,
@@ -245,7 +246,8 @@ def resolve(session: Session, manifest: SceneManifest, *, base: SceneVersion | N
             key=inst.key, character=cpin, rig_profile=rig.ref, fit_profile=cv.fit_profile,
             outfit=opin, outfit_compatibility=compat_doc, accessories=tuple(accs), transform=inst.transform,
             expressions=tuple(inst.expressions), blink=inst.blink, animations=clips,
-            dialogue=tuple(inst.dialogue), state=inst.state))
+            dialogue=tuple(ResolvedDialogueLine(start_frame=d.start_frame, end_frame=d.end_frame, text=d.text)
+                           for d in inst.dialogue), state=inst.state))
         res.rows.append((cv, ov, compat, acc_rows))
     if not res.errors:
         res.resolved = ResolvedScene(manifest_digest=manifest.digest(), name=manifest.name, fps=manifest.fps,

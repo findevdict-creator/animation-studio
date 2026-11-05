@@ -15,6 +15,7 @@ bpy = pytest.importorskip("bpy", reason="needs the bpy 5.2 wheel")
 from studio_contracts.ids import uuid7
 from studio_contracts.scene import (
     ResolvedAccessoryUse,
+    ResolvedDialogueLine,
     ResolvedInstance,
     ResolvedPin,
     ResolvedScene,
@@ -86,7 +87,8 @@ def resolve(m: SceneManifest, pins: dict[str, ResolvedPin]) -> ResolvedScene:
             key=inst.key, character=pins[inst.character.code], rig_profile=RIG.ref, fit_profile="child_average",
             outfit=pins[inst.outfit.code] if inst.outfit else None, outfit_compatibility={"status": "approved"},
             accessories=tuple(accs), transform=inst.transform, expressions=tuple(inst.expressions), blink=inst.blink,
-            animations=tuple(resolve_clip(a) for a in inst.animations), dialogue=tuple(inst.dialogue),
+            animations=tuple(resolve_clip(a) for a in inst.animations), dialogue=tuple(ResolvedDialogueLine(start_frame=d.start_frame, end_frame=d.end_frame, text=d.text)
+                           for d in inst.dialogue),
             state=inst.state))
     return ResolvedScene(manifest_digest=m.digest(), name=m.name, fps=m.fps, frame_start=m.frame_start,
                          frame_end=m.frame_end, camera=m.camera, instances=tuple(insts))

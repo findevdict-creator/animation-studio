@@ -25,6 +25,10 @@ class RigProfile(BaseModel):
     face_control_bone: str
     head_deform_bone: str
     rotation_mode: str
+    #: pose bones that carry the ``IK_FK`` switch property (0 is IK, 1 is FK)
+    ik_fk_switches: tuple[str, ...] = ("upper_arm_parent.L", "upper_arm_parent.R", "thigh_parent.L", "thigh_parent.R")
+    #: further controls every generated rig has that animations may key (the IK toes)
+    animation_controls: tuple[str, ...] = ("toe_ik.L", "toe_ik.R")
 
     @property
     def ref(self) -> str:

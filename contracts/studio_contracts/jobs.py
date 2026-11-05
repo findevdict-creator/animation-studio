@@ -199,6 +199,54 @@ class PublishAccessoryParams(Model):
     bump: Literal["minor", "major"] = "minor"
 
 
+class AnimationPreviewSettings(Model):
+    tile: int = Field(default=256, ge=64, le=1024)
+    samples: int = Field(default=8, ge=1, le=256)
+
+
+class GenerateAnimationParams(Model):
+    """Blender: a validated AnimationSpecification to an Action on the controls of its rig
+    profile, baked (generator) or retargeted (BVH, staged as ``inputs/source.bvh``) on the
+    reference body, saved alone to ``animation.blend`` and played on the check bodies."""
+
+    spec: dict[str, Any]
+    previews: AnimationPreviewSettings = Field(default_factory=AnimationPreviewSettings)
+    draft_version_id: UUID | None = Field(
+        default=None, description="the animation draft the build is for; without one a new animation is created")
+
+    @model_validator(mode="after")
+    def _spec_is_valid(self) -> GenerateAnimationParams:
+        from studio_contracts.animation import (
+            AnimationSpecification,
+            validate_animation,
+        )
+
+        spec = AnimationSpecification.model_validate(self.spec)
+        errors = [i for i in validate_animation(spec) if i.severity == "error"]
+        if errors:
+            raise ValueError("; ".join(f"{i.path}: {i.message}" for i in errors))
+        self.spec = spec.model_dump(mode="json")
+        return self
+
+
+class PublishAnimationParams(Model):
+    """Publisher: an approved animation version in review to an immutable library version. Its
+    Blender process re-checks the exact ``animation.blend`` (contents, digest stamp, the
+    compatibility record and the play check on the reference bodies)."""
+
+    version_id: UUID
+    bump: Literal["minor", "major"] = "minor"
+
+
+class LipSyncParams(Model):
+    """Media: normalise an uploaded dialogue recording to 16-bit mono WAV and find its mouth
+    cues (Rhubarb Lip Sync). The worker stages the upload as ``inputs/<name>``."""
+
+    audio_id: UUID
+    dialog_text: str | None = Field(default=None, max_length=2000,
+                                    description="the transcript; it helps the analyser find the phonemes")
+
+
 class ScenePreviewSettings(Model):
     width: int = Field(default=640, ge=64, le=3840)
     height: int = Field(default=360, ge=36, le=2160)
@@ -255,6 +303,9 @@ class JobType(StrEnum):
     publish_accessory = "publish_accessory"
     assemble_scene = "assemble_scene"
     verify_scene = "verify_scene"
+    generate_animation = "generate_animation"
+    publish_animation = "publish_animation"
+    lipsync = "lipsync"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -270,6 +321,9 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.publish_accessory: PublishAccessoryParams,
     JobType.assemble_scene: AssembleSceneParams,
     JobType.verify_scene: VerifySceneParams,
+    JobType.generate_animation: GenerateAnimationParams,
+    JobType.publish_animation: PublishAnimationParams,
+    JobType.lipsync: LipSyncParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
@@ -277,7 +331,9 @@ JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobTyp
                                     JobType.generate_outfit: Queue.blender, JobType.fit_outfit: Queue.blender,
                                     JobType.publish_outfit: Queue.publish,
                                     JobType.generate_accessory: Queue.blender, JobType.publish_accessory: Queue.publish,
-                                    JobType.assemble_scene: Queue.blender, JobType.verify_scene: Queue.blender}
+                                    JobType.assemble_scene: Queue.blender, JobType.verify_scene: Queue.blender,
+                                    JobType.generate_animation: Queue.blender,
+                                    JobType.publish_animation: Queue.publish, JobType.lipsync: Queue.media}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
@@ -287,7 +343,9 @@ RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpre
                                    JobType.generate_outfit: True, JobType.fit_outfit: True,
                                    JobType.publish_outfit: True,
                                    JobType.generate_accessory: True, JobType.publish_accessory: True,
-                                   JobType.assemble_scene: True, JobType.verify_scene: True}
+                                   JobType.assemble_scene: True, JobType.verify_scene: True,
+                                   JobType.generate_animation: True, JobType.publish_animation: True,
+                                   JobType.lipsync: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
@@ -299,7 +357,10 @@ JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: 
                                                    JobType.generate_accessory: ("asset.create",),
                                                    JobType.publish_accessory: ("asset.publish",),
                                                    JobType.assemble_scene: ("scene.edit",),
-                                                   JobType.verify_scene: ("scene.edit",)}
+                                                   JobType.verify_scene: ("scene.edit",),
+                                                   JobType.generate_animation: ("asset.create",),
+                                                   JobType.publish_animation: ("asset.publish",),
+                                                   JobType.lipsync: ("scene.edit",)}
 
 
 class InputFile(Model):

@@ -15,10 +15,12 @@ Three layers, like the asset specifications:
 * ``ResolvedScene`` is what the Blender jobs see: version ids, file hashes and the fixed
   workspace paths ``assets/<kind>/<code>/<version>/`` every scene file links from.
 
-Animation clips are a **built-in stand-in catalog** (``CLIP-*@0.1``): short procedural
-motions made by code on the rig's FK controls. The versioned animation library, retargeting
-and lip sync are Phase 6; a manifest names clips by reference so that swap does not change
-its shape.
+Animation assignments name either a version of the animation library (``ANIM-003@1.0``,
+Phase 6: pinned like any other asset, checked for rig compatibility against the character)
+or a clip of the built-in Phase 5 stand-in catalog (``CLIP-*@0.1``), which is kept so the
+scene versions made with it still validate. Dialogue lines can carry a recording
+(``AUDIO-001``); the face track then keys the visemes found in it (lip sync) instead of
+the fixed mouth cycle of a text-only line.
 """
 
 from __future__ import annotations
@@ -30,6 +32,7 @@ from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
+from studio_contracts.audio import AUDIO_CODE_RE, MouthCue
 from studio_contracts.character import Issue
 from studio_contracts.ids import CODE_RE
 from studio_contracts.rig_profile import CARTOON_HUMANOID_V1, RigProfile
@@ -128,21 +131,35 @@ class ExpressionKey(Model):
     weight: float = Field(default=1.0, ge=0.0, le=1.0)
 
 
+ANIM_REF_RE = r"^ANIM-\d{3,}@\d+\.\d+$"
+
+
+def is_library_clip(ref: str) -> bool:
+    return re.fullmatch(ANIM_REF_RE, ref) is not None
+
+
 class AnimationUse(Model):
-    clip: str = Field(description="clip reference (CLIP-WAVE@0.1) or catalog key")
+    clip: str = Field(description="an animation library version (ANIM-003@1.0), or a stand-in catalog clip "
+                                  "(CLIP-WAVE@0.1) or catalog key")
     start_frame: int = Field(ge=0, le=100_000)
     repeat: int = Field(default=1, ge=1, le=100)
     speed: float = Field(default=1.0, ge=0.25, le=4.0)
     influence: float = Field(default=1.0, ge=0.0, le=1.0)
+    #: a travelling animation (a walk) moves the instance forward along its facing while it
+    #: plays; false keeps it in place (a walk on the spot)
+    travel: bool = True
 
 
 class DialogueLine(Model):
-    """A spoken line. Until lip sync (Phase 6) the mouth flaps through visemes between the
-    two frames; the text is kept for the script and subtitles."""
+    """A spoken line. With ``audio`` the mouth follows the visemes found in the recording
+    (lip sync), which starts at ``start_frame``; without it the mouth flaps through a fixed
+    viseme cycle between the two frames. The text is kept for the script and subtitles and is
+    given to the lip-sync analyser as the transcript."""
 
     start_frame: int = Field(ge=0, le=100_000)
     end_frame: int = Field(ge=0, le=100_000)
     text: str = Field(min_length=1, max_length=500)
+    audio: str | None = Field(default=None, pattern=AUDIO_CODE_RE, description="a dialogue recording, AUDIO-NNN")
 
 
 StateValue = str | float | int | bool
@@ -233,10 +250,15 @@ def validate_manifest(m: SceneManifest, rig: RigProfile = CARTOON_HUMANOID_V1) -
             frames.setdefault(e.frame, j)
         for j, a in enumerate(inst.animations):
             ap = f"{p}.animations[{j}]"
-            try:
-                get_clip(a.clip)
-            except KeyError as exc:
-                issues.append(Issue(path=f"{ap}.clip", code="unknown_clip", message=str(exc.args[0])))
+            if a.clip.startswith("ANIM-"):
+                if not is_library_clip(a.clip):
+                    issues.append(Issue(path=f"{ap}.clip", code="bad_ref",
+                                        message="a library animation is ANIM-NNN@major.minor"))
+            else:
+                try:
+                    get_clip(a.clip)
+                except KeyError as exc:
+                    issues.append(Issue(path=f"{ap}.clip", code="unknown_clip", message=str(exc.args[0])))
             if not m.frame_start <= a.start_frame <= m.frame_end:
                 issues.append(Issue(path=f"{ap}.start_frame", code="out_of_range",
                                     message=f"frame {a.start_frame} is outside {m.frame_start}..{m.frame_end}"))
@@ -274,7 +296,7 @@ def validate_manifest(m: SceneManifest, rig: RigProfile = CARTOON_HUMANOID_V1) -
 
 # ------------------------------------------------------------------ resolved (what Blender sees)
 class ResolvedPin(_Frozen):
-    kind: Literal["character", "outfit", "accessory"]
+    kind: Literal["character", "outfit", "accessory", "animation"]
     code: str
     version: str
     version_id: str
@@ -282,7 +304,8 @@ class ResolvedPin(_Frozen):
     name: str
     #: workspace directory the files are staged in: assets/<kind>/<code>/<version>
     path: str
-    #: file name -> SHA-256 (character.blend, character.json / outfit.blend / accessory.blend)
+    #: file name -> SHA-256 (character.blend, character.json / outfit.blend / accessory.blend /
+    #: animation.blend)
     files: dict[str, str]
 
     @property
@@ -299,7 +322,7 @@ class ResolvedAccessoryUse(_Frozen):
 
 
 class ResolvedClipUse(_Frozen):
-    clip: str  # CLIP-X@0.1
+    clip: str  # ANIM-003@1.0 or CLIP-X@0.1
     key: str
     start_frame: int
     repeat: int
@@ -307,6 +330,28 @@ class ResolvedClipUse(_Frozen):
     influence: float
     frames: int
     loops: bool
+    source: Literal["catalog", "library"] = "catalog"
+    #: library animations: the pinned version and its compatibility record (AnimationCompat)
+    pin: ResolvedPin | None = None
+    compat: dict | None = None
+    travel: bool = False
+
+
+class ResolvedAudio(_Frozen):
+    code: str  # AUDIO-001
+    sha256: str
+    #: workspace path the normalised WAV is staged at: audio/<code>/dialogue.wav
+    path: str
+    duration_s: float
+    analyser: str
+    cues: tuple[MouthCue, ...]
+
+
+class ResolvedDialogueLine(_Frozen):
+    start_frame: int
+    end_frame: int
+    text: str
+    audio: ResolvedAudio | None = None
 
 
 class ResolvedInstance(_Frozen):
@@ -322,7 +367,7 @@ class ResolvedInstance(_Frozen):
     expressions: tuple[ExpressionKey, ...]
     blink: bool
     animations: tuple[ResolvedClipUse, ...]
-    dialogue: tuple[DialogueLine, ...]
+    dialogue: tuple[ResolvedDialogueLine, ...]
     state: dict[str, StateValue]
 
 
@@ -338,17 +383,31 @@ class ResolvedScene(_Frozen):
     def pins(self) -> list[ResolvedPin]:
         seen: dict[str, ResolvedPin] = {}
         for inst in self.instances:
-            for p in (inst.character, inst.outfit, *(a.pin for a in inst.accessories)):
+            for p in (inst.character, inst.outfit, *(a.pin for a in inst.accessories),
+                      *(c.pin for c in inst.animations)):
                 if p is not None:
                     seen.setdefault(p.version_id, p)
         return sorted(seen.values(), key=lambda p: (p.kind, p.code, p.version))
+
+    def audio(self) -> list[ResolvedAudio]:
+        seen: dict[str, ResolvedAudio] = {}
+        for inst in self.instances:
+            for d in inst.dialogue:
+                if d.audio is not None:
+                    seen.setdefault(d.audio.code, d.audio)
+        return sorted(seen.values(), key=lambda a: a.code)
 
 
 def pin_path(kind: str, code: str, version: str) -> str:
     return f"assets/{kind}/{code}/{version}"
 
 
+def audio_path(code: str) -> str:
+    return f"audio/{code}/dialogue.wav"
+
+
 def resolve_clip(use: AnimationUse) -> ResolvedClipUse:
+    """A stand-in catalog clip; library animations are resolved by the API against the registry."""
     c = get_clip(use.clip)
     return ResolvedClipUse(clip=c.ref, key=c.key, start_frame=use.start_frame, repeat=use.repeat, speed=use.speed,
                            influence=use.influence, frames=c.frames, loops=c.loops)
