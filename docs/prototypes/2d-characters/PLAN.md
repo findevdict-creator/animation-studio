@@ -1,6 +1,6 @@
 # 2D Character Generation in Blender: Plan
 
-Status: draft for M's review, 2026-11-05. This is a plan only. Nothing in it has been built.
+Status: draft for M's review, 2026-11-05 (updated the same day with M's GPU and the shared bake-off brief). This is a plan only. Nothing in it has been built.
 
 Companion document: the 3D asset generation requirements (`asset-generation/REQUIREMENTS.md`
 in the project files). That document covers turning pictures into 3D meshes; this one covers
@@ -33,9 +33,9 @@ the only way to get hand-illustrated art, but it replaces large parts of the stu
 should earn its place with one character in one shot first (section 11, phase B0).
 
 Because character look is the pipeline's main constraint, the final choice is made by a
-**common bake-off** (section 12): one girl character, one walking and talking clip, one scene,
+**common bake-off** (section 12): one original girl, Zara, walking in and saying one line in the living room,
 rendered at 640x360 by every route, including the AI-generated 3D mesh route from
-REQUIREMENTS, and scored blind by M.
+REQUIREMENTS (same brief as its section 9.1), and scored blind by M.
 
 One honest note on "Pixar style": Pixar's look is 3D (soft light, rounded forms, big
 expressive eyes). In 2D it means "illustrated with soft shading and appealing proportions".
@@ -231,9 +231,9 @@ time. Models and their VRAM needs follow REQUIREMENTS sections 3.2 and 4.2.
 
 | Step | Tool | What happens |
 |---|---|---|
-| B-1 Concept | **SDXL** (tier A+) or **FLUX.1 [schnell]** (tier B+), plus a cartoon / animated-film style LoRA | From the character's description, make 4 to 8 candidate full-body pictures. M picks one. The seed and every setting are recorded. |
+| B-1 Concept | **SDXL** in ComfyUI's low-VRAM mode (fits M's 8 GB card; FLUX.1 [schnell] only after a GPU upgrade, section 8), plus a cartoon / animated-film style LoRA | From the character's description, make 4 to 8 candidate full-body pictures. M picks one. The seed and every setting are recorded. |
 | B-2 Character sheet | Same model, **ControlNet** (OpenPose for pose, Lineart or Canny for shape) and **IP-Adapter** (keeps the face and colours of the chosen picture) | Paint the picked character again in a fixed *rigging pose*: front view, arms slightly away from the body, legs apart, mouth closed, eyes open, plain background. Then the 3/4, side and back views from the same reference (the "turnaround"). |
-| B-3 Character LoRA (optional, recommended for main cast) | **kohya_ss** or **ai-toolkit** on the PC (1 to 2 hours on tier C) | Train a small add-on from the approved sheet and 15 to 30 accepted variations, so later pictures of this character (new outfits, new views, new expressions) come out recognisably the same. |
+| B-3 Character LoRA (optional, recommended for main cast) | **kohya_ss** or **ai-toolkit** on the PC (several hours and only just fits on M's 8 GB card, section 8; 1 to 2 hours on a 16 GB card) | Train a small add-on from the approved sheet and 15 to 30 accepted variations, so later pictures of this character (new outfits, new views, new expressions) come out recognisably the same. |
 | B-4 Background removal | **BiRefNet** (MIT), as in REQUIREMENTS 4.3 | Clean transparent cut-out of each view. |
 | B-5 Cut into parts | **SAM 2** (Apache 2.0) for masks, guided by an OpenPose skeleton so each mask knows which limb it is | Each view becomes separate part images. |
 | B-6 Fill hidden areas | **Inpainting** with the same model and LoRA (or LaMa for small fills) | Where the arm covered the torso, paint the missing torso, so the torso card is whole when the arm swings away. Joints get overlap "caps" (a rounded end on the upper arm) so no gap shows when a limb rotates. |
@@ -442,17 +442,35 @@ repeating earlier ones, as in REQUIREMENTS section 5.
 
 ## 8. Hardware
 
-Same tiers as REQUIREMENTS 3.2. In short:
+**M's PC: NVIDIA GeForce RTX 3060 Ti with 8 GB of VRAM** (checked with `nvidia-smi` inside
+Docker on 2026-11-05, so the GPU already works in containers). The Windows desktop uses about
+1.8 GB of it, which leaves **about 6 GB free** for the studio. That is **tier A** in
+REQUIREMENTS 3.2.
 
-* **Route A** needs any NVIDIA GPU that runs Eevee (any RTX card). VRAM is barely a factor.
-* **Route B** needs the image model: SDXL works on 8 GB (tier A) in low-memory mode, FLUX.1
-  [schnell] wants 12 GB+ (tier B), LoRA training is comfortable on 16 GB (tier C). Only one
-  model is loaded at a time.
+| Tool | VRAM it needs | Fits on the 3060 Ti? | Plan |
+|---|---|---|---|
+| **Eevee** (Route A and all renders) | 1 to 3 GB at 640x360 and 1080p for these scenes | Yes, comfortably | Route A is not limited by this card. |
+| **SDXL** (Route B art, the bake-off reference picture) | 8 GB normally, about 4 to 6 GB with ComfyUI's low-VRAM mode (parts of the model wait in system RAM) | **Yes, with low-VRAM mode**, about 30 to 60 s per 1024 px picture | The image model for Route B. |
+| SDXL + ControlNet + IP-Adapter together (step B-2) | adds about 1 to 2.5 GB | Tight | Use the smaller "Control-LoRA" ControlNets, one guide at a time, and low-VRAM mode. Measured in B0. |
+| **FLUX.1 [schnell]** | about 12 GB in 8-bit | **No** (offloaded versions are far too slow) | Out for now. Every FLUX mention in this plan applies only after a GPU upgrade. |
+| BiRefNet, SAM 2, OpenPose, LaMa | under 2 GB each | Yes | Run one at a time. |
+| SDXL character LoRA training (B-3) | 8 GB+ even with memory-saving settings | Only just: batch size 1, gradient checkpointing, cached latents, nothing else open; several hours per character | Optional. Try once in B1; if it fails, rely on IP-Adapter and inpainting for consistency, or train on a rented or upgraded GPU later. |
+
+What this means in practice:
+
+* **Route A is unaffected** by the card's size.
+* **Route B works, but slowly and at SDXL quality.** One model is loaded at a time and ComfyUI
+  runs in low-VRAM mode. Generating a full character (concepts, three views, parts, 10 mouths,
+  eye and brow sets) is likely an hour or two of machine time rather than minutes. Vector
+  mouths (5.5) avoid much of that.
+* **Never run ComfyUI and a Blender render at the same time**; each wants most of the free
+  VRAM.
+* System RAM matters for low-VRAM mode: 32 GB is recommended (REQUIREMENTS 3.3 and question 5).
 * ComfyUI runs natively on Windows (portable build), which is simpler for M than Docker. The
   Blender side still runs in the studio's worker containers.
-
-M's GPU model and VRAM are still unknown (REQUIREMENTS question 1); the same answer serves
-both documents.
+* If the bake-off shows the look is held back by the card, a 16 GB card (tier C) unlocks
+  FLUX.1 [schnell], comfortable LoRA training, and the better 3D models in REQUIREMENTS, so
+  one upgrade helps every route.
 
 ---
 
@@ -541,23 +559,19 @@ girl character** and renders **the same short clip in the same scene from the sa
 
 ### 12.2 Fixed inputs (identical for every contender)
 
-* **Character brief** (one text, used as the prompt or the specification, never edited per
-  route): *"Maya, a cheerful 9-year-old girl, big expressive brown eyes, warm brown skin,
-  curly black hair in a high ponytail with a yellow hair tie, yellow t-shirt, blue denim
-  overalls, red sneakers. Soft, rounded animated-film style."* (Generic style words only, R8.)
-  Routes that start from a picture (R2, R3) use **the same approved concept picture**, made
-  once with SDXL or FLUX.1 [schnell] at a recorded seed, so they start from identical art.
-* **Scene:** the phase 7 living-room set and its main camera mark, same lighting rig
-  (toon-shaded for R1, R2 and R3t, standard for R0 and R3).
-* **Script:** one shot, about 6 seconds at 24 fps. Maya walks in from frame left, about 2 m,
-  stops at her mark facing the camera, waves once, and says one line:
-  *"Hi! I'm Maya, and today we're building a robot!"* The line is synthesised once with the
-  studio's espeak-ng voice and lip-synced once with Rhubarb; **the same audio clip and mouth
-  cues** feed every contender. Expression `happy` at 0.8 during the line, automatic blinks on.
-* **Camera:** a slow `push_in` across the shot (tests that the look holds as she gets closer).
-* **Render:** 640x360, 24 fps, Eevee on M's GPU for every contender (Cycles for R0 and R3 only
-  if Eevee standard looks markedly worse; record which), H.264, same colour management.
-* **Machine:** M's PC, one contender at a time, nothing else running.
+This is the same brief as REQUIREMENTS section 9.1, so the AI 3D mesh route and both routes
+in this plan make exactly the same clip. If the two documents ever disagree, 9.1 wins and this
+section is updated to match.
+
+| Item | Fixed value (identical for every contender) |
+|---|---|
+| Character | **Zara**, an original girl about 8 years old, in a soft, rounded, feature-film 3D cartoon style (a "Pixar-like" look, but an original design; generic style words only, R8). Proposed written description: *"Zara, a cheerful 8-year-old girl, big expressive brown eyes, warm brown skin, curly black hair in a high ponytail with a yellow hair tie, yellow t-shirt, blue denim overalls, red sneakers. Soft, rounded animated-film style."* The same description and **the same front reference picture** (made once with SDXL at a recorded seed, section 8) go to every route. |
+| Action | She walks in from the left, about four steps, stops facing the camera, and says one line. Automatic blinks on; no other gestures. |
+| Line | *"Hi! I'm Zara, and today we're going to the park!"* **One audio file**, shared by every route, lip-synced once with Rhubarb so every contender gets the same mouth cues. |
+| Length | About 6 seconds, 24 fps. |
+| Scene | The living room environment (`ENV-001`), camera mark `wide` (no camera move), lighting preset warm indoor. Toon-shaded for R1, R2 and R3t, standard for R0 and R3. R2 stands its cutout cards in the same 3D room (2.5D, section 5.7); if that is not ready yet, it uses a still render of the room from `wide` as its background, as 9.1 allows. |
+| Output | 640 × 360 MP4 with the audio (H.264), same colour management. Eevee on M's GPU for every contender (Cycles for R0 and R3 only if Eevee standard looks markedly worse; record which). |
+| Machine | M's PC, one contender at a time, ComfyUI and other GPU apps closed while rendering. |
 
 The scene, script and render settings are one episode manifest; each contender only swaps the
 character reference (and the series `shading` setting), so the comparison is as fair as the
@@ -573,6 +587,8 @@ pipeline allows.
   (many stylised productions do faces this way), and is noted as such in the results.
 * **R2 turns:** the walk-in uses the side view and switches to front at the stop. That switch
   is part of what is being judged.
+* **R2 background:** 2.5D in the room, or a still render of it (see the table above). The
+  report says which was used.
 
 ### 12.4 What each contender delivers
 
@@ -587,7 +603,7 @@ peak, and anything done by hand.
 1. **Blind look test by M.** The five clips play side by side, labelled only A to E in random
    order, looping. M scores each 1 to 5 on: *appeal* (do you like looking at her?), *"film
    look"* (closest to the soft animated-film look you want), *face and lip sync* (does she seem
-   to talk?), *motion* (walk and wave feel alive), and *consistency* (same girl in every frame
+   to talk?), *motion* (the walk and stop feel alive), and *consistency* (same girl in every frame
    and on the turn sheet).
 2. **Measured facts** from `report.json`: hands-on minutes per new character, machine minutes
    per new character, render seconds per frame, what breaks in the rest of the pipeline
@@ -618,7 +634,7 @@ with the bake-off as the decision point after A3 and B0.
 
 | # | Question | Default if no answer |
 |---|---|---|
-| 1 | Which GPU and how much VRAM? (Same as REQUIREMENTS question 1.) | Tier C for Route B; any RTX card for Route A. |
+| 1 | ~~Which GPU and how much VRAM?~~ Answered: RTX 3060 Ti, 8 GB (section 8). How much system RAM does the PC have? (Low-VRAM mode leans on it.) | 32 GB assumed. |
 | 2 | Which look do you picture: "3D cartoon drawn flat" (Route A) or "illustrated storybook" (Route B)? A couple of reference pictures you like would settle it. | Route A first, Route B spike to compare. |
 | 3 | Will the cartoons be sold or monetised? (Licences, R7.) | Treat as commercial. |
 | 4 | For 2D, painted mouths or cleaner vector mouths? | Vector, decided properly in B0. |
