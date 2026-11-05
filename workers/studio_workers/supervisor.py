@@ -251,13 +251,26 @@ class Supervisor:
         with self.sessions.begin() as s:
             outcome = OUTCOMES.get(envelope.type.value)
             recorded = outcome(s, job_id, uploaded, result.data, result.blender_version) if outcome else {}
+            follow_up = recorded.pop("_dispatch", [])
             service.finish(
                 s, job_id, JobStatus.succeeded,
                 result={"data": result.data, "outputs": uploaded, **recorded,
                         "engine_version": result.engine_version},
                 log_key=log_key, blender_version=result.blender_version,
             )
+        self._send_follow_up(follow_up)
         return JobStatus.succeeded, None
+
+    def _send_follow_up(self, jobs: list[list[str]]) -> None:
+        """Jobs an outcome queued (the export after the last shot): sent once they are
+        committed; the outbox sweeper re-sends any that this misses."""
+        for job_id, queue in jobs:
+            try:
+                self.dispatcher.send(uuid.UUID(job_id), queue)
+                with self.sessions.begin() as s:
+                    service.mark_enqueued(s, uuid.UUID(job_id))
+            except Exception:
+                log.exception("could not dispatch follow-up job %s", job_id)
 
     def _upload_outputs(self, job_id: uuid.UUID, attempt: int, workspace: Path, result: JobResult) -> list[dict[str, Any]]:
         out_dir = (workspace / "out").resolve()

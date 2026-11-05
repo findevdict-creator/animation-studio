@@ -48,7 +48,11 @@ class AudioOut(BaseModel):
     id: uuid.UUID
     code: str
     name: str
-    upload_id: uuid.UUID
+    kind: str = Field(description="dialogue | music | sfx")
+    source: str = Field(description="upload | tts (spoken by a speech provider)")
+    upload_id: uuid.UUID | None
+    voice: dict[str, Any] | None = Field(description="the VoiceProfile a speech clip was spoken with")
+    provider: str | None
     dialog_text: str | None
     status: str = Field(description="analysing | ready | failed")
     job_id: uuid.UUID | None

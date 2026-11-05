@@ -8,6 +8,7 @@ from app.models import (  # noqa: F401
     audio,
     audit,
     characters,
+    episodes,
     identity,
     jobs,
     outfits,

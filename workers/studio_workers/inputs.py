@@ -116,6 +116,7 @@ def _generate_animation(session: Session, params: dict[str, Any]) -> Wanted:
 
 
 STAGERS: dict[str, Stager] = {"fit_outfit": _fit_outfit, "assemble_scene": _scene_pins, "verify_scene": _verify_scene,
+                              "render_scene": _verify_scene,
                               "generate_animation": _generate_animation}
 READ_ONLY_PREFIXES = ("assets/", "audio/")
 

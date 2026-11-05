@@ -6,6 +6,7 @@ from app.api.v1 import (
     assets,
     audio,
     characters,
+    episodes,
     health,
     jobs,
     library,
@@ -38,3 +39,8 @@ api_router.include_router(uploads.router)
 api_router.include_router(audio.router)
 api_router.include_router(scenes.catalog_router)
 api_router.include_router(scenes.router)
+api_router.include_router(episodes.series_router)
+api_router.include_router(episodes.episodes_router)
+api_router.include_router(episodes.storyboards_router)
+api_router.include_router(episodes.versions_router)
+api_router.include_router(episodes.renders_router)

@@ -191,7 +191,16 @@ def _verify_scene(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded],
     return scenes.record_verify(session, job_id, uuid.UUID(params["scene_version_id"]), uploaded, data)
 
 
-OUTCOMES: dict[str, Outcome] = {"blender_smoke": _blender_smoke, "generate_character": _generate_character,
+def _render_scene(session: Session, job_id: uuid.UUID, uploaded: list[Uploaded], data: dict[str, Any],
+                  blender_version: str | None) -> dict[str, Any]:
+    """A shot's frames onto its render job; the last shot in queues the export (its job id
+    comes back under ``_dispatch`` and is sent to the broker after this commits)."""
+    from app.assets import renders
+
+    return renders.record_shot(session, job_id, uploaded, data, blender_version)
+
+
+OUTCOMES: dict[str, Outcome] = {"render_scene": _render_scene, "blender_smoke": _blender_smoke, "generate_character": _generate_character,
                                 "generate_outfit": _generate_outfit, "fit_outfit": _fit_outfit,
                                 "generate_accessory": _generate_accessory, "assemble_scene": _assemble_scene,
                                 "verify_scene": _verify_scene, "generate_animation": _generate_animation,
