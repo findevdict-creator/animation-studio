@@ -1,0 +1,407 @@
+{
+  "scene": "Two Alis",
+  "manifest_digest": "ac0322d541941bf8e01dfc5b16df597000e16be8741976961e5bcb73ff451cea",
+  "scene_blend_sha256": "9fc24c4abbf4bc60f7fd0c288c1ebc579f3dd1e323f306c7bbb6dfe3440c247b",
+  "fps": 24,
+  "frame_start": 1,
+  "frame_end": 72,
+  "instances": [
+    {
+      "key": "ali_school",
+      "character": {
+        "ref": "CHAR-006@1.0",
+        "name": "Ali 011011",
+        "override": "CHAR_Ali",
+        "rig": "rig",
+        "library": "/work/01a1a943-f92a-78d7-a245-a23799dea91d/attempt-1/assets/character/CHAR-006/1.0/character.blend"
+      },
+      "outfit": {
+        "ref": "OUTFIT-007@1.0",
+        "collection": "OUTFIT_School_day_011047",
+        "source": "OUTFIT-007@1.0#b799de9c8eae78ea694b793b8ba166c8a905b0fa8cda93ab48670fc86515443f",
+        "pieces": [
+          "footwear_sneakers",
+          "lower_shorts",
+          "upper_tshirt"
+        ],
+        "body_vertices_hidden": 868,
+        "compatibility": {
+          "status": "approved",
+          "override": false,
+          "checked_at": "2026-11-05T01:11:15.754556+00:00",
+          "fit_profile": "child_average",
+          "compatibility_id": "01a1a942-686c-7e0b-96cc-a4d756fab353"
+        }
+      },
+      "accessories": [
+        {
+          "ref": "ACC-004@1.0",
+          "object": "ali_school:ACC-004",
+          "frame": {
+            "point": "face_eyes",
+            "origin": [
+              0.0,
+              -0.15023,
+              1.05669
+            ],
+            "size": 0.12153,
+            "push": [
+              0.0,
+              -1.0,
+              0.0
+            ]
+          },
+          "scale": 1.0165,
+          "mirrored": false,
+          "moved_m": 0.0,
+          "final_scale": 1.0165,
+          "point": "face_eyes",
+          "bone": "DEF-spine.006",
+          "mesh": "ACC_glasses",
+          "library": "/work/01a1a943-f92a-78d7-a245-a23799dea91d/attempt-1/assets/accessory/ACC-004/1.0/accessory.blend"
+        },
+        {
+          "ref": "ACC-005@1.0",
+          "object": "ali_school:ACC-005",
+          "frame": {
+            "point": "wrist_R",
+            "origin": [
+              -0.34354,
+              0.01915,
+              0.53121
+            ],
+            "size": 0.03872,
+            "push": null
+          },
+          "scale": 1.024,
+          "mirrored": true,
+          "scaled_up": 1.0,
+          "final_scale": 1.024,
+          "point": "wrist_R",
+          "bone": "DEF-forearm.R.001",
+          "mesh": "ACC_watch",
+          "library": "/work/01a1a943-f92a-78d7-a245-a23799dea91d/attempt-1/assets/accessory/ACC-005/1.0/accessory.blend"
+        }
+      ],
+      "accessory_check": {
+        "ok": true,
+        "failed": [],
+        "checks": [
+          {
+            "name": "on_attachment_bone:ali_school:ACC-004",
+            "ok": true,
+            "bone": "DEF-spine.006",
+            "point": "face_eyes"
+          },
+          {
+            "name": "rigid:ali_school:ACC-004",
+            "ok": true
+          },
+          {
+            "name": "on_attachment_bone:ali_school:ACC-005",
+            "ok": true,
+            "bone": "DEF-forearm.R.001",
+            "point": "wrist_R"
+          },
+          {
+            "name": "rigid:ali_school:ACC-005",
+            "ok": true
+          },
+          {
+            "name": "clear_of_body:ali_school:ACC-004",
+            "ok": true,
+            "poses": [],
+            "worst_share": 0.0,
+            "worst_depth_m": 0.0
+          },
+          {
+            "name": "clear_of_body:ali_school:ACC-005",
+            "ok": true,
+            "poses": [],
+            "worst_share": 0.0,
+            "worst_depth_m": 0.0
+          }
+        ]
+      },
+      "animations": [
+        {
+          "track": "00_wave",
+          "action": "ali_school:wave",
+          "clip": "CLIP-WAVE@0.1",
+          "frame_start": 1.0,
+          "frame_end": 73.0,
+          "repeat": 2,
+          "scale": 1.0
+        },
+        {
+          "track": "01_idle",
+          "action": "ali_school:idle",
+          "clip": "CLIP-IDLE@0.1",
+          "frame_start": 1.0,
+          "frame_end": 49.0,
+          "repeat": 1,
+          "scale": 1.0
+        }
+      ],
+      "face": {
+        "action": "ali_school:face",
+        "keys": 77,
+        "expressions": [
+          [
+            1,
+            "neutral",
+            1.0
+          ],
+          [
+            24,
+            "happy",
+            1.0
+          ],
+          [
+            60,
+            "surprised",
+            0.7
+          ]
+        ],
+        "blinks": [
+          21
+        ],
+        "dialogue": [
+          {
+            "start_frame": 30,
+            "end_frame": 48,
+            "visemes": 6
+          }
+        ]
+      },
+      "transform": {
+        "location": [
+          -0.45,
+          0.0,
+          0.0
+        ],
+        "rotation_deg": [
+          0.0,
+          0.0,
+          15.0
+        ],
+        "scale": 1.0
+      },
+      "state": {
+        "mood": "cheerful",
+        "holding": "nothing"
+      }
+    },
+    {
+      "key": "ali_winter",
+      "character": {
+        "ref": "CHAR-006@1.0",
+        "name": "Ali 011011",
+        "override": "CHAR_Ali.001",
+        "rig": "rig.001",
+        "library": "/work/01a1a943-f92a-78d7-a245-a23799dea91d/attempt-1/assets/character/CHAR-006/1.0/character.blend"
+      },
+      "outfit": {
+        "ref": "OUTFIT-008@1.0",
+        "collection": "OUTFIT_Winter_walk_011122",
+        "source": "OUTFIT-008@1.0#4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157",
+        "pieces": [
+          "footwear_boots",
+          "lower_trousers",
+          "upper_sweater"
+        ],
+        "body_vertices_hidden": 1772,
+        "compatibility": {
+          "status": "approved",
+          "override": false,
+          "checked_at": "2026-11-05T01:11:49.914964+00:00",
+          "fit_profile": "child_average",
+          "compatibility_id": "01a1a942-eedc-753d-a127-c2e843cb1c85"
+        }
+      },
+      "accessories": [
+        {
+          "ref": "ACC-006@1.0",
+          "object": "ali_winter:ACC-006",
+          "frame": {
+            "point": "head_top",
+            "origin": [
+              0.0,
+              0.0064,
+              1.0752
+            ],
+            "size": 0.39195,
+            "push": null
+          },
+          "scale": 1.0424,
+          "mirrored": false,
+          "scaled_up": 1.0,
+          "final_scale": 1.0424,
+          "hair_hidden": 1923,
+          "hair_vertices": 2049,
+          "point": "head_top",
+          "bone": "DEF-spine.006",
+          "mesh": "ACC_beanie",
+          "library": "/work/01a1a943-f92a-78d7-a245-a23799dea91d/attempt-1/assets/accessory/ACC-006/1.0/accessory.blend"
+        }
+      ],
+      "accessory_check": {
+        "ok": true,
+        "failed": [],
+        "checks": [
+          {
+            "name": "on_attachment_bone:ali_winter:ACC-006",
+            "ok": true,
+            "bone": "DEF-spine.006",
+            "point": "head_top"
+          },
+          {
+            "name": "rigid:ali_winter:ACC-006",
+            "ok": true
+          },
+          {
+            "name": "clear_of_body:ali_winter:ACC-006",
+            "ok": true,
+            "poses": [],
+            "worst_share": 0.0,
+            "worst_depth_m": 0.0
+          }
+        ]
+      },
+      "animations": [
+        {
+          "track": "00_look_around",
+          "action": "ali_winter:look_around",
+          "clip": "CLIP-LOOK@0.1",
+          "frame_start": 5.0,
+          "frame_end": 53.0,
+          "repeat": 1,
+          "scale": 1.0
+        },
+        {
+          "track": "01_nod",
+          "action": "ali_winter:nod",
+          "clip": "CLIP-NOD@0.1",
+          "frame_start": 50.0,
+          "frame_end": 74.0,
+          "repeat": 1,
+          "scale": 1.0
+        }
+      ],
+      "face": {
+        "action": "ali_winter:face",
+        "keys": 56,
+        "expressions": [
+          [
+            12,
+            "confused",
+            1.0
+          ],
+          [
+            50,
+            "laughing",
+            1.0
+          ]
+        ],
+        "blinks": [],
+        "dialogue": [
+          {
+            "start_frame": 52,
+            "end_frame": 66,
+            "visemes": 5
+          }
+        ]
+      },
+      "transform": {
+        "location": [
+          0.45,
+          0.1,
+          0.0
+        ],
+        "rotation_deg": [
+          0.0,
+          0.0,
+          -15.0
+        ],
+        "scale": 1.0
+      },
+      "state": {
+        "mood": "puzzled"
+      }
+    }
+  ],
+  "libraries": {
+    "libraries": [
+      {
+        "stored": "//../assets/accessory/ACC-004/1.0/accessory.blend",
+        "workspace_path": "assets/accessory/ACC-004/1.0/accessory.blend",
+        "ok": true
+      },
+      {
+        "stored": "//../assets/accessory/ACC-005/1.0/accessory.blend",
+        "workspace_path": "assets/accessory/ACC-005/1.0/accessory.blend",
+        "ok": true
+      },
+      {
+        "stored": "//../assets/accessory/ACC-006/1.0/accessory.blend",
+        "workspace_path": "assets/accessory/ACC-006/1.0/accessory.blend",
+        "ok": true
+      },
+      {
+        "stored": "//../assets/character/CHAR-006/1.0/character.blend",
+        "workspace_path": "assets/character/CHAR-006/1.0/character.blend",
+        "ok": true
+      },
+      {
+        "stored": "//../assets/outfit/OUTFIT-007/1.0/outfit.blend",
+        "workspace_path": "assets/outfit/OUTFIT-007/1.0/outfit.blend",
+        "ok": true
+      },
+      {
+        "stored": "//../assets/outfit/OUTFIT-008/1.0/outfit.blend",
+        "workspace_path": "assets/outfit/OUTFIT-008/1.0/outfit.blend",
+        "ok": true
+      }
+    ],
+    "ok": true,
+    "outside_or_absolute": [],
+    "pinned_but_not_linked": []
+  },
+  "sources": {
+    "before": {
+      "assets/accessory/ACC-004/1.0/accessory.blend": "2c8fe6ab7d2fcc656415e651f267cdf0fbd5433460af5edf4defbb90e4548d08",
+      "assets/accessory/ACC-005/1.0/accessory.blend": "5dcb72356df8ee7946ae026d2438c5d0b43e58b8ec40cde6307874cd5d5974a0",
+      "assets/accessory/ACC-006/1.0/accessory.blend": "aa95ac8b28f822f8a2512bcd24d5fc5b0405bd46f6ec27bebe443b146c83d43d",
+      "assets/character/CHAR-006/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "assets/character/CHAR-006/1.0/character.blend": "7f81d452aa02e4aa5313f4ca8773a88e1fece0bff255871147f460cf31c3b064",
+      "assets/outfit/OUTFIT-007/1.0/outfit.blend": "b799de9c8eae78ea694b793b8ba166c8a905b0fa8cda93ab48670fc86515443f",
+      "assets/outfit/OUTFIT-008/1.0/outfit.blend": "4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+    },
+    "after": {
+      "assets/accessory/ACC-004/1.0/accessory.blend": "2c8fe6ab7d2fcc656415e651f267cdf0fbd5433460af5edf4defbb90e4548d08",
+      "assets/accessory/ACC-005/1.0/accessory.blend": "5dcb72356df8ee7946ae026d2438c5d0b43e58b8ec40cde6307874cd5d5974a0",
+      "assets/accessory/ACC-006/1.0/accessory.blend": "aa95ac8b28f822f8a2512bcd24d5fc5b0405bd46f6ec27bebe443b146c83d43d",
+      "assets/character/CHAR-006/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "assets/character/CHAR-006/1.0/character.blend": "7f81d452aa02e4aa5313f4ca8773a88e1fece0bff255871147f460cf31c3b064",
+      "assets/outfit/OUTFIT-007/1.0/outfit.blend": "b799de9c8eae78ea694b793b8ba166c8a905b0fa8cda93ab48670fc86515443f",
+      "assets/outfit/OUTFIT-008/1.0/outfit.blend": "4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+    },
+    "unchanged": true
+  },
+  "preview_frames": [
+    1,
+    24,
+    48,
+    72
+  ],
+  "ok": true,
+  "failed": [],
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0",
+  "timings_s": {
+    "check_inputs_s": 0.01,
+    "assemble_s": 3.32,
+    "save_check_s": 0.28,
+    "previews_s": 23.84
+  }
+}

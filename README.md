@@ -6,7 +6,7 @@ then assembled into scenes and episodes.
 
 The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md);
 the phase demonstrations are in [docs/demos/](docs/demos/) ([Phase 1](docs/demos/phase-1.md),
-[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md)).
+[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md)).
 
 ## Branches
 
@@ -34,6 +34,11 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-17-outfit-geometry` | `cartoon_engine.outfit`: garments cut from the reference body of the outfit's fit profile and saved alone in `outfit.blend`; fitting onto any character of the rig profile through skeleton space, rigid pieces on attachment bones, a per-vertex body mask; the fit check (clipping both ways, stretch against the skin, lift, structure) over a pose suite; the `generate_outfit` and `fit_outfit` jobs with thumbnail, pose sheet and try-on GLB |
 | `v2-18-outfit-library` | Outfit identity, versions and the compatibility registry (migration 0006, with guards), the outfit library service and `/outfits` API (drafts, generate, fit checks on published character versions, fit approval and revocation, submit gated on a passing fit, review, publish, deprecate, wardrobe per character version), fit-job inputs staged by the worker from the exact files, the publisher generalised to `publish_outfit` (fresh-process re-check of the exact `outfit.blend`) |
 | `v2-19-outfit-web` | Web outfit library: outfit gallery with slot/scope/status filters, new-outfit form (one catalog garment per slot, parameter sliders, fabric and colour presets, scope and fit profiles), outfit page with the try-on GLB viewer and pose sheet on the reference body or any checked character, the fit report as a garment-by-pose grid, the compatibility table (fit-check on a published character, approve, revoke), version actions; a wardrobe on the character page that puts any checked outfit on the character in the viewer |
+| `v2-20-accessory-library` | Accessory Library (SRS 8): catalog of procedural stand-ins (glasses, beanie, watch, tote, teddy), specification and validation, attachment frames, cover/ring/solid placement, bone binding, attach check over a pose suite, `generate_accessory` and `publish_accessory` jobs, accessories and accessory versions with guards (migration 0007), `/accessories` API |
+| `v2-21-scene-assembly` | Scene manifest and resolved scene contracts, built-in clip catalog, assembly engine (one library override per instance, outfit fitted per instance, accessories linked and bound, NLA clips, face track, camera and preview frames), `assemble_scene` and `verify_scene` jobs (reopen in a fresh workspace, check against the manifest, sources byte-identical) |
+| `v2-22-scenes-backend` | Scenes, append-only scene versions and pinned instances with guards (migration 0008), `scene.edit` permission, registry checks for every pin, director fit override (audited), `/scenes` API (validate, versions, assemble, reopen, files, usage), worker staging of pinned files read-only |
+| `v2-23-scenes-web` | Web accessory library (gallery, form, detail with preview and attach report) and scenes (list, manifest editor with wardrobe-aware pickers, scene page with pins, assemble and reopen, frames and reports) |
+| `v2-24-phase5-acceptance` | Phase 5 acceptance script and demonstration record; hats sized to the skull with the hair under them masked |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the

@@ -1,0 +1,170 @@
+{
+  "scene": "Winter walk",
+  "manifest_digest": "98c3b6ccd05138d7c1211efa6f90ff361ad7fab29b13bff3d8a6657d3cb4af95",
+  "scene_blend_sha256": "4045195e48f37713a18fadb53b9994eaacbe9deac588523f9ba5f9d20523a38e",
+  "opened_from": "scene/scene.blend",
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "libraries_resolve",
+      "ok": true,
+      "missing": [],
+      "libraries": [
+        {
+          "stored": "//../assets/accessory/ACC-006/1.0/accessory.blend",
+          "workspace_path": "assets/accessory/ACC-006/1.0/accessory.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/accessory/ACC-005/1.0/accessory.blend",
+          "workspace_path": "assets/accessory/ACC-005/1.0/accessory.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/character/CHAR-006/1.0/character.blend",
+          "workspace_path": "assets/character/CHAR-006/1.0/character.blend",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "manifest_digest",
+      "ok": true
+    },
+    {
+      "name": "frame_range",
+      "ok": true
+    },
+    {
+      "name": "ali:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "ali:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Ali"
+      ]
+    },
+    {
+      "name": "ali:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-006/1.0/character.blend",
+      "pin": "CHAR-006@1.0"
+    },
+    {
+      "name": "ali:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-006/1.0/character.blend",
+      "head": "//../assets/character/CHAR-006/1.0/character.blend"
+    },
+    {
+      "name": "ali:outfit_present",
+      "ok": true,
+      "source": "OUTFIT-008@1.0#4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+    },
+    {
+      "name": "ali:outfit_bound_to_this_rig",
+      "ok": true,
+      "pieces": [
+        "footwear_boots",
+        "lower_trousers",
+        "upper_sweater"
+      ]
+    },
+    {
+      "name": "ali:body_mask_present",
+      "ok": true
+    },
+    {
+      "name": "ali:accessory:ACC-006",
+      "ok": true,
+      "bone": "DEF-spine.006",
+      "expected_bone": "DEF-spine.006"
+    },
+    {
+      "name": "ali:hair_under_hat:ACC-006",
+      "ok": true,
+      "modifier": "acc_hair_mask_ali:ACC-006"
+    },
+    {
+      "name": "ali:accessory:ACC-005",
+      "ok": true,
+      "bone": "DEF-forearm.L.001",
+      "expected_bone": "DEF-forearm.L.001"
+    },
+    {
+      "name": "ali:placement",
+      "ok": true,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "ali:expressions_play",
+      "ok": true,
+      "keys": 1,
+      "mismatches": []
+    },
+    {
+      "name": "ali:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_walk",
+          "ali:walk",
+          1.0
+        ]
+      ],
+      "found": [
+        [
+          "00_walk",
+          "ali:walk",
+          1.0
+        ],
+        [
+          "face",
+          "ali:face",
+          12.0
+        ]
+      ]
+    },
+    {
+      "name": "renders",
+      "ok": true,
+      "frames": [
+        1,
+        16,
+        32,
+        48
+      ]
+    },
+    {
+      "name": "sources_unchanged",
+      "ok": true,
+      "changed": [],
+      "files": {
+        "assets/accessory/ACC-005/1.0/accessory.blend": "5dcb72356df8ee7946ae026d2438c5d0b43e58b8ec40cde6307874cd5d5974a0",
+        "assets/accessory/ACC-006/1.0/accessory.blend": "aa95ac8b28f822f8a2512bcd24d5fc5b0405bd46f6ec27bebe443b146c83d43d",
+        "assets/character/CHAR-006/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+        "assets/character/CHAR-006/1.0/character.blend": "7f81d452aa02e4aa5313f4ca8773a88e1fece0bff255871147f460cf31c3b064",
+        "assets/outfit/OUTFIT-008/1.0/outfit.blend": "4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+      }
+    }
+  ],
+  "sources": {
+    "before": {
+      "assets/accessory/ACC-005/1.0/accessory.blend": "5dcb72356df8ee7946ae026d2438c5d0b43e58b8ec40cde6307874cd5d5974a0",
+      "assets/accessory/ACC-006/1.0/accessory.blend": "aa95ac8b28f822f8a2512bcd24d5fc5b0405bd46f6ec27bebe443b146c83d43d",
+      "assets/character/CHAR-006/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "assets/character/CHAR-006/1.0/character.blend": "7f81d452aa02e4aa5313f4ca8773a88e1fece0bff255871147f460cf31c3b064",
+      "assets/outfit/OUTFIT-008/1.0/outfit.blend": "4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+    },
+    "unchanged": true
+  },
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0"
+}

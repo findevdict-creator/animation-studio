@@ -142,6 +142,12 @@ def check_instance(inst, scene, ws) -> list[dict]:
             and bpy.path.abspath(lib.filepath).replace("\\", "/").endswith(f"{use.pin.path}/accessory.blend")
             and obj.parent == parts.rig and obj.parent_type == "BONE" and obj.parent_bone == use.attach_bone,
             bone=obj.parent_bone if obj else None, expected_bone=use.attach_bone)
+        if use.placement == "cover" and use.attach_point == "head_top" and parts.hair is not None:
+            from cartoon_engine.accessory.attach import HAIR_MASK_PREFIX
+
+            mod = parts.hair.modifiers.get(f"{HAIR_MASK_PREFIX}{name}")
+            add(f"hair_under_hat:{use.pin.code}", mod is not None and mod.node_group is not None,
+                modifier=mod.name if mod else None)
     add("placement", _matrix_close(parts.rig.matrix_world, _matrix(inst.transform)),
         location=[round(v, 4) for v in parts.rig.matrix_world.translation])
 

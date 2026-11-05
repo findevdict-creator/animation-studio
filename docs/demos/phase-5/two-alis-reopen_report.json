@@ -1,0 +1,300 @@
+{
+  "scene": "Two Alis",
+  "manifest_digest": "ac0322d541941bf8e01dfc5b16df597000e16be8741976961e5bcb73ff451cea",
+  "scene_blend_sha256": "9fc24c4abbf4bc60f7fd0c288c1ebc579f3dd1e323f306c7bbb6dfe3440c247b",
+  "opened_from": "scene/scene.blend",
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "libraries_resolve",
+      "ok": true,
+      "missing": [],
+      "libraries": [
+        {
+          "stored": "//../assets/accessory/ACC-004/1.0/accessory.blend",
+          "workspace_path": "assets/accessory/ACC-004/1.0/accessory.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/accessory/ACC-005/1.0/accessory.blend",
+          "workspace_path": "assets/accessory/ACC-005/1.0/accessory.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/accessory/ACC-006/1.0/accessory.blend",
+          "workspace_path": "assets/accessory/ACC-006/1.0/accessory.blend",
+          "ok": true
+        },
+        {
+          "stored": "//../assets/character/CHAR-006/1.0/character.blend",
+          "workspace_path": "assets/character/CHAR-006/1.0/character.blend",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "manifest_digest",
+      "ok": true
+    },
+    {
+      "name": "frame_range",
+      "ok": true
+    },
+    {
+      "name": "ali_school:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "ali_school:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Ali"
+      ]
+    },
+    {
+      "name": "ali_school:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-006/1.0/character.blend",
+      "pin": "CHAR-006@1.0"
+    },
+    {
+      "name": "ali_school:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-006/1.0/character.blend",
+      "head": "//../assets/character/CHAR-006/1.0/character.blend"
+    },
+    {
+      "name": "ali_school:outfit_present",
+      "ok": true,
+      "source": "OUTFIT-007@1.0#b799de9c8eae78ea694b793b8ba166c8a905b0fa8cda93ab48670fc86515443f"
+    },
+    {
+      "name": "ali_school:outfit_bound_to_this_rig",
+      "ok": true,
+      "pieces": [
+        "footwear_sneakers",
+        "lower_shorts",
+        "upper_tshirt"
+      ]
+    },
+    {
+      "name": "ali_school:body_mask_present",
+      "ok": true
+    },
+    {
+      "name": "ali_school:accessory:ACC-004",
+      "ok": true,
+      "bone": "DEF-spine.006",
+      "expected_bone": "DEF-spine.006"
+    },
+    {
+      "name": "ali_school:accessory:ACC-005",
+      "ok": true,
+      "bone": "DEF-forearm.R.001",
+      "expected_bone": "DEF-forearm.R.001"
+    },
+    {
+      "name": "ali_school:placement",
+      "ok": true,
+      "location": [
+        -0.45,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "ali_school:expressions_play",
+      "ok": true,
+      "keys": 3,
+      "mismatches": []
+    },
+    {
+      "name": "ali_school:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_wave",
+          "ali_school:wave",
+          1.0
+        ],
+        [
+          "01_idle",
+          "ali_school:idle",
+          1.0
+        ]
+      ],
+      "found": [
+        [
+          "00_wave",
+          "ali_school:wave",
+          1.0
+        ],
+        [
+          "01_idle",
+          "ali_school:idle",
+          1.0
+        ],
+        [
+          "face",
+          "ali_school:face",
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "ali_school:dialogue_mouth_moves",
+      "ok": true,
+      "frame": 30,
+      "viseme": "vis_AI",
+      "prop": 1.0,
+      "measured": 1.0
+    },
+    {
+      "name": "ali_winter:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "ali_winter:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Ali.001"
+      ]
+    },
+    {
+      "name": "ali_winter:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-006/1.0/character.blend",
+      "pin": "CHAR-006@1.0"
+    },
+    {
+      "name": "ali_winter:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-006/1.0/character.blend",
+      "head": "//../assets/character/CHAR-006/1.0/character.blend"
+    },
+    {
+      "name": "ali_winter:outfit_present",
+      "ok": true,
+      "source": "OUTFIT-008@1.0#4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+    },
+    {
+      "name": "ali_winter:outfit_bound_to_this_rig",
+      "ok": true,
+      "pieces": [
+        "footwear_boots",
+        "lower_trousers",
+        "upper_sweater"
+      ]
+    },
+    {
+      "name": "ali_winter:body_mask_present",
+      "ok": true
+    },
+    {
+      "name": "ali_winter:accessory:ACC-006",
+      "ok": true,
+      "bone": "DEF-spine.006",
+      "expected_bone": "DEF-spine.006"
+    },
+    {
+      "name": "ali_winter:hair_under_hat:ACC-006",
+      "ok": true,
+      "modifier": "acc_hair_mask_ali_winter:ACC-006"
+    },
+    {
+      "name": "ali_winter:placement",
+      "ok": true,
+      "location": [
+        0.45,
+        0.1,
+        0.0
+      ]
+    },
+    {
+      "name": "ali_winter:expressions_play",
+      "ok": true,
+      "keys": 2,
+      "mismatches": []
+    },
+    {
+      "name": "ali_winter:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_look_around",
+          "ali_winter:look_around",
+          5.0
+        ],
+        [
+          "01_nod",
+          "ali_winter:nod",
+          50.0
+        ]
+      ],
+      "found": [
+        [
+          "00_look_around",
+          "ali_winter:look_around",
+          5.0
+        ],
+        [
+          "01_nod",
+          "ali_winter:nod",
+          50.0
+        ],
+        [
+          "face",
+          "ali_winter:face",
+          12.0
+        ]
+      ]
+    },
+    {
+      "name": "ali_winter:dialogue_mouth_moves",
+      "ok": true,
+      "frame": 52,
+      "viseme": "vis_AI",
+      "prop": 1.0,
+      "measured": 1.0
+    },
+    {
+      "name": "renders",
+      "ok": true,
+      "frames": [
+        1,
+        24,
+        48,
+        72
+      ]
+    },
+    {
+      "name": "sources_unchanged",
+      "ok": true,
+      "changed": [],
+      "files": {
+        "assets/accessory/ACC-004/1.0/accessory.blend": "2c8fe6ab7d2fcc656415e651f267cdf0fbd5433460af5edf4defbb90e4548d08",
+        "assets/accessory/ACC-005/1.0/accessory.blend": "5dcb72356df8ee7946ae026d2438c5d0b43e58b8ec40cde6307874cd5d5974a0",
+        "assets/accessory/ACC-006/1.0/accessory.blend": "aa95ac8b28f822f8a2512bcd24d5fc5b0405bd46f6ec27bebe443b146c83d43d",
+        "assets/character/CHAR-006/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+        "assets/character/CHAR-006/1.0/character.blend": "7f81d452aa02e4aa5313f4ca8773a88e1fece0bff255871147f460cf31c3b064",
+        "assets/outfit/OUTFIT-007/1.0/outfit.blend": "b799de9c8eae78ea694b793b8ba166c8a905b0fa8cda93ab48670fc86515443f",
+        "assets/outfit/OUTFIT-008/1.0/outfit.blend": "4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+      }
+    }
+  ],
+  "sources": {
+    "before": {
+      "assets/accessory/ACC-004/1.0/accessory.blend": "2c8fe6ab7d2fcc656415e651f267cdf0fbd5433460af5edf4defbb90e4548d08",
+      "assets/accessory/ACC-005/1.0/accessory.blend": "5dcb72356df8ee7946ae026d2438c5d0b43e58b8ec40cde6307874cd5d5974a0",
+      "assets/accessory/ACC-006/1.0/accessory.blend": "aa95ac8b28f822f8a2512bcd24d5fc5b0405bd46f6ec27bebe443b146c83d43d",
+      "assets/character/CHAR-006/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "assets/character/CHAR-006/1.0/character.blend": "7f81d452aa02e4aa5313f4ca8773a88e1fece0bff255871147f460cf31c3b064",
+      "assets/outfit/OUTFIT-007/1.0/outfit.blend": "b799de9c8eae78ea694b793b8ba166c8a905b0fa8cda93ab48670fc86515443f",
+      "assets/outfit/OUTFIT-008/1.0/outfit.blend": "4ed08780d51719a77a78906a0c812c7f288249481732b23a288adfc44bb10157"
+    },
+    "unchanged": true
+  },
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0"
+}

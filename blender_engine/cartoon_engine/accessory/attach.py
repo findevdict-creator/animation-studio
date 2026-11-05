@@ -7,9 +7,14 @@ attachment frame onto the wearer (``T(origin) @ S(size / ref_size)``, mirrored w
 point is on the other side from the one the item was modelled on), cleared from what is
 under it, then parented to the attachment bone of the wearer's rig so it follows the pose.
 
-Clearing: a ``cover`` (hat, watch) grows about its origin until the body, hair and clothes
-under it are inside with the clearance; a ``solid`` (glasses, bag, toy) moves along the
-frame's push direction until nothing is inside it or closer than the clearance.
+Clearing: a ``cover`` (hat, watch) grows about its origin until the body and clothes under
+it are inside with the clearance; a ``solid`` (glasses, bag, toy) moves along the frame's
+push direction until nothing is inside it or closer than the clearance.
+
+A hat does not grow over the hair: it is sized to the skull, and the hair above its rim is
+hidden on this instance by a Geometry Nodes mask (the same mechanism as an outfit's body
+mask, which works on linked hair where vertex groups cannot be added). Growing a beanie
+until spiky hair fits inside made it a helmet.
 """
 
 from __future__ import annotations
@@ -32,12 +37,16 @@ from cartoon_engine.outfit.garments import (
 MAX_COVER_SCALE = 1.6
 
 
+HAIR_MASK_PREFIX = "acc_hair_mask_"
+
+
 @dataclass
 class Attached:
     obj: object
     point: str
     bone: str
     info: dict
+    hair_mask: object = None  # the mask object, when the item covers hair
 
 
 def link_accessory_mesh(path: Path | str):
@@ -55,11 +64,11 @@ def link_accessory_mesh(path: Path | str):
     return mesh
 
 
-def under_surfaces(parts: Parts, garments: list = ()) -> list[Surface]:
-    """What an accessory must stay clear of, in rest-pose world space: skin, hair, eyes and
-    the garments the instance wears (with their thickness)."""
+def under_surfaces(parts: Parts, garments: list = (), hair: bool = True) -> list[Surface]:
+    """What an accessory must stay clear of, in rest-pose world space: skin, hair (unless the
+    item covers it), eyes and the garments the instance wears (with their thickness)."""
     out = []
-    for obj in [parts.body, parts.head, parts.hair, *parts.eyes.values(), *garments]:
+    for obj in [parts.body, parts.head, parts.hair if hair else None, *parts.eyes.values(), *garments]:
         if obj is None:
             continue
         co, polys = mesh_arrays(obj.data)
@@ -115,7 +124,14 @@ def place(mesh, point: str, parts: Parts, sk: Skeleton, under: list[Surface], cl
     world = local + f.origin
     info: dict = {"frame": f.as_dict(), "scale": round(scale, 4), "mirrored": mirror}
     if mesh["studio_placement"] == "cover":
-        _, k = clear_rigid_cover(world, polys, f.origin, under, clearance)
+        # only what is above the rim can be under the hat: the face, ears and neck below
+        # the open rim are outside its shell by design and must not make it grow
+        a, c = rim_plane(world)
+        above = [_Points(u.points[u.points[:, 2] > a * u.points[:, 1] + c]) for u in under]
+        # and only the faces that look away from the head: the inner side of the cuff faces
+        # the head, so a head point next to it would read as outside the hat
+        outer = [pl for pl in polys if _faces_out(world, pl, f.origin)]
+        _, k = clear_rigid_cover(world, outer, f.origin, [u for u in above if len(u.points)], clearance)
         k = min(k, MAX_COVER_SCALE)
         info["scaled_up"] = round(k, 4)
         scale *= k
@@ -136,6 +152,67 @@ def place(mesh, point: str, parts: Parts, sk: Skeleton, under: list[Surface], cl
     m[:3, 3] = f.origin + offset
     info["final_scale"] = round(scale, 4)
     return m, info
+
+
+def _faces_out(w: np.ndarray, poly, origin: np.ndarray) -> bool:
+    p = w[list(poly)]
+    n = np.zeros(3)
+    for i in range(len(p)):  # Newell normal
+        a, b = p[i], p[(i + 1) % len(p)]
+        n += np.array([(a[1] - b[1]) * (a[2] + b[2]), (a[2] - b[2]) * (a[0] + b[0]), (a[0] - b[0]) * (a[1] + b[1])])
+    return float(np.dot(n, p.mean(axis=0) - origin)) > 0
+
+
+@dataclass
+class _Points:
+    points: np.ndarray
+
+
+def rim_plane(w: np.ndarray) -> tuple[float, float]:
+    """``z = a*y + c`` through the lowest band of a placed hat's points (a beanie sits lower
+    at the back)."""
+    band = w[w[:, 2] <= np.quantile(w[:, 2], 0.15)]
+    a, c = np.linalg.lstsq(np.c_[band[:, 1], np.ones(len(band))], band[:, 2], rcond=None)[0]
+    return float(a), float(c)
+
+
+def covers_hair(mesh, point: str) -> bool:
+    return mesh["studio_placement"] == "cover" and point == "head_top"
+
+
+def hair_under(mesh, world: np.ndarray, parts: Parts, margin: float = 0.004) -> np.ndarray:
+    """Per hair vertex (rest pose, world space): above the hat's rim plane. The rim plane is
+    fitted to the lowest band of the placed hat (``z = a*y + c``: a beanie sits lower at the
+    back)."""
+    co, _ = mesh_arrays(mesh)
+    a, c = rim_plane(co @ world[:3, :3].T + world[:3, 3])
+    hco, _ = mesh_arrays(parts.hair.data)
+    m = np.array(parts.hair.matrix_world)
+    hw = hco @ m[:3, :3].T + m[:3, 3]
+    return hw[:, 2] > a * hw[:, 1] + c - margin
+
+
+def mask_hair(parts: Parts, hide: np.ndarray, name: str, collection):
+    """A Geometry Nodes mask on this instance's hair: one point per hair vertex carrying the flag."""
+    import bpy
+
+    from cartoon_engine.outfit.fit import MASK_ATTRIBUTE, _mask_node_group
+
+    co, _ = mesh_arrays(parts.hair.data)
+    mesh = bpy.data.meshes.new(f"{name}_hair_mask")
+    mesh.vertices.add(len(co))
+    mesh.vertices.foreach_set("co", co.ravel())
+    attr = mesh.attributes.new(MASK_ATTRIBUTE, "FLOAT", "POINT")
+    attr.data.foreach_set("value", hide.astype(float))
+    obj = bpy.data.objects.new(f"{name}_hair_mask", mesh)
+    obj["studio_mask_for"] = parts.hair.name
+    obj["studio_vertex_count"] = len(co)
+    obj.hide_render = True
+    obj.hide_viewport = True
+    (collection or bpy.context.scene.collection).objects.link(obj)
+    mod = parts.hair.modifiers.new(f"{HAIR_MASK_PREFIX}{name}", "NODES")
+    mod.node_group = _mask_node_group(obj)
+    return obj
 
 
 def bind_to_bone(obj, rig, bone_name: str, world) -> None:
@@ -174,18 +251,32 @@ def attach_accessory(path: Path | str, parts: Parts, sk: Skeleton, *, point: str
     saved = parts.rig.matrix_world.copy()
     parts.rig.matrix_world = Matrix.Identity(4)
     bpy.context.view_layer.update()
+    hat = covers_hair(mesh, point) and parts.hair is not None
+    mask = None
     try:
-        world, info = place(mesh, point, parts, sk, under_surfaces(parts, garments), clearance)
+        world, info = place(mesh, point, parts, sk, under_surfaces(parts, garments, hair=not hat), clearance)
+        if hat:
+            hide = hair_under(mesh, world, parts)
+            info["hair_hidden"] = int(hide.sum())
+            info["hair_vertices"] = len(hide)
+            if hide.any():
+                mask = mask_hair(parts, hide, obj.name, collection)
         bind_to_bone(obj, parts.rig, bone, world)
     finally:
         parts.rig.matrix_world = saved
         bpy.context.view_layer.update()
     obj["studio_accessory_point"] = point
     info.update(point=point, bone=bone, mesh=mesh.name, library=mesh.library.filepath if mesh.library else None)
-    return Attached(obj, point, bone, info)
+    return Attached(obj, point, bone, info, mask)
 
 
-def detach_accessory(att: Attached) -> None:
+def detach_accessory(att: Attached, parts: Parts | None = None) -> None:
     import bpy
 
+    if att.hair_mask is not None and parts is not None and parts.hair is not None:
+        for mod in [m for m in parts.hair.modifiers if m.name == f"{HAIR_MASK_PREFIX}{att.obj.name}"]:
+            if mod.node_group is not None:
+                bpy.data.node_groups.remove(mod.node_group)
+            parts.hair.modifiers.remove(mod)
+        bpy.data.objects.remove(att.hair_mask)
     bpy.data.objects.remove(att.obj)

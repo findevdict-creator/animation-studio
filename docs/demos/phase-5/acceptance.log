@@ -1,0 +1,143 @@
+PASS  character created  (CHAR-006 01a1a941-9b1a-71e5-8343-9c1b5dd6121c)
+PASS  generate job accepted for the draft  (01a1a941-9b30-7489-a570-affb0d86685a)
+      queued 0% 
+      running 3% building geometry
+      running 25% saving
+      running 30% validating
+      running 45% turntable frame 2/8
+      running 55% turntable frame 4/8
+      running 60% turntable frame 5/8
+      running 70% turntable frame 7/8
+      running 78% expression sheet
+      succeeded 100% done
+PASS  Blender built and validated the draft  (null)
+PASS  the build is attached to the draft and current  (8 files, built from 6816efcad0ba)
+PASS  draft submitted for review
+PASS  reviewer approved it
+PASS  publish job accepted on the publisher queue  (01a1a942-193b-7d47-b341-499a85138a68)
+      queued 0% 
+      running 30% validating
+      succeeded 100% recording the published version
+PASS  publisher re-validated, copied and recorded the version  (null)
+PASS  Ali 1.0 published  (library/characters/01a1a941-9b1a-71e5-8343-9c1b5dd6121c/versions/1.0/manifest.json)
+      running 0% 
+      running 5% building the reference body (child_average)
+      running 12% building garments
+      running 20% rigging the reference character
+      running 55% thumbnail
+      running 65% pose sheet
+      succeeded 100% done
+PASS  school: outfit built and fit-checked on the reference body  (OUTFIT-007)
+      running 0% 
+      running 20% fitting the outfit
+      running 40% thumbnail
+      running 50% pose sheet
+      succeeded 100% fits
+PASS  school: fit-checked on Ali 1.0
+      running 0% 
+      running 15% building the reference character (child_average)
+      running 35% fitting and checking
+      succeeded 100% recording the published version
+PASS  school: fit approved and outfit published 1.0  (library/outfits/01a1a942-2952-77d2-8c9b-2d5d5f411a05/versions/1.0/manifest.json)
+      running 0% 
+      running 5% building the reference body (child_average)
+      running 12% building garments
+      running 20% rigging the reference character
+      running 55% thumbnail
+      running 65% pose sheet
+      succeeded 100% done
+PASS  winter: outfit built and fit-checked on the reference body  (OUTFIT-008)
+      running 0% 
+      running 20% fitting the outfit
+      running 40% thumbnail
+      running 50% pose sheet
+      succeeded 100% fits
+PASS  winter: fit-checked on Ali 1.0
+      running 0% 
+      running 15% building the reference character (child_average)
+      running 35% fitting and checking
+      succeeded 100% recording the published version
+PASS  winter: fit approved and outfit published 1.0  (library/outfits/01a1a942-afb3-7039-b7cb-841ffa7139e1/versions/1.0/manifest.json)
+PASS  glasses: accessory created (eyewear)  (ACC-004)
+      running 0% 
+      running 5% building the reference body (child_average)
+      running 30% rigging the reference character
+      running 65% close-up
+      running 100% done
+      succeeded 100% done
+PASS  glasses: built, attached to the reference body and attach-checked in every pose  (3 checks on face_eyes, points face_eyes)
+      running 0% 
+      running 15% building the reference character (child_average)
+      running 40% attaching and checking
+      succeeded 100% recording the published version
+PASS  glasses: publisher re-checked accessory.blend and published 1.0  (null)
+PASS  watch: accessory created (wristwear)  (ACC-005)
+      running 0% 
+      running 5% building the reference body (child_average)
+      running 30% rigging the reference character
+      running 65% close-up
+      running 100% done
+      succeeded 100% done
+PASS  watch: built, attached to the reference body and attach-checked in every pose  (3 checks on wrist_L, points wrist_L, wrist_R)
+      running 0% 
+      running 15% building the reference character (child_average)
+      running 40% attaching and checking
+      succeeded 100% recording the published version
+PASS  watch: publisher re-checked accessory.blend and published 1.0  (null)
+PASS  beanie: accessory created (headwear)  (ACC-006)
+      running 0% 
+      running 5% building the reference body (child_average)
+      running 30% rigging the reference character
+      running 65% close-up
+      running 85% GLB
+      succeeded 100% done
+PASS  beanie: built, attached to the reference body and attach-checked in every pose  (3 checks on head_top, points head_top)
+      running 0% 
+      running 15% building the reference character (child_average)
+      running 40% attaching and checking
+      succeeded 100% recording the published version
+PASS  beanie: publisher re-checked accessory.blend and published 1.0  (null)
+PASS  an accessory on a point it does not go on is refused before anything is built  (ACC-004@1.0 goes on face_eyes, not head_top; accessories[0] is already on head_top)
+PASS  two_alis: scene created and every pin resolved  (SCENE-003)
+PASS  two_alis: each instance pins exact versions and an approved fit  (ali_school: CHAR-006@1.0 + OUTFIT-007@1.0 + ACC-004 on face_eyes, ACC-005 on wrist_R; ali_winter: CHAR-006@1.0 + OUTFIT-008@1.0 + ACC-006 on head_top)
+      running 0% 
+      running 5% assembling ali_school (CHAR-006@1.0)
+      running 30% assembling ali_winter (CHAR-006@1.0)
+      running 70% rendering preview frames
+      succeeded 100% assembled
+PASS  two_alis: Blender assembled scene.blend (assemble_scene job)  (2 instance(s), scene.blend 9fc24c4abbf4bc60)
+PASS  two_alis: every accessory attach-checked on its instance  (ali_school: 6 checks; ali_winter: 3 checks)
+PASS  two_alis: scene.blend links only the pinned files, by relative path  (//../assets/accessory/ACC-004/1.0/accessory.blend, //../assets/accessory/ACC-005/1.0/accessory.blend, //../assets/accessory/ACC-006/1.0/accessory.blend, //../assets/character/CHAR-006/1.0/character.blend, //../assets/outfit/OUTFIT-007/1.0/outfit.blend, //../assets/outfit/OUTFIT-008/1.0/outfit.blend)
+PASS  two_alis: the pinned sources were byte-identical after assembly  (7 files hashed before and after)
+PASS  winter_walk: scene created and every pin resolved  (SCENE-004)
+PASS  winter_walk: each instance pins exact versions and an approved fit  (ali: CHAR-006@1.0 + OUTFIT-008@1.0 + ACC-006 on head_top, ACC-005 on wrist_L)
+      running 0% 
+      running 5% assembling ali (CHAR-006@1.0)
+      running 70% rendering preview frames
+      succeeded 100% assembled
+PASS  winter_walk: Blender assembled scene.blend (assemble_scene job)  (1 instance(s), scene.blend 4045195e48f37713)
+PASS  winter_walk: every accessory attach-checked on its instance  (ali: 6 checks)
+PASS  winter_walk: scene.blend links only the pinned files, by relative path  (//../assets/accessory/ACC-005/1.0/accessory.blend, //../assets/accessory/ACC-006/1.0/accessory.blend, //../assets/character/CHAR-006/1.0/character.blend, //../assets/outfit/OUTFIT-008/1.0/outfit.blend)
+PASS  winter_walk: the pinned sources were byte-identical after assembly  (5 files hashed before and after)
+PASS  the two scene files are separate  (two scene.blend files)
+      running 0% 
+      running 70% rendering from the reopened file
+      succeeded 100% reopened and checked
+PASS  two_alis: reopened in a fresh workspace and matched its manifest (verify_scene job)  (31 checks, opened from scene/scene.blend)
+PASS  two_alis: overrides, outfits, accessories, placement, face and clips all came back  (20 kinds of check)
+      running 0% 
+      running 70% rendering from the reopened file
+      succeeded 100% reopened and checked
+PASS  winter_walk: reopened in a fresh workspace and matched its manifest (verify_scene job)  (18 checks, opened from scene/scene.blend)
+PASS  winter_walk: overrides, outfits, accessories, placement, face and clips all came back  (18 kinds of check)
+PASS  ali: source asset unchanged (registry rows, stored bytes, status)  (10 files, published)
+PASS  school: source asset unchanged (registry rows, stored bytes, status)  (8 files, published)
+PASS  winter: source asset unchanged (registry rows, stored bytes, status)  (8 files, published)
+PASS  glasses: source asset unchanged (registry rows, stored bytes, status)  (8 files, published)
+PASS  watch: source asset unchanged (registry rows, stored bytes, status)  (8 files, published)
+PASS  beanie: source asset unchanged (registry rows, stored bytes, status)  (8 files, published)
+PASS  no character was created or copied by the scenes  (5 characters)
+PASS  Ali 1.0 is pinned three times across the two scenes, by reference  (SCENE-003 v1 ali_school, SCENE-003 v1 ali_winter, SCENE-004 v1 ali)
+
+Phase 5 acceptance: all criteria passed in 260 s. Files in /tmp/claude-0/-home-claude-animation-studio/11dd7093-adb9-51a9-ac75-2e5c8bd21e51/scratchpad/phase5b
+EXIT 0
