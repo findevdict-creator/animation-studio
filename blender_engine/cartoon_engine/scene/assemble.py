@@ -136,7 +136,7 @@ def assemble_instance(ws: Path, inst: ResolvedInstance, scene, *, check_accessor
             report["accessory_check"] = {"ok": r.ok, "failed": r.failed(), "checks": r.checks}
 
     use_fk(parts.rig)
-    report["animations"] = assign(parts.rig, inst.animations, scene.render.fps, inst.key)
+    report["animations"] = assign(parts.rig, inst.animations, scene.render.fps, inst.key, ws=ws)
     report["face"] = build_face_track(parts.rig, inst, scene.render.fps, scene.frame_start, scene.frame_end, profile)
     # placement last: binding and checks above assume the rig at its rest placement
     parts.rig.matrix_world = _matrix(inst.transform)
@@ -162,8 +162,27 @@ def assemble(ws: Path, rs: ResolvedScene, progress=None) -> tuple[list[Assembled
         if progress:
             progress(i / max(len(rs.instances), 1), f"assembling {inst.key} ({inst.character.ref})")
         built.append(assemble_instance(ws, inst, scene))
+    add_dialogue_audio(ws, rs, scene)
     scene.frame_set(rs.frame_start)
     return built, scene
+
+
+def add_dialogue_audio(ws: Path, rs: ResolvedScene, scene) -> list[dict]:
+    """A sound strip per recorded line, one channel per instance, so a preview or the edit
+    plays the dialogue the mouths were synced to."""
+    out = []
+    lines = [(i, inst, d) for i, inst in enumerate(rs.instances) for d in inst.dialogue if d.audio is not None]
+    if not lines:
+        return out
+    se = scene.sequence_editor_create()
+    strips = se.strips if hasattr(se, "strips") else se.sequences
+    for i, inst, d in lines:
+        strip = strips.new_sound(f"{inst.key}:{d.audio.code}", str((ws / d.audio.path).resolve()), channel=1 + i,
+                                 frame_start=d.start_frame)
+        strip["studio_audio"] = f"{d.audio.code}#{d.audio.sha256}"
+        out.append({"strip": strip.name, "frame_start": d.start_frame, "audio": d.audio.code})
+    scene["studio_dialogue_audio"] = len(out)
+    return out
 
 
 # ------------------------------------------------------------------ camera and light

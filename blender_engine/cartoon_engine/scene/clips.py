@@ -1,5 +1,6 @@
-"""The built-in clip catalog (``CLIP-*@0.1``, a stand-in until the animation library of
-Phase 6) and assigning clips to an instance as NLA strips.
+"""Assigning animations to an instance as NLA strips: library animations (``ANIM-*``,
+Phase 6) and the built-in Phase 5 stand-in catalog (``CLIP-*@0.1``), kept so the scene
+versions made with it still build.
 
 Each clip is a few key poses on the rig's FK controls, made with the same pose helpers as
 the fit check. A clip becomes one Action per instance (scene-local, never in a library
@@ -83,17 +84,40 @@ def clip_action(rig, key: str, name: str, profile: RigProfile = CARTOON_HUMANOID
     return action
 
 
-def assign(rig, uses: tuple[ResolvedClipUse, ...], fps: int, prefix: str) -> list[dict]:
-    """One NLA track per assignment, bottom to top in manifest order."""
+def assign(rig, uses: tuple[ResolvedClipUse, ...], fps: int, prefix: str, ws=None) -> list[dict]:
+    """One NLA track per assignment, bottom to top in manifest order. Library animations
+    (``ANIM-*``) are appended from their pinned file and fitted to this rig
+    (``cartoon_engine.animation.apply``); a travelling one also moves the root."""
+    from pathlib import Path
+
+    from cartoon_engine.animation import apply as A
+
     rig.animation_data_create()
     actions: dict[str, object] = {}
     out = []
+    travel: list[tuple[float, float, float]] = []
     for i, use in enumerate(uses):
+        name = f"{i:02d}_{use.key}"
+        if use.source == "library":
+            if use.clip not in actions:
+                actions[use.clip] = A.library_action(Path(ws), rig, use, f"{prefix}:{use.clip}")
+            action, ratio, compat = actions[use.clip]
+            track, strip = A.strip_for(rig, action, name, use, fps)
+            info = {"track": track.name, "action": action.name, "clip": use.clip, "source": "library",
+                    "frame_start": strip.frame_start, "frame_end": round(strip.frame_end, 3), "repeat": use.repeat,
+                    "scale": round(strip.scale, 4), "leg_ratio": round(ratio, 4),
+                    "action_source": action["studio_source"]}
+            if compat.travels and use.travel and compat.stride_m > 0:
+                metres = compat.stride_m * ratio * use.repeat
+                travel.append((strip.frame_start, strip.frame_end, metres))
+                info["travel_m"] = round(metres, 4)
+            out.append(info)
+            continue
         if use.key not in actions:
             actions[use.key] = clip_action(rig, use.key, f"{prefix}:{use.key}")
         action = actions[use.key]
         track = rig.animation_data.nla_tracks.new()
-        track.name = f"{i:02d}_{use.key}"
+        track.name = name
         strip = track.strips.new(f"{use.key}", use.start_frame, action)
         strip.scale = (fps / 24.0) / use.speed
         strip.repeat = float(use.repeat)
@@ -104,4 +128,7 @@ def assign(rig, uses: tuple[ResolvedClipUse, ...], fps: int, prefix: str) -> lis
             strip.influence = use.influence
         out.append({"track": track.name, "action": action.name, "clip": use.clip, "frame_start": strip.frame_start,
                     "frame_end": round(strip.frame_end, 3), "repeat": use.repeat, "scale": round(strip.scale, 4)})
+    t = A.build_travel(rig, travel, f"{prefix}:travel")
+    if t:
+        out.append({"travel": t})
     return out

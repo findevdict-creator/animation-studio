@@ -21,8 +21,10 @@ def sha256(path: Path) -> str:
 
 
 def expected_files(rs: ResolvedScene) -> dict[str, str]:
-    """workspace-relative path -> SHA-256 of every pinned file."""
-    return {f"{p.path}/{name}": sha for p in rs.pins() for name, sha in p.files.items()}
+    """workspace-relative path -> SHA-256 of every pinned file and dialogue recording."""
+    out = {f"{p.path}/{name}": sha for p in rs.pins() for name, sha in p.files.items()}
+    out.update({a.path: a.sha256 for a in rs.audio()})
+    return out
 
 
 def hash_sources(ws: Path, rs: ResolvedScene) -> dict[str, str]:
@@ -58,4 +60,4 @@ def library_check(blend_dir: Path, ws: Path, rs: ResolvedScene) -> dict:
             bad.append(stored)
     used = {x["workspace_path"] for x in libs}
     return {"libraries": libs, "ok": not bad, "outside_or_absolute": bad,
-            "pinned_but_not_linked": sorted(p for p in allowed if p not in used and "/outfit/" not in p)}
+            "pinned_but_not_linked": sorted(p for p in allowed if p not in used and "/outfit/" not in p and "/animation/" not in p)}

@@ -16,9 +16,11 @@ def handlers() -> dict[str, Handler]:
         blender_smoke,
         fit_outfit,
         generate_accessory,
+        generate_animation,
         generate_character,
         generate_outfit,
         publish_accessory,
+        publish_animation,
         publish_character,
         publish_outfit,
         verify_scene,
@@ -28,4 +30,5 @@ def handlers() -> dict[str, Handler]:
             "generate_accessory": generate_accessory.run, "publish_accessory": publish_accessory.run,
             "blender_smoke": blender_smoke.run, "generate_character": generate_character.run,
             "publish_character": publish_character.run, "generate_outfit": generate_outfit.run,
-            "fit_outfit": fit_outfit.run, "publish_outfit": publish_outfit.run}
+            "fit_outfit": fit_outfit.run, "publish_outfit": publish_outfit.run,
+            "generate_animation": generate_animation.run, "publish_animation": publish_animation.run}

@@ -5,8 +5,10 @@ properties the character's drivers read (``expr_happy`` 0..1 drives the happy br
 mouth shape keys). The keys live in one scene-local Action on its own NLA track named
 ``face``; the character file is not touched.
 
-Dialogue is a placeholder for lip sync (Phase 6): between a line's frames the mouth steps
-through a fixed viseme cycle, then rests.
+Dialogue: a line with a recording (``AUDIO-NNN``) is lip-synced: each mouth cue found in the
+audio by the lipsync job keys its viseme at the cue's time from the line's start frame
+(1 for that viseme, 0 for the others, so the mouth eases between shapes). A line without a
+recording falls back to a fixed viseme cycle between its frames.
 """
 
 from __future__ import annotations
@@ -43,7 +45,7 @@ def build_face_track(rig, inst: ResolvedInstance, fps: int, start: int, end: int
     action = bpy.data.actions.new(f"{inst.key}:face")
     rig.animation_data.action = action
 
-    def key(prop: str, value: float, frame: int) -> None:
+    def key(prop: str, value: float, frame: float) -> None:
         nonlocal count
         count += 1
         pb[prop] = float(value)
@@ -63,7 +65,19 @@ def build_face_track(rig, inst: ResolvedInstance, fps: int, start: int, end: int
                 key(f"eye_blink_{side}", 1.0, f + 1)
                 key(f"eye_blink_{side}", 0.0, f + 3)
         lines = []
+        all_vis = [f"vis_{v}" for v in profile.visemes]
         for d in sorted(inst.dialogue, key=lambda d: d.start_frame):
+            if getattr(d, "audio", None) is not None:
+                cues = [c for c in d.audio.cues if d.start_frame + c.start_s * fps < d.end_frame]
+                for c in cues:
+                    f = d.start_frame + c.start_s * fps
+                    for v in all_vis:
+                        key(v, 1.0 if v == f"vis_{c.viseme}" else 0.0, f)
+                for v in all_vis:
+                    key(v, 1.0 if v == "vis_rest" else 0.0, d.end_frame)
+                lines.append({"start_frame": d.start_frame, "end_frame": d.end_frame, "audio": d.audio.code,
+                              "cues": len(cues), "analyser": d.audio.analyser})
+                continue
             frames = list(range(d.start_frame, d.end_frame, FLAP_STEP))
             for i, f in enumerate(frames):
                 for v in sorted(set(FLAP)):
