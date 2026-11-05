@@ -515,6 +515,40 @@ The prototype is done when all of these pass on M's PC (and are recorded in an
 12. **AC12 Fits the GPU.** No stage crashes with an out-of-memory error on the detected tier
     when using the models `assetgen models list` offers for it.
 
+### 9.1 Common bake-off test (comparing look routes)
+
+How a character looks is the main constraint of the whole studio, so this AI-generated
+route will be compared against other ways of making characters: toon-shaded 3D (the
+studio's own template route) and a true 2D cutout approach (planned in a separate
+document). Every route makes **the same short clip**, so the comparison is fair.
+
+**The test clip (identical for every route):**
+
+| Item | Fixed value |
+|---|---|
+| Character | One girl, about 8 years old, in a soft, rounded, feature-film 3D cartoon style (a "Pixar-like" look, but an original design). The same written description and the same front reference picture are given to every route. |
+| Action | She walks in from the left, about four steps, stops facing the camera, and says one line. |
+| Line | "Hi! I'm Zara, and today we're going to the park!" One recorded audio file, shared by every route. |
+| Length | About 6 seconds, 24 frames per second. |
+| Scene | The studio's living room environment (`ENV-001`), same camera mark (`wide`), same lighting preset (warm indoor). A 2D route uses a still render of the same room as its background. |
+| Output | 640 × 360 MP4 with the audio. |
+
+**What this route has to do to make the clip.** The prototype gives a static character mesh
+and a rig test (section 6.7). For the bake-off it also needs: the Rigify rig from the rig
+test, a walk applied from the studio's walk animation, and a simple mouth (a jaw bone, or a
+few mouth shapes made by hand) for the line, since generated meshes have no face shape keys
+(section 7.2). That extra work is counted, because it is part of the real cost of this route.
+
+**What is recorded for each route:**
+
+1. The clip itself, side by side with the other routes.
+2. M's rating of the look (appealing, consistent from every angle, fits a children's cartoon)
+   and of the motion (walk, lip sync) on a 1 to 5 scale.
+3. Hands-on time: hours of human fixing needed, separate from waiting time.
+4. Machine time: generation and render time on M's PC.
+5. Where it broke: the steps that needed a workaround, and whether they would repeat for
+   every new character.
+
 ---
 
 ## 10. Risks
