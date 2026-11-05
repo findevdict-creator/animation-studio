@@ -5,9 +5,9 @@
 # with STUDIO_BLENDER_MODE=wheel. BLENDER_SOURCE=binary downloads the official Linux build,
 # checks its SHA-256 and runs jobs with the blender executable; use it for GPU render workers.
 #
-# --target media builds the media worker (lip sync): ffmpeg, no Blender. With
-# WITH_RHUBARB=1 it also installs Rhubarb Lip Sync 1.14.0 (MIT), checked against its
-# SHA-256; without it the worker uses the built-in phonetic analyser.
+# --target media builds the media worker (lip sync): ffmpeg and Rhubarb Lip Sync 1.14.0
+# (MIT), checked against its SHA-256, no Blender. WITH_RHUBARB=0 leaves Rhubarb out; the
+# worker then uses the built-in phonetic analyser (set STUDIO_RHUBARB_BINARY empty).
 ARG BLENDER_SOURCE=wheel
 ARG PYTHON_BASE=python:3.13-slim-bookworm
 
@@ -48,7 +48,7 @@ RUN set -eux; \
 ENV STUDIO_BLENDER_MODE=binary STUDIO_BLENDER_BINARY=/opt/blender/blender
 
 FROM common AS media
-ARG WITH_RHUBARB=0
+ARG WITH_RHUBARB=1
 ARG RHUBARB_VERSION=1.14.0
 ARG RHUBARB_SHA256=a9a9074862cff47b2d59b8bf399a678a3b0b74f9452ad6ad94cb292913dd8667
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg \
@@ -59,7 +59,7 @@ RUN set -eux; if [ "${WITH_RHUBARB}" = "1" ]; then \
       echo "${RHUBARB_SHA256}  /tmp/rhubarb.zip" | sha256sum -c -; \
       unzip -q /tmp/rhubarb.zip -d /opt; mv /opt/Rhubarb-Lip-Sync-${RHUBARB_VERSION}-Linux /opt/rhubarb; rm /tmp/rhubarb.zip; \
       ln -s /opt/rhubarb/rhubarb /usr/local/bin/rhubarb; fi
-ENV STUDIO_WORK_ROOT=/work
+ENV STUDIO_WORK_ROOT=/work STUDIO_RHUBARB_BINARY=/usr/local/bin/rhubarb
 USER studio
 WORKDIR /work
 CMD ["celery", "-A", "studio_workers.tasks", "worker", "-Q", "media", "--concurrency", "2", "--hostname", "media@%h"]

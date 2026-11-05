@@ -207,3 +207,17 @@ def test_scene_face_follows_the_recording(api_as, db, storage_as, dispatcher, tm
     assert audio["stored"] == f"//../audio/{clip['code']}/dialogue.wav" and audio["sha256"] == clip["wav_sha256"]
     talking = next(c for n, c in checks.items() if n.startswith("ali:") and c.get("audio") == clip["code"])
     assert talking["prop"] > 0.5, talking
+
+
+def test_a_configured_rhubarb_that_is_missing_is_an_error(tmp_path):
+    wav, duration = normalised(tmp_path)
+    with pytest.raises(RuntimeError, match="not an executable"):
+        L.analyse(wav, duration, TEXT, tmp_path, rhubarb=str(tmp_path / "no-such-rhubarb"))
+
+
+@pytest.mark.skipif(shutil.which("rhubarb") is None, reason="Rhubarb Lip Sync is not installed here")
+def test_real_rhubarb(tmp_path):
+    wav, duration = normalised(tmp_path)
+    r = L.analyse(wav, duration, TEXT, tmp_path, rhubarb=shutil.which("rhubarb"))
+    assert r.analyser == "rhubarb-1.14.0" and r.cues[0].start_s == 0
+    assert {c.viseme for c in r.cues} - {"rest"}

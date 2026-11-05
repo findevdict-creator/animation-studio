@@ -187,16 +187,23 @@ def add_dialogue_audio(ws: Path, rs: ResolvedScene, scene) -> list[dict]:
 
 # ------------------------------------------------------------------ camera and light
 def stage_camera(scene, built: list[Assembled], rs: ResolvedScene):
-    """A camera and two suns framing the cast (or the focus instance) at the first frame."""
+    """A fixed camera and two suns framing the cast (or the focus instance) over the whole
+    scene: the bounds are taken at frames across it, so a character that walks stays in shot."""
     import bpy
 
     from cartoon_engine.character import previews as P
 
     targets = [b for b in built if rs.camera.focus in (None, b.key)]
     objs = [o for b in targets for o in (*b.parts.meshes(), *b.garments, *(a.obj for a in b.accessories))]
+    span = max(rs.frame_end - rs.frame_start, 0)
+    samples = sorted({rs.frame_start + round(span * k / 8) for k in range(9)})
+    boxes = []
+    for f in samples:
+        scene.frame_set(f)
+        boxes.append(P._bounds(objs))
     scene.frame_set(rs.frame_start)
-    lo, hi = P._bounds(objs)
-    lo, hi = np.asarray(lo), np.asarray(hi)
+    lo = np.min([np.asarray(b[0]) for b in boxes], axis=0)
+    hi = np.max([np.asarray(b[1]) for b in boxes], axis=0)
     if rs.camera.preset != "wide":
         top = hi[2]
         share = 0.55 if rs.camera.preset == "medium" else 0.3
@@ -208,6 +215,7 @@ def stage_camera(scene, built: list[Assembled], rs: ResolvedScene):
     scene.collection.objects.link(cam)
     scene.camera = cam
     P._frame(cam, lo, hi, rs.camera.angle_deg, margin=1.2, aspect=16 / 9, elevation_deg=8.0)
+    _fit_box(scene, cam, lo, hi)
     for name, energy, rot in (("SUN_key", 3.0, (50, 0, -35)), ("SUN_rim", 1.4, (60, 0, 160))):
         data = bpy.data.lights.new(name, "SUN")
         data.energy = energy
@@ -233,6 +241,27 @@ def stage_camera(scene, built: list[Assembled], rs: ResolvedScene):
     floor.materials.append(mat)
     scene.collection.objects.link(fobj)
     return cam
+
+
+def _fit_box(scene, cam, lo: np.ndarray, hi: np.ndarray, border: float = 0.04) -> None:
+    """Back the camera off along its view line until every corner of the box is in shot. The
+    first guess treats the box as flat; a walk toward the camera is deep, and its near end
+    would be cut off."""
+    import itertools
+
+    import bpy
+    from bpy_extras.object_utils import world_to_camera_view
+    from mathutils import Vector
+
+    scene.render.resolution_x, scene.render.resolution_y = 1920, 1080  # the 16:9 the previews render at
+    center = Vector(((lo + hi) / 2).tolist())
+    corners = [Vector(c) for c in itertools.product(*zip(lo.tolist(), hi.tolist(), strict=True))]
+    for _ in range(40):
+        bpy.context.view_layer.update()
+        views = [world_to_camera_view(scene, cam, c) for c in corners]
+        if all(border <= v.x <= 1 - border and border <= v.y <= 1 - border and v.z > 0 for v in views):
+            return
+        cam.location = center + (cam.location - center) * 1.08
 
 
 def render_frames(scene, out_dir: Path, frames: list[int], res: tuple[int, int], samples: int) -> list[Path]:

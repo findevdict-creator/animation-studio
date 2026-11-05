@@ -5,11 +5,12 @@ find its mouth cues. Runs in the media worker; no Blender.
 PCM WAV at 16 kHz, the format Rhubarb reads, with silence padding left alone so cue times
 match the original. Longer than ``MAX_AUDIO_SECONDS`` is refused.
 
-**Analyse.** Two analysers, chosen by what the worker has:
+**Analyse.** Two analysers, chosen by configuration:
 
-* ``rhubarb``: Rhubarb Lip Sync (``STUDIO_RHUBARB_PATH``), with the transcript as its dialog
-  file when given. Its Preston Blair shapes are mapped by ``cues_from_rhubarb``.
-* ``phonetic`` (built in, used when no Rhubarb binary is configured): finds the voiced
+* ``rhubarb`` (the default in the worker-media image): Rhubarb Lip Sync 1.14.0 at
+  ``STUDIO_RHUBARB_BINARY``, with the transcript as its dialog file when given. Its Preston Blair shapes are mapped by ``cues_from_rhubarb``.
+* ``phonetic`` (built in, used only when ``STUDIO_RHUBARB_BINARY`` is empty; a configured
+  binary that is missing is an error, never a silent switch): finds the voiced
   stretches of the recording from its loudness, then lays the transcript's visemes
   (spelling rules, below) across them in order, longer for vowels; when the transcript has
   as many phrases (split at punctuation) as the recording has pauses, each phrase goes in
@@ -220,7 +221,9 @@ def analyse(wav: Path, duration_s: float, dialog_text: str | None, workdir: Path
             rhubarb: str | None = None) -> LipSync:
     """Mouth cues for a normalised recording, with Rhubarb when ``rhubarb`` names a binary."""
     text = (dialog_text or "").strip() or None
-    if rhubarb and shutil.which(rhubarb):
+    if rhubarb:
+        if not shutil.which(rhubarb):
+            raise RuntimeError(f"STUDIO_RHUBARB_BINARY is {rhubarb!r}, which is not an executable on this worker")
         cues, name = rhubarb_cues(wav, text, rhubarb, workdir)
         return LipSync(analyser=name, recognizer="pocketSphinx", dialog_text=text, duration_s=duration_s,
                        cues=tuple(cues))
