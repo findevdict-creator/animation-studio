@@ -1,0 +1,207 @@
+{
+  "scene": "Dev walks the same walk",
+  "manifest_digest": "a675fa4282ad9b6724133baf8d7ecb94f201d1fa761b9edb7b731c2f26bf88cb",
+  "scene_blend_sha256": "e032862518a63556926175756ab5bcb3cdae84260d411a0934a4e34b0825136a",
+  "opened_from": "scene/scene.blend",
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "libraries_resolve",
+      "ok": true,
+      "missing": [],
+      "libraries": [
+        {
+          "stored": "//../assets/character/CHAR-013/1.0/character.blend",
+          "workspace_path": "assets/character/CHAR-013/1.0/character.blend",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "manifest_digest",
+      "ok": true
+    },
+    {
+      "name": "frame_range",
+      "ok": true
+    },
+    {
+      "name": "dev:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "dev:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Dev"
+      ]
+    },
+    {
+      "name": "dev:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-013/1.0/character.blend",
+      "pin": "CHAR-013@1.0"
+    },
+    {
+      "name": "dev:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-013/1.0/character.blend",
+      "head": "//../assets/character/CHAR-013/1.0/character.blend"
+    },
+    {
+      "name": "dev:placement",
+      "ok": true,
+      "location": [
+        0.6,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "dev:expressions_play",
+      "ok": true,
+      "keys": 0,
+      "mismatches": []
+    },
+    {
+      "name": "dev:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_anim_011",
+          "dev:ANIM-011@1.0",
+          1.0
+        ],
+        [
+          "01_anim_015",
+          "dev:ANIM-015@1.0",
+          64.0
+        ]
+      ],
+      "found": [
+        [
+          "00_anim_011",
+          "dev:ANIM-011@1.0",
+          1.0
+        ],
+        [
+          "01_anim_015",
+          "dev:ANIM-015@1.0",
+          64.0
+        ],
+        [
+          "face",
+          "dev:face",
+          31.0
+        ],
+        [
+          "travel",
+          "dev:travel",
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "dev:animation:ANIM-011@1.0",
+      "ok": true,
+      "source": "ANIM-011@1.0#fc9200dde11ad2338ad94291fbfebbc6d315795cabb2c79d0e6852a78bede9d8",
+      "leg_ratio": 1.6376
+    },
+    {
+      "name": "dev:travels:ANIM-011@1.0",
+      "ok": true,
+      "moved_m": 1.8708,
+      "expected_m": 1.8708,
+      "frames": [
+        1,
+        49
+      ]
+    },
+    {
+      "name": "dev:feet_planted:ANIM-011@1.0",
+      "ok": true,
+      "max_slide_cm": 0.03,
+      "limit_cm": 1.5,
+      "slide_cm": {
+        "ankle.L": 0.03,
+        "ball.L": 0.0,
+        "tip.L": 0.0,
+        "ankle.R": 0.03,
+        "ball.R": 0.0,
+        "tip.R": 0.0
+      },
+      "frames": [
+        7,
+        43
+      ]
+    },
+    {
+      "name": "dev:animation:ANIM-015@1.0",
+      "ok": true,
+      "source": "ANIM-015@1.0#b394b88b23c3c7e82862c51add925691af7f5100993c706204956ca0dd1b5bbd",
+      "leg_ratio": 1.6376
+    },
+    {
+      "name": "dev:travels:ANIM-015@1.0",
+      "ok": true,
+      "moved_m": 2.3445,
+      "expected_m": 2.3445,
+      "frames": [
+        64,
+        132
+      ]
+    },
+    {
+      "name": "dev:feet_planted:ANIM-015@1.0",
+      "ok": true,
+      "max_slide_cm": 2.27,
+      "limit_cm": 3.0,
+      "slide_cm": {
+        "ankle.L": 0.0,
+        "ball.L": 0.0,
+        "tip.L": 0.0,
+        "ankle.R": 2.27,
+        "ball.R": 1.41,
+        "tip.R": 0.0
+      },
+      "frames": [
+        70,
+        126
+      ]
+    },
+    {
+      "name": "renders",
+      "ok": true,
+      "frames": [
+        1,
+        30,
+        70,
+        100,
+        130
+      ]
+    },
+    {
+      "name": "sources_unchanged",
+      "ok": true,
+      "changed": [],
+      "files": {
+        "assets/animation/ANIM-011/1.0/animation.blend": "fc9200dde11ad2338ad94291fbfebbc6d315795cabb2c79d0e6852a78bede9d8",
+        "assets/animation/ANIM-015/1.0/animation.blend": "b394b88b23c3c7e82862c51add925691af7f5100993c706204956ca0dd1b5bbd",
+        "assets/character/CHAR-013/1.0/character.json": "13b76802459ba825eed3ebd49d0869003454f1a8ab4d20832fb214bfcaebc073",
+        "assets/character/CHAR-013/1.0/character.blend": "329c8e7220d208f5f413a2238c71a999a75539256a2f5e72583566f4ec59ae55"
+      }
+    }
+  ],
+  "sources": {
+    "before": {
+      "assets/animation/ANIM-011/1.0/animation.blend": "fc9200dde11ad2338ad94291fbfebbc6d315795cabb2c79d0e6852a78bede9d8",
+      "assets/animation/ANIM-015/1.0/animation.blend": "b394b88b23c3c7e82862c51add925691af7f5100993c706204956ca0dd1b5bbd",
+      "assets/character/CHAR-013/1.0/character.json": "13b76802459ba825eed3ebd49d0869003454f1a8ab4d20832fb214bfcaebc073",
+      "assets/character/CHAR-013/1.0/character.blend": "329c8e7220d208f5f413a2238c71a999a75539256a2f5e72583566f4ec59ae55"
+    },
+    "unchanged": true
+  },
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0"
+}

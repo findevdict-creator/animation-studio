@@ -1,0 +1,82 @@
+PASS  Ali: character created  (CHAR-012)
+PASS  generate job accepted for the draft  (01a1aa02-0a47-7492-88ae-57db957f586a)
+      succeeded 100% done
+PASS  Blender built and validated the draft  (null)
+PASS  the build is attached to the draft and current  (8 files, built from 6816efcad0ba)
+PASS  draft submitted for review
+PASS  reviewer approved it
+PASS  publish job accepted on the publisher queue  (01a1aa02-9a9c-70ee-b2b5-d546ca8b9a86)
+      succeeded 100% recording the published version
+PASS  publisher re-validated, copied and recorded the version  (null)
+PASS  Ali 1.0 published (child_average)  (library/characters/01a1aa02-07ae-7e36-ac14-700e6ef06afe/versions/1.0/manifest.json)
+PASS  Dev: character created  (CHAR-013)
+PASS  generate job accepted for the draft  (01a1aa02-aab3-7169-8d6f-9d159d3deace)
+      succeeded 100% done
+PASS  Blender built and validated the draft  (null)
+PASS  the build is attached to the draft and current  (8 files, built from f7e711a7ef0f)
+PASS  draft submitted for review
+PASS  reviewer approved it
+PASS  publish job accepted on the publisher queue  (01a1aa03-2960-724b-9b9f-519baf713a03)
+      succeeded 100% recording the published version
+PASS  publisher re-validated, copied and recorded the version  (null)
+PASS  Dev 1.0 published (adult_average)  (library/characters/01a1aa02-aa97-7483-b2dd-3cf6f3bfd86a/versions/1.0/manifest.json)
+PASS  walk: animation created (locomotion)  (ANIM-011)
+      succeeded 100% done
+PASS  walk: built and play-checked by Blender on child_average, adult_average  (child_average: slide 0.44 cm, stretch 0.9895; adult_average: slide 0.03 cm, stretch 0.9895; 24 frames, 18 controls, stride 0.57 m; failed: [])
+      succeeded 100% recording the published version
+PASS  walk: publisher re-checked animation.blend and published 1.0  (null)
+PASS  talk: animation created (talk)  (ANIM-012)
+      succeeded 100% done
+PASS  talk: built and play-checked by Blender on child_average, adult_average  (child_average: slide 0.0 cm, stretch 0.9943; adult_average: slide 0.0 cm, stretch 0.9943; 96 frames, 15 controls; failed: [])
+      succeeded 100% recording the published version
+PASS  talk: publisher re-checked animation.blend and published 1.0  (null)
+PASS  happy: animation created (expression)  (ANIM-013)
+      succeeded 100% done
+PASS  happy: built and play-checked by Blender on child_average, adult_average  (child_average: slide 0.0 cm, stretch 1.0; adult_average: slide 0.0 cm, stretch 1.0; 48 frames, 3 controls; failed: [])
+      succeeded 100% recording the published version
+PASS  happy: publisher re-checked animation.blend and published 1.0  (null)
+PASS  wave: animation created (gesture)  (ANIM-014)
+      succeeded 100% done
+PASS  wave: built and play-checked by Blender on child_average  (child_average: slide 0.0 cm, stretch 1.0; 48 frames, 8 controls; failed: [])
+      succeeded 100% recording the published version
+PASS  wave: publisher re-checked animation.blend and published 1.0  (null)
+PASS  CMU walk take uploaded  (uploads/01a1aa04-d058-77b3-ae47-4e1344f98d94/cmu_02_01_walk.bvh sha256 cf56db43157a)
+PASS  mocap: animation created (locomotion)  (ANIM-015)
+      succeeded 100% done
+PASS  mocap: built and play-checked by Blender on child_average, adult_average  (child_average: slide 1.25 cm, stretch 1.0; adult_average: slide 1.85 cm, stretch 1.0; 68 frames, 20 controls, stride 1.43 m; failed: [])
+      succeeded 100% recording the published version
+PASS  mocap: publisher re-checked animation.blend and published 1.0  (null)
+PASS  the gallery finds both walks by category
+PASS  dialogue clip created, lipsync job on the media queue  (AUDIO-003)
+      succeeded 100% finding the mouth shapes
+PASS  the media worker normalised the recording and found its mouth cues  (4.34 s, 16 cues (AI, E, MBP, O, U), analyser rhubarb-1.14.0)
+PASS  a wave declared for child bodies is refused on the adult before anything is built  (ANIM-014@1.0 cannot play on CHAR-013@1.0: the animation is declared for ['child_average']; the character is adult_average)
+PASS  ali_walks_and_talks: scene created; its animations pinned and compatible with the rig  (SCENE-009)
+PASS  ali_walks_and_talks: each library animation is pinned by exact version and file hash  (ANIM-011@1.0 fc9200dde1, ANIM-012@1.0 eb4495bdf3, ANIM-013@1.0 7f2e7e79cf)
+      succeeded 100% assembled
+PASS  ali_walks_and_talks: Blender assembled scene.blend  (scene.blend 32d32d63969102f5)
+PASS  ali_walks_and_talks: every animation fitted to CHAR-012's legs  (ANIM-011@1.0 x1.0363, travels 1.1839 m; ANIM-012@1.0 x1.0363; ANIM-013@1.0 x1.0363)
+PASS  dev_walks: scene created; its animations pinned and compatible with the rig  (SCENE-010)
+PASS  dev_walks: each library animation is pinned by exact version and file hash  (ANIM-011@1.0 fc9200dde1, ANIM-015@1.0 b394b88b23)
+      succeeded 100% assembled
+PASS  dev_walks: Blender assembled scene.blend  (scene.blend e032862518a63556)
+PASS  dev_walks: every animation fitted to CHAR-013's legs  (ANIM-011@1.0 x1.6376, travels 1.8708 m; ANIM-015@1.0 x1.6376, travels 2.3445 m)
+      succeeded 100% reopened and checked
+PASS  ali_walks_and_talks: reopened in a fresh workspace and matched its manifest  (19 checks)
+      succeeded 100% reopened and checked
+PASS  dev_walks: reopened in a fresh workspace and matched its manifest  (18 checks)
+PASS  Ali walks: the root travelled the stride the feet imply and the planted feet held  (moved 1.1839 m (expected 1.1839), worst slide 0.46 cm (limit 1.5))
+PASS  Dev walks: the root travelled the stride the feet imply and the planted feet held  (moved 1.8708 m (expected 1.8708), worst slide 0.03 cm (limit 1.5))
+PASS  the same walk version plays on two characters, scaled to each one's legs  (leg ratio Ali 1.0363, Dev 1.6376)
+PASS  the motion-capture walk plays on Dev with its feet planted  (worst slide 2.27 cm (limit 3.0))
+PASS  Ali talks: the recording plays from the scene and the mouth follows it  (//../audio/AUDIO-003/dialogue.wav; frame 68: vis_U at 1.0)
+PASS  Ali's expressions play (neutral, happy, excited, then the happy take)  (3 expression keys measured on the face)
+PASS  the walk version is pinned in both scenes, by reference  (SCENE-009 ali, SCENE-010 dev)
+PASS  walk: animation version unchanged (registry rows, stored bytes, status)  (7 files, published)
+PASS  talk: animation version unchanged (registry rows, stored bytes, status)  (7 files, published)
+PASS  happy: animation version unchanged (registry rows, stored bytes, status)  (7 files, published)
+PASS  wave: animation version unchanged (registry rows, stored bytes, status)  (7 files, published)
+PASS  mocap: animation version unchanged (registry rows, stored bytes, status)  (7 files, published)
+
+Phase 6 acceptance: all criteria passed in 365 s. Files in /tmp/claude-0/-home-claude-animation-studio/11dd7093-adb9-51a9-ac75-2e5c8bd21e51/scratchpad/phase6
+EXIT 0

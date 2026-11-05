@@ -6,7 +6,7 @@ then assembled into scenes and episodes.
 
 The architecture is in [docs/architecture/ARCHITECTURE.md](docs/architecture/ARCHITECTURE.md);
 the phase demonstrations are in [docs/demos/](docs/demos/) ([Phase 1](docs/demos/phase-1.md),
-[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md)).
+[Phase 2](docs/demos/phase-2.md), [Phase 3](docs/demos/phase-3.md), [Phase 4](docs/demos/phase-4.md), [Phase 5](docs/demos/phase-5.md), [Phase 6](docs/demos/phase-6.md)).
 
 ## Branches
 
@@ -39,6 +39,12 @@ the one before, so each step can be reviewed and merged on its own.
 | `v2-22-scenes-backend` | Scenes, append-only scene versions and pinned instances with guards (migration 0008), `scene.edit` permission, registry checks for every pin, director fit override (audited), `/scenes` API (validate, versions, assemble, reopen, files, usage), worker staging of pinned files read-only |
 | `v2-23-scenes-web` | Web accessory library (gallery, form, detail with preview and attach report) and scenes (list, manifest editor with wardrobe-aware pickers, scene page with pins, assemble and reopen, frames and reports) |
 | `v2-24-phase5-acceptance` | Phase 5 acceptance script and demonstration record; hats sized to the skull with the hair under them masked |
+| `v2-25-animation-spec` | Animation contracts: specification (generator or BVH take), generator catalog, bone maps, compatibility record, lip-sync cues, scene pins of library animations and dialogue audio |
+| `v2-26-animation-engine` | Animation engine: eight generators, BVH retargeting, fitting to the wearer, NLA strips and root travel, face track from audio cues, `generate_animation` and `publish_animation` jobs with play checks on the reference bodies |
+| `v2-27-animation-library` | Animation library: tables and guards (migration 0009), uploads, `/animations` API, scene pinning with rig compatibility, reopen checks for travel and planted feet, mocap stance-foot locking |
+| `v2-28-lipsync` | Dialogue clips (migration 0010), `/audio-clips` API, media worker (ffmpeg, Rhubarb or built-in analyser), scene dialogue audio staged and verified |
+| `v2-29-animation-web` | Web animation library, dialogue audio page, library animations and recordings in the scene editor |
+| `v2-30-phase6-acceptance` | Phase 6 acceptance script and demonstration record; Rhubarb 1.14.0 as the default analyser; the scene camera frames the whole scene |
 
 The earlier story-to-package pipeline lives on branches `01-schemas` to `14-build-queue`
 and the two GUI/LLM branches after them (PRs #1 to #16). It is not merged into `main`; the

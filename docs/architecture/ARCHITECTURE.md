@@ -262,7 +262,7 @@ and recorded in `docs/architecture/versions.md`):
 | Node | 22 LTS | |
 | React / TS | React 18 or 19, TypeScript 5.x | R3F major must match React major (v8 for 18, v9 for 19) |
 | FFmpeg | 6 or 7 | |
-| Rhubarb Lip Sync | 1.13 or later | |
+| Rhubarb Lip Sync | 1.14.0 (SHA-256 pinned in the worker-media image) | built-in phonetic analyser when unset |
 
 ---
 
@@ -1238,7 +1238,7 @@ The SRS's `POST /characters/{id}/publish` becomes version-scoped
 |---|---|
 | `POST /uploads` | `{purpose, filename, size, mime}` → presigned PUT + upload id |
 | `POST /uploads/{id}/complete` | trigger validation (job); becomes usable when accepted |
-| `POST /audio`, `POST /audio/tts` (job), `POST /audio/{id}/lipsync` (job) | dialogue audio, TTS, visemes |
+| `POST /audio-clips` (upload id + transcript; queues `lipsync`), `GET /audio-clips[/{id or code}]`, `GET /audio-clips/{ref}/dialogue.wav` | dialogue audio and visemes (Phase 6). TTS is not built yet. |
 | `POST /render-jobs`, `GET /render-jobs?episode_id=`, `GET /render-jobs/{id}` | SRS |
 | `POST /render-jobs/{id}/cancel`, `POST /render-jobs/{id}/retry` | SRS |
 | `GET /render-jobs/{id}/outputs` | outputs with presigned URLs |
@@ -1482,4 +1482,6 @@ Per SRS 32.20 these need approval because they differ from the text, even if sli
 | 20: entity list | Adds rig profiles, body-fit profiles, templates, jobs, job events, AI generations, reviews, comments, series members, instance link tables, a version registry | Needed by requirements elsewhere in the SRS (sections 7.3, 10.3, 24, 26, 3). |
 | 6.2: version folder per character `CHAR-001/versions/1.0/` | Same layout keyed by UUID (`characters/{uuid}/versions/1.0/`), display code in the manifest | Codes are human-facing and could be renumbered; storage keys must never move. |
 | 5.3: procedural mesh generation | Parametric variation of hand-authored templates | Quality (R1). Procedural operations still do all variation, so the pipeline stays deterministic and AI-independent. |
+| 30 Phase 6 retargeting "onto `DEF-*`" | Animations key the rig's **controls** (torso, `*_fk`, `foot_ik.*`, `toe_ik.*`, IK/FK switches, face properties), never deform bones; a wearer of other proportions gets the location curves scaled by its leg length over the reference body's | Controls are what the rig standard guarantees across characters (section 8); keying deform bones would bypass the IK and the face rig. |
+| 23 uploads (`POST /uploads` then `/complete`) | One `POST /uploads?kind=&name=` with the raw body, stored write-once and hashed; jobs re-check the hash | The files are small (BVH ≤ 20 MB, audio ≤ 25 MB); a separate completion step added nothing. Presigned multipart can come with video. |
 | 18 "Do not execute unrelated concurrent production jobs in one shared Blender process" | Satisfied; additionally, related jobs also get their own process | Simpler and safer. |

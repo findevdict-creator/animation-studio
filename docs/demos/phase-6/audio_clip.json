@@ -1,0 +1,115 @@
+{
+  "id": "01a1aa05-4db1-79f9-9dc5-ef0beb2182bc",
+  "code": "AUDIO-003",
+  "name": "ali_hello.wav",
+  "upload_id": "01a1aa05-4d51-7823-98e7-9aef3df44b64",
+  "dialog_text": "Hello there! My name is Ali. Do you want to play?",
+  "status": "ready",
+  "job_id": "01a1aa05-4db7-7f25-ac30-e8053f38c5ce",
+  "wav_sha256": "34f726ef2862d718ae99572a778693cce6c4599b375d5bd98999d384869953bb",
+  "duration_s": 4.3368,
+  "analyser": "rhubarb-1.14.0",
+  "recognizer": "pocketSphinx",
+  "cues": [
+    {
+      "start_s": 0.0,
+      "end_s": 0.36,
+      "viseme": "U",
+      "shape": "F"
+    },
+    {
+      "start_s": 0.36,
+      "end_s": 0.44,
+      "viseme": "MBP",
+      "shape": "A"
+    },
+    {
+      "start_s": 0.44,
+      "end_s": 0.48,
+      "viseme": "E",
+      "shape": "B"
+    },
+    {
+      "start_s": 0.48,
+      "end_s": 0.73,
+      "viseme": "E",
+      "shape": "C"
+    },
+    {
+      "start_s": 0.73,
+      "end_s": 0.8,
+      "viseme": "E",
+      "shape": "B"
+    },
+    {
+      "start_s": 0.8,
+      "end_s": 1.34,
+      "viseme": "rest",
+      "shape": "X"
+    },
+    {
+      "start_s": 1.34,
+      "end_s": 1.88,
+      "viseme": "E",
+      "shape": "B"
+    },
+    {
+      "start_s": 1.88,
+      "end_s": 2.02,
+      "viseme": "E",
+      "shape": "C"
+    },
+    {
+      "start_s": 2.02,
+      "end_s": 2.23,
+      "viseme": "E",
+      "shape": "B"
+    },
+    {
+      "start_s": 2.23,
+      "end_s": 2.63,
+      "viseme": "rest",
+      "shape": "X"
+    },
+    {
+      "start_s": 2.63,
+      "end_s": 2.93,
+      "viseme": "O",
+      "shape": "E"
+    },
+    {
+      "start_s": 2.93,
+      "end_s": 3.07,
+      "viseme": "U",
+      "shape": "F"
+    },
+    {
+      "start_s": 3.07,
+      "end_s": 3.63,
+      "viseme": "E",
+      "shape": "B"
+    },
+    {
+      "start_s": 3.63,
+      "end_s": 3.77,
+      "viseme": "AI",
+      "shape": "D"
+    },
+    {
+      "start_s": 3.77,
+      "end_s": 3.91,
+      "viseme": "E",
+      "shape": "B"
+    },
+    {
+      "start_s": 3.91,
+      "end_s": 4.33,
+      "viseme": "rest",
+      "shape": "X"
+    }
+  ],
+  "error": null,
+  "created_by": "01a1a6ae-1c32-725e-99a8-860ab5bc0dcb",
+  "created_at": "2026-11-05T04:43:56.718698Z",
+  "finished_at": "2026-11-05T04:44:25.814072Z"
+}

@@ -1,0 +1,216 @@
+{
+  "scene": "Ali walks in and says hello",
+  "manifest_digest": "7a4c4a676649a9f7d01ae44208e1806810b8b53016a5e60d71a5ab76d5206a88",
+  "scene_blend_sha256": "32d32d63969102f50cbe263a724d3a9cac24fe6f6130fa7fa40296ddf5cc9260",
+  "opened_from": "scene/scene.blend",
+  "ok": true,
+  "failed": [],
+  "checks": [
+    {
+      "name": "libraries_resolve",
+      "ok": true,
+      "missing": [],
+      "libraries": [
+        {
+          "stored": "//../assets/character/CHAR-012/1.0/character.blend",
+          "workspace_path": "assets/character/CHAR-012/1.0/character.blend",
+          "ok": true
+        }
+      ]
+    },
+    {
+      "name": "dialogue_audio:ali:AUDIO-003",
+      "ok": true,
+      "stored": "//../audio/AUDIO-003/dialogue.wav",
+      "sha256": "34f726ef2862d718ae99572a778693cce6c4599b375d5bd98999d384869953bb",
+      "frame_start": 60
+    },
+    {
+      "name": "manifest_digest",
+      "ok": true
+    },
+    {
+      "name": "frame_range",
+      "ok": true
+    },
+    {
+      "name": "ali:instance_collection",
+      "ok": true
+    },
+    {
+      "name": "ali:character_is_a_library_override",
+      "ok": true,
+      "overrides": [
+        "CHAR_Ali"
+      ]
+    },
+    {
+      "name": "ali:character_linked_from_pin",
+      "ok": true,
+      "library": "//../assets/character/CHAR-012/1.0/character.blend",
+      "pin": "CHAR-012@1.0"
+    },
+    {
+      "name": "ali:character_mesh_not_copied",
+      "ok": true,
+      "body": "//../assets/character/CHAR-012/1.0/character.blend",
+      "head": "//../assets/character/CHAR-012/1.0/character.blend"
+    },
+    {
+      "name": "ali:placement",
+      "ok": true,
+      "location": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    {
+      "name": "ali:expressions_play",
+      "ok": true,
+      "keys": 3,
+      "mismatches": []
+    },
+    {
+      "name": "ali:animations_assigned",
+      "ok": true,
+      "want": [
+        [
+          "00_anim_011",
+          "ali:ANIM-011@1.0",
+          1.0
+        ],
+        [
+          "01_anim_012",
+          "ali:ANIM-012@1.0",
+          60.0
+        ],
+        [
+          "02_anim_013",
+          "ali:ANIM-013@1.0",
+          150.0
+        ]
+      ],
+      "found": [
+        [
+          "00_anim_011",
+          "ali:ANIM-011@1.0",
+          1.0
+        ],
+        [
+          "01_anim_012",
+          "ali:ANIM-012@1.0",
+          60.0
+        ],
+        [
+          "02_anim_013",
+          "ali:ANIM-013@1.0",
+          150.0
+        ],
+        [
+          "face",
+          "ali:face",
+          1.0
+        ],
+        [
+          "travel",
+          "ali:travel",
+          1.0
+        ]
+      ]
+    },
+    {
+      "name": "ali:animation:ANIM-011@1.0",
+      "ok": true,
+      "source": "ANIM-011@1.0#fc9200dde11ad2338ad94291fbfebbc6d315795cabb2c79d0e6852a78bede9d8",
+      "leg_ratio": 1.0363
+    },
+    {
+      "name": "ali:travels:ANIM-011@1.0",
+      "ok": true,
+      "moved_m": 1.1839,
+      "expected_m": 1.1839,
+      "frames": [
+        1,
+        49
+      ]
+    },
+    {
+      "name": "ali:feet_planted:ANIM-011@1.0",
+      "ok": true,
+      "max_slide_cm": 0.46,
+      "limit_cm": 1.5,
+      "slide_cm": {
+        "ankle.L": 0.46,
+        "ball.L": 0.02,
+        "tip.L": 0.02,
+        "ankle.R": 0.46,
+        "ball.R": 0.02,
+        "tip.R": 0.02
+      },
+      "frames": [
+        7,
+        43
+      ]
+    },
+    {
+      "name": "ali:animation:ANIM-012@1.0",
+      "ok": true,
+      "source": "ANIM-012@1.0#eb4495bdf3347d67b17dde98d8c18f4816a940be96c2236e674a6e4a427f0563",
+      "leg_ratio": 1.0363
+    },
+    {
+      "name": "ali:animation:ANIM-013@1.0",
+      "ok": true,
+      "source": "ANIM-013@1.0#7f2e7e79cf47cb08264c18f4ef8a501542605ffdfefceea8a12598eabe8d9948",
+      "leg_ratio": 1.0363
+    },
+    {
+      "name": "ali:dialogue_mouth_moves",
+      "ok": true,
+      "frame": 68,
+      "viseme": "vis_U",
+      "prop": 1.0,
+      "audio": "AUDIO-003",
+      "measured": 1.0
+    },
+    {
+      "name": "renders",
+      "ok": true,
+      "frames": [
+        1,
+        28,
+        70,
+        100,
+        130,
+        180
+      ]
+    },
+    {
+      "name": "sources_unchanged",
+      "ok": true,
+      "changed": [],
+      "files": {
+        "assets/animation/ANIM-011/1.0/animation.blend": "fc9200dde11ad2338ad94291fbfebbc6d315795cabb2c79d0e6852a78bede9d8",
+        "assets/animation/ANIM-012/1.0/animation.blend": "eb4495bdf3347d67b17dde98d8c18f4816a940be96c2236e674a6e4a427f0563",
+        "assets/animation/ANIM-013/1.0/animation.blend": "7f2e7e79cf47cb08264c18f4ef8a501542605ffdfefceea8a12598eabe8d9948",
+        "assets/character/CHAR-012/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+        "assets/character/CHAR-012/1.0/character.blend": "21280516f4a85157326d8d5add032f56ca6bda7000161ab28db06b5bd9f8a3d3",
+        "audio/AUDIO-003/dialogue.wav": "34f726ef2862d718ae99572a778693cce6c4599b375d5bd98999d384869953bb"
+      }
+    }
+  ],
+  "sources": {
+    "before": {
+      "assets/animation/ANIM-011/1.0/animation.blend": "fc9200dde11ad2338ad94291fbfebbc6d315795cabb2c79d0e6852a78bede9d8",
+      "assets/animation/ANIM-012/1.0/animation.blend": "eb4495bdf3347d67b17dde98d8c18f4816a940be96c2236e674a6e4a427f0563",
+      "assets/animation/ANIM-013/1.0/animation.blend": "7f2e7e79cf47cb08264c18f4ef8a501542605ffdfefceea8a12598eabe8d9948",
+      "assets/character/CHAR-012/1.0/character.json": "32322242bd5726aa928365ea9bffd8e77b822ff06ee03c58b3de0d243bb48983",
+      "assets/character/CHAR-012/1.0/character.blend": "21280516f4a85157326d8d5add032f56ca6bda7000161ab28db06b5bd9f8a3d3",
+      "audio/AUDIO-003/dialogue.wav": "34f726ef2862d718ae99572a778693cce6c4599b375d5bd98999d384869953bb"
+    },
+    "unchanged": true
+  },
+  "blender_version": "5.2.3 LTS",
+  "engine_version": "0.4.0"
+}
