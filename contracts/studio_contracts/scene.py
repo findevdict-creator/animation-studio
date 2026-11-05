@@ -207,6 +207,9 @@ class SceneCamera(Model):
     angle_deg: float = Field(default=20.0, ge=-90.0, le=90.0)
     #: frame the instance with this key instead of the whole cast
     focus: str | None = Field(default=None, pattern=INSTANCE_KEY)
+    #: Phase 8: the camera moves over the scene (push in or pull out along its view, or pan
+    #: across it); static by default
+    movement: Literal["static", "push_in", "pull_out", "pan_left", "pan_right"] = "static"
 
 
 class PropUse(Model):
@@ -347,7 +350,8 @@ def validate_manifest(m: SceneManifest, rig: RigProfile = CARTOON_HUMANOID_V1) -
     if m.camera.focus is not None and m.camera.focus not in keys:
         issues.append(Issue(path="camera.focus", code="unknown_instance", message=f"no instance {m.camera.focus!r}"))
     # two instances on the same spot is almost always a mistake
-    locs = [(inst.key, inst.transform.location) for inst in m.instances]
+    # (with a mark the transform is an offset from it; check_layout places those)
+    locs = [(inst.key, inst.transform.location) for inst in m.instances if inst.mark is None]
     for a in range(len(locs)):
         for b in range(a + 1, len(locs)):
             d = sum((x - y) ** 2 for x, y in zip(locs[a][1], locs[b][1], strict=True)) ** 0.5

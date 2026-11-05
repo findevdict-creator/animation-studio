@@ -360,6 +360,75 @@ class VerifySceneParams(Model):
         return self
 
 
+class GenerateScriptParams(Model):
+    """AI: an episode concept to a ``ScriptSpecification`` (SRS 14). The cast and the
+    locations are the series' published codes, given by the API; the model may only use
+    those. The result is a suggestion stored as a script version a person edits."""
+
+    episode_id: UUID
+    concept: str = Field(min_length=3, max_length=4000)
+    target_duration_s: float = Field(default=60.0, gt=5, le=1800)
+    provider: str | None = Field(default=None, max_length=120)
+
+
+class SuggestShotsParams(Model):
+    """AI: camera suggestions for a script version's storyboard (SRS 15: the AI suggests
+    camera angles and compositions; people keep manual control). The result is a storyboard
+    a person edits; the rule-based plan is always available without AI."""
+
+    episode_id: UUID
+    script_version_id: UUID
+    provider: str | None = Field(default=None, max_length=120)
+
+
+class SynthesizeSpeechParams(Model):
+    """Media: say ``text`` with ``voice`` through the named text-to-speech provider, then
+    normalise and lip-sync it like an uploaded recording. The clip row exists already."""
+
+    audio_id: UUID
+    text: str = Field(min_length=1, max_length=2000)
+    voice: dict[str, Any] = Field(description="VoiceProfile")
+
+    @model_validator(mode="after")
+    def _voice_is_valid(self) -> SynthesizeSpeechParams:
+        from studio_contracts.episode import VoiceProfile
+
+        self.voice = VoiceProfile.model_validate(self.voice).model_dump(mode="json")
+        return self
+
+
+class RenderSceneParams(Model):
+    """Render: reopen a scene version's stored ``scene.blend`` (staged with its pinned files,
+    like ``verify_scene``), apply the render settings and render its frames to a PNG
+    sequence. One process per shot (SRS 18.2)."""
+
+    render_job_id: UUID
+    scene_version_id: UUID
+    resolved: dict[str, Any]
+    scene_blend_sha256: str = Field(pattern=r"^[0-9a-f]{64}$")
+    settings: dict[str, Any] = Field(description="RenderSettings")
+    #: render every frame unless a sub-range is asked for
+    frame_start: int | None = Field(default=None, ge=0)
+    frame_end: int | None = Field(default=None, ge=0)
+
+    @model_validator(mode="after")
+    def _valid(self) -> RenderSceneParams:
+        from studio_contracts.episode import RenderSettings
+        from studio_contracts.scene import ResolvedScene
+
+        self.resolved = ResolvedScene.model_validate(self.resolved).model_dump(mode="json")
+        self.settings = RenderSettings.model_validate(self.settings).model_dump(mode="json")
+        return self
+
+
+class ExportEpisodeParams(Model):
+    """Media: the rendered PNG sequences of a render job's shots, joined with their
+    transitions into H.264 and mixed with dialogue, music and sound effects into AAC, as one
+    MP4 (SRS 18.1 steps 7 to 10). The worker reads the frames from the render outputs."""
+
+    render_job_id: UUID
+
+
 class JobType(StrEnum):
     blender_smoke = "blender_smoke"
     interpret_character = "interpret_character"
@@ -380,6 +449,11 @@ class JobType(StrEnum):
     publish_prop = "publish_prop"
     generate_environment = "generate_environment"
     publish_environment = "publish_environment"
+    generate_script = "generate_script"
+    suggest_shots = "suggest_shots"
+    synthesize_speech = "synthesize_speech"
+    render_scene = "render_scene"
+    export_episode = "export_episode"
 
 
 JOB_PARAMS: dict[JobType, type[Model]] = {
@@ -402,6 +476,11 @@ JOB_PARAMS: dict[JobType, type[Model]] = {
     JobType.publish_prop: PublishPropParams,
     JobType.generate_environment: GenerateEnvironmentParams,
     JobType.publish_environment: PublishEnvironmentParams,
+    JobType.generate_script: GenerateScriptParams,
+    JobType.suggest_shots: SuggestShotsParams,
+    JobType.synthesize_speech: SynthesizeSpeechParams,
+    JobType.render_scene: RenderSceneParams,
+    JobType.export_episode: ExportEpisodeParams,
 }
 JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobType.interpret_character: Queue.ai,
                                     JobType.interpret_outfit: Queue.ai,
@@ -414,7 +493,10 @@ JOB_QUEUES: dict[JobType, Queue] = {JobType.blender_smoke: Queue.blender, JobTyp
                                     JobType.publish_animation: Queue.publish, JobType.lipsync: Queue.media,
                                     JobType.generate_prop: Queue.blender, JobType.publish_prop: Queue.publish,
                                     JobType.generate_environment: Queue.blender,
-                                    JobType.publish_environment: Queue.publish}
+                                    JobType.publish_environment: Queue.publish,
+                                    JobType.generate_script: Queue.ai, JobType.suggest_shots: Queue.ai,
+                                    JobType.synthesize_speech: Queue.media, JobType.render_scene: Queue.render,
+                                    JobType.export_episode: Queue.media}
 #: whether a failed attempt may be retried automatically (it writes only to a fresh draft path)
 RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpret_character: True,
                                    JobType.interpret_outfit: True,
@@ -428,7 +510,10 @@ RETRY_SAFE: dict[JobType, bool] = {JobType.blender_smoke: True, JobType.interpre
                                    JobType.generate_animation: True, JobType.publish_animation: True,
                                    JobType.lipsync: True, JobType.generate_prop: True,
                                    JobType.publish_prop: True, JobType.generate_environment: True,
-                                   JobType.publish_environment: True}
+                                   JobType.publish_environment: True,
+                                   JobType.generate_script: True, JobType.suggest_shots: True,
+                                   JobType.synthesize_speech: True, JobType.render_scene: True,
+                                   JobType.export_episode: True}
 #: permissions a caller needs on top of job.submit to submit the type
 JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: ("ai.use", "asset.create"),
                                                    JobType.interpret_outfit: ("ai.use", "asset.create"),
@@ -447,7 +532,12 @@ JOB_PERMISSIONS: dict[JobType, tuple[str, ...]] = {JobType.interpret_character: 
                                                    JobType.generate_prop: ("asset.create",),
                                                    JobType.publish_prop: ("asset.publish",),
                                                    JobType.generate_environment: ("asset.create",),
-                                                   JobType.publish_environment: ("asset.publish",)}
+                                                   JobType.publish_environment: ("asset.publish",),
+                                                   JobType.generate_script: ("ai.use", "episode.manage"),
+                                                   JobType.suggest_shots: ("ai.use", "episode.manage"),
+                                                   JobType.synthesize_speech: ("episode.manage",),
+                                                   JobType.render_scene: ("render.submit",),
+                                                   JobType.export_episode: ("render.submit",)}
 
 
 class InputFile(Model):
